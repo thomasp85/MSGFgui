@@ -434,6 +434,7 @@ shinyServer(function(input, output, session) {
     dataFiles <- c()
     analysisButtonCount <- 0
     currentPar <- msgfPar()
+    saveRDS(dataStore, file.path(path.package('MSGFgui'), 'currentData.RDS')) # Reset currentData
     
     par <- reactive({
         msgfPar(
@@ -475,6 +476,8 @@ shinyServer(function(input, output, session) {
         
         if(length(dataFiles)) {
             invalidateLater(1, session)
+        } else {
+            saveRDS(dataStore, file.path(path.package('MSGFgui'), 'currentData.RDS'))
         }
     })
     data <- reactive({
