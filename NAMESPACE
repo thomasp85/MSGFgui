@@ -1,3 +1,4 @@
 export(MSGFgui)
 export(currentData)
+importFrom(mzID,mzIDCollection)
 importFrom(shiny,runApp)
