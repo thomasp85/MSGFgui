@@ -422,7 +422,7 @@ parameters <- function(mzID) {
 }
 
 ## SERVER LOGIC
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     testdata <- lapply(readRDS('/Users/Thomas/Desktop/testData.RDS'), function(x) {
         list(
             name=basename(x@parameters@idFile),
@@ -431,6 +431,9 @@ shinyServer(function(input, output) {
     })
     dataAdded <- reactiveValues(counter=0)
     dataStore <- list()
+    dataFiles <- c()
+    analysisButtonCount <- 0
+    currentPar <- msgfPar()
     
     par <- reactive({
         msgfPar(
@@ -452,22 +455,26 @@ shinyServer(function(input, output) {
     dataGenerator <- observe({
         if(input$analysisButton == 0) return(c())
         
-        files <- isolate({input$datafiles})
-        par <- isolate({par()})
+        if(input$analysisButton != analysisButtonCount) {
+            dataFiles <<- isolate({input$datafiles})
+            currentPar <<- isolate({par()})
+            analysisButtonCount <<- input$analysisButton
+        }
         
-        for(i in files) {
-            shiny:::flushReact()
-            
-            res <- runMSGF(par, i)
-            raw <- openMSfile(i)
-            header(raw)
-            index <- length(dataStore)+1
-            dataStore[[index]] <<- list(
-                name=basename(i),
-                mzID=res,
-                mzML=raw
-                )
-            dataAdded$counter <<- isolate(dataAdded$counter)+1
+        res <- runMSGF(currentPar, dataFiles[1])
+        raw <- openMSfile(dataFiles[1])
+        header(raw)
+        index <- length(dataStore)+1
+        dataStore[[index]] <<- list(
+            name=basename(dataFiles[1]),
+            mzID=res,
+            mzML=raw
+            )
+        dataFiles <<- dataFiles[-1]
+        dataAdded$counter <<- isolate(dataAdded$counter)+1
+        
+        if(length(dataFiles)) {
+            invalidateLater(1, session)
         }
     })
     data <- reactive({
