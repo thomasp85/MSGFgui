@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Run MS-GF+</title>
+		
+		
+		
+		
+		
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+		
+		
+			
+		<script src="d3.min.js" type="text/javascript"></script>
+		<script src="xxhash.min.lmd.js"></script>
+		<script src="shared/jquery.js" type="text/javascript"></script>
+		<script src="jquery.ba-throttle-debounce.min.js" type="text/javascript"></script>
+		<script src="shared/shiny.js" type="text/javascript"></script>
+		<script src="inputs.js" type="text/javascript"></script>
+		<script src="outputs.js" type="text/javascript"></script>
+		<script src="dataModel.js" type="text/javascript"></script>
+		<script src="plots.js" type="text/javascript"></script>
+		<script src="UI.js" type="text/javascript"></script>
+		<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
+		<link rel="stylesheet" type="text/css" href="css/topcoat-desktop-light.min.css">
+		<link rel="stylesheet" type="css" href="css/style.css">
+	</head>
+	<body>
+		<div id='msgfRun-pane' class="lefts col">
+			<div id='fileInput' class="row">
+				<h4>Add datafiles</h4>
+				<div>
+					<div class="listview">
+						<table id="datafiles" class='tableList' rules="none">
+							<tbody>
+								
+							</tbody>
+						</table>
+					</div>
+					<div class="rightButtonPane">
+						<div><button id="dataAddButton" class="topcoat-button rightButton">Upload</button></div>
+						<div><button id="dataRemoveButton" class="topcoat-button rightButton" disabled>Remove</button></div>
+					</div>
+				</div>
+				<div>
+					<div class="textview">
+						<table id="database" class="tableList">
+							<tbody>
+								<tr class="placeholder">
+									<td class="ellipsis">Add database fasta file...</td>
+								</tr>
+							</tbody>
+						</table>
+						<p ></p>
+					</div>
+					<div class="rightButtonPane">
+						<button id="databaseButton" class="topcoat-button rightButton">Upload</button>
+					</div>
+				</div>
+				<hr/>
+<!--				<input id="database" type="file" accept=".fasta" class="shiny-bound-input">     -->
+			</div>
+			<div id='parameters' class="row scroll-y">
+				<h4>Set parameters</h4>
+				<div>
+					<label>
+						<span>Tolerance</span>
+						<div class="formInput">
+							<input name="tolValue" type="text" value="20" class="numeric"/>
+							<select name="tolUnit">
+								<option>ppm</option>
+								<option>Da</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Isotope error range</span>
+						<div class="formInput">
+							<input name="isoLow" type="number" value="0"/>
+							-
+							<input name="isoHigh" type="number" value="1"/>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label class="topcoat-checkbox">
+						<span>Target-decoy</span>
+						<div class="formInput">
+							<input name="tda" type="checkbox" checked/>
+							<div class="topcoat-checkbox__checkmark"></div>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Fragmentation method</span>
+						<div class="formInput">
+							<select name="fragMethod" class="fill">
+								<option value="0">From spectrum</option>
+								<option value="1">CID</option>
+								<option value="2">ETD</option>
+								<option value="3">HCD</option>
+								<option value="4">Merged</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Instrument</span>
+						<div class="formInput">
+							<select name="instrument" class="fill">
+								<option value='0'>Low-res LCQ/LTQ</option>
+								<option value='1'>High-res LTQ</option>
+								<option value='2'>TOF</option>
+								<option value='3'>Q-Exactive</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Enzyme</span>
+						<div class="formInput">
+							<select name="enzyme" class="fill">
+								<option value="0">Unspecific cleavage</option>
+								<option value="1" selected>Trypsin</option>
+								<option value="2">Chymotrypsin</option>
+								<option value="3">Lys-C</option>
+								<option value="4">Lys-N</option>
+								<option value="5">Glutamyl endopeptidase (Glu-C)</option>
+								<option value="6">Arg-C</option>
+								<option value="7">Asp-N</option>
+								<option value="8">alphaLP</option>
+								<option value="9">No cleavage</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Protocol</span>
+						<div class="formInput">
+							<select name="protocol" class="fill">
+								<option value="0">No protocol</option>
+								<option value="1">Phosphorylation</option>
+								<option value="2">iTRAQ</option>
+								<option value="3">iTRAQPhospho</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Tolerable termini</span>
+						<div class="formInput">
+							<input name="ntt" type="number" value="2" min="0" max="2" />
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Allowed modifications</span>
+					</label>
+					<div class="formInput">
+						<div class="listview">
+							<table id="modificationList" class='tableList' rules='none'>
+								<tbody>
+									<tr data-collapse='N:Carbamidomethyl;C:C2H3N1O1;R:C;T:fix;P:any'>
+										<td>Fixed</td>
+										<td>Carbamidomethyl</td>
+										<td>C</td>
+										<td>Anywhere</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="topcoat-button-bar">
+							<button id="addModButton" class="topcoat-button">Add</button>
+							<button id="editModButton" class="topcoat-button" disabled>Edit</button>
+							<button id="removeModButton" class="topcoat-button" disabled>Remove</button>
+						</div>
+					</div>
+				</div>
+				<div>
+					<label>
+						<span>Modifications per peptide</span>
+						<div class="formInput">
+							<input name="nMod" type="number" value="2" min='1'/>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Peptide length</span>
+						<div class="formInput">
+							<input name="lengthMin" type="number" value="6" min="1"/>
+							-
+							<input name="lengthMax" type="number" value="40"/>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Peptide charge</span>
+						<div class="formInput">
+							<input name="chargeMin" type="number" value="2" min="1"/>
+							-
+							<input name="chargeMax" type="number" value="3"/>
+						</div>
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>Matches per spectrum</span>
+						<div class="formInput">
+							<input name="matches" type="number" value="1" min="1"/>
+						</div>
+					</label>
+				</div>
+			</div>
+			<div id='run' class="row">
+				<hr/>
+				<div>
+					<div>
+						<div class="progressBar">
+							<progress value="0"></progress>
+							<p>Waiting...</p>
+						</div>
+					</div>
+					<button id="analysisButton" class="topcoat-button--cta rightButton action-button" disabled>Analyse</button>
+				</div>
+			</div>
+		</div>
+		<div id='result-eval' class='rights col'>
+			<div class="iconmenu row">
+			</div>
+			
+			<div id="resulttabs" class="dataSink row">
+				<div class="tabbar">
+					<ul>
+						<li class="active first sampleTab">
+							<p>Samples</p>
+						</li>
+						<li class="idTab">
+							<p>Identifications</p>
+						</li>
+						<li class="last filterTab">
+							<p>Filter</p>
+						</li>
+					</ul>
+				</div>
+				<div id="sampleTab" class="active row tabpane sampleTab">
+					<div class="plotArea row scroll-x scroll-y">
+						<div id="samplePlots">
+							<div id="samplesDensity" class="kde"></div>
+							<div id="samplesScatter"></div>
+						</div>
+					</div>
+					<div class="infoArea row">
+						<div class="col samples">
+							<h4>Samples</h4>
+							<select name="samplesSelect" multiple size="9">
+								
+							</select>
+							<p><span>Total:&nbsp</span><span id="sampleCount">0</span></p>
+						</div>
+						<div class="col stat">
+							<h4>Statistics</h4>
+							<div class="row scroll-x">
+								<div>
+									<div>
+										<p><span># scans</span> 30000</p>
+										<p><span># psm (total)</span> 30000</p>
+										<p><span># psm (filter)</span> 30000</p>
+										<p><span># identifications</span> 40000</p>
+										<p><span># peptides</span> 30000</p>
+										<p><span># proteins</span> 30000</p>
+									</div>
+									<div>
+										<p><span>No. of psm</span> 30000</p>
+										<p><span>No. of psm</span> 30000</p>
+										<p><span>No. of psm</span> 30000</p>
+										<p><span>No. of psm</span> 30000</p>
+										<p><span>No. of psm</span> 30000</p>
+										<p><span>No. of psm</span> 30000</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="idTab" class="row tabpane idTab">
+					<div class="plotArea row scroll-x scroll-y">
+						<div id="idPlots" class="scanPlot">
+							<div id="idPlot"></div>
+						</div>
+					</div>
+					<div class="infoArea row scroll-x">
+						<div>
+							<div>
+								<h4>Proteins</h4>
+								<select id="proteinSelect" size="9">
+									
+								</select>
+								<p><span>Total:&nbsp</span><span id="proteinCount">0</span></p>
+							</div>
+							<div>
+								<h4>Peptides</h4>
+								<select id="peptideSelect" size="9">
+									
+								</select>
+								<p><span>Total:&nbsp</span><span id="peptideCount">0</span></p>
+							</div>
+							<div>
+								<h4>Scans</h4>
+								<select id="scanSelect" class="scanSelector" size="9">
+									
+								</select>
+								<p><span>Total:&nbsp</span><span id="scanCount">0</span></p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="filterTab" class="row tabpane filterTab">
+					<div></div>
+					<div></div>
+					<div></div>
+				</div>
+			</div>
+			<pre id="show" class="shiny-text-output"></pre>
+		</div>
+	</body>
+</html>

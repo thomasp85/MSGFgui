@@ -1,0 +1,17 @@
+\name{currentData}
+\alias{currentData}
+\title{Gets the result data currently in use by another R session running MSGFgui}
+\usage{
+currentData()
+}
+\value{
+An mzIDCollection object containing the current
+identification results in the the MSGFgui browser
+}
+\description{
+This function makes it possible to directly access the data
+used in the gui by starting a new R session and running
+this function. This will only work if only one instance of
+MSGFgui is running in the browser.
+}
+

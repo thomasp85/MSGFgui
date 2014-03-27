@@ -1,0 +1,529 @@
+/*
+	Element standards
+*/
+
+body {
+	margin: 0px
+}
+h4 {
+	margin: 10px 0;
+}
+
+/*
+	Layout
+*/
+
+/* Run pane */
+.lefts.col {
+	width: 390px;
+	padding: 5px;
+	z-index: 1;
+	box-shadow: 0px 0px 15px rgba(0,0,0,0.5)
+}
+
+#fileInput.row {
+	top: 0;
+	height: 190px;
+	margin: 5px;
+}
+	#fileInput .listview {
+		height: 100px;
+		width: 320px;
+		display: inline-block
+	}
+	#fileInput .textview{
+		height: 1.3em;
+		width: 320px;
+		display: inline-block
+	}
+	.placeholder {
+		margin: 2px;
+		height: 1.3em;
+		font-size: 12px;
+		color: grey;
+		padding-left: 5px;
+		font-style: italic;
+	}
+
+#parameters.row {
+	top: 190px;
+	bottom: 70px;
+	margin: 5px;
+}
+
+	#parameters>div {
+		width: 100%;
+		margin: 5px 0px 5px 0px;
+	}	
+	.formInput {
+		display: inline-block;
+		width: 185px;
+	}
+	label span {
+		width: 190px;
+		text-align: right;
+		vertical-align: top;
+		margin-right: 10px; 
+		display: inline-block;
+	}
+	input[type='number'],
+	input[type='text']{
+		width: 30px;
+		text-align: right;
+	}
+	input[type='number']:invalid,
+	input[type='text']:invalid{
+		background-color: lightcoral;
+	}
+	input[type='file'] {
+		visibility: hidden;
+		height: 0;
+		width: 0;
+		margin: 0;
+		padding: 0;
+	}
+	select.fill {
+		width: 185px;
+	}
+	#parameters .listview {
+		height: 60px;
+	}
+
+#run.row {
+	height: 70px;
+	bottom: 0;
+	margin: 5px;
+}
+
+	#run>div {
+		display: table;
+		width: 100%;
+	}
+		#run>div>div {
+			display: table-cell;
+			padding-right: 5px;
+			width: 100%;
+		}
+			#run>div>div>div {
+				position: relative;
+			}
+	#run progress {
+		width: 100%;
+		position: absolute;
+	}
+	#run button {
+		display: table-cell;
+	}
+	#run p {
+		font-size: small;
+		text-align: center;
+	}	
+
+
+
+/* Results pane */
+.rights.col {
+	left: 400px;
+	right: 0;
+}
+
+.iconmenu.row {
+	top: 0;
+	height: 50px;
+}
+	.iconmenu svg {
+		margin: 10px;
+		width: 30px;
+		height: 30px;
+	}
+		.iconmenu svg:first-child {
+			margin-left: 30px;
+		}
+		.iconmenu svg:last-child {
+			float: right;
+			margin-right: 30px
+		}
+			.iconmenu svg path {
+				fill: grey;
+			}
+			.iconmenu svg:hover path {
+				fill: darkgrey;
+			}
+
+#resulttabs.row {
+	top: 50px;
+	bottom: 0;
+	background-color: whitesmoke;
+}
+	.tabpane:not(.active) {
+		display: none;
+	}
+	.tabpane.row {
+		top: 40px;
+		bottom: 0;
+	}
+
+#sampleTab .plotArea {
+	top: 0;
+	bottom: 200px;
+}
+#samplePlots div {
+	display: inline-block;
+}
+#sampleTab .infoArea {
+	height: 200px;
+	bottom: 0;
+}
+	#sampleTab .infoArea>div {
+		left: 10px;
+		width: 230px;
+	}
+		#sampleTab .infoArea select{
+			width: 230px;
+		}
+	#sampleTab .infoArea>div+div.col{
+		left: 250px;
+		right: 0;
+		width: auto;
+	}
+		#sampleTab .infoArea>div+div div div{
+			width: 510px;
+		}
+		
+		#sampleTab .infoArea>div+div div div div{
+			display: inline-block;
+			width: 250px;
+		}
+			#sampleTab .infoArea .samples p {
+				font-size: x-small;
+				margin-top: 2px;
+				float: right;
+			}
+			#sampleTab .infoArea .samples p span:first-child {
+				font-weight: bold;
+			}
+			#sampleTab .infoArea .stat p {
+				margin: 0;
+				line-height: 1.5em
+			}
+			#sampleTab .infoArea .stat p span {
+				width: 150px;
+				text-align: right;
+				font-weight: bold;
+				display: inline-block;
+				margin-right: 10px;
+			}
+
+#idTab .plotArea {
+	top: 0;
+	bottom: 200px;
+}
+#idTab .plotArea div {
+	margin: auto;
+}
+#idTab .infoArea {
+	height: 200px;
+	bottom: 0;
+}
+	#idTab .infoArea div {
+		width: 750px;
+		margin: auto;
+	}
+		#idTab .infoArea div div {
+			display: table-cell;
+			width: 250px;
+			padding: 0 10px;
+		}
+		#idTab .infoArea select {
+			width: 230px
+		}
+		#idTab .infoArea p {
+			font-size: x-small;
+			margin-top: 2px;
+			float: right;
+		}
+		#idTab .infoArea p span:first-child {
+			font-weight: bold;
+		}
+
+.listview, .textview {
+	background: white;
+	border-style: inset;
+	border-width: 1px;
+	border-radius: 2px;
+}
+.textview table{
+	table-layout: fixed;
+}
+.listview {
+	overflow: scroll;
+}
+
+
+.rightButtonPane {
+	display: inline-block;
+	vertical-align: top;
+}
+.rightButton {
+	width: 60px;
+	margin-bottom: 5px;
+	margin-left: 4px
+}
+.topcoat-button-bar {
+	margin-top: 3px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.topcoat-button-bar .topcoat-button {
+	width: 33.33%
+}
+table {
+	font-size: 12px;
+}
+.clearBackground {
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	background-color: white;
+	opacity: 0.5;
+	z-index: 100;
+}
+.modalPopup {
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	z-index: 101
+}
+.modalPopup>div {
+	background: darkgrey;
+	opacity: 1;
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 100px;
+	z-index: 102;
+	border-radius: 10px;
+	padding-bottom: 10px;
+	box-shadow: 0px 0px 10px 3px grey
+}
+.modalPopup h5 {
+	width: 100%;
+	text-align: center;
+	background: grey;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+.modalPopup input, .modalPopup select {
+	width: 150px;
+	text-align: left;
+}
+.modalButton {
+	margin-top: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 150px
+}
+.modalButton button {
+	width: 49%
+}
+#modificationList tr {
+	width: 100%
+}
+.listview {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+.selected {
+	background: lightblue;
+}
+#databaseModal label, #dataModal label {
+	margin-left: 20px;
+	margin-right: 20px;
+}
+#databaseModal input, #dataModal input {
+	width: 70%;
+	margin-left: 10px
+}
+#database, #datafiles {
+	width: 100%;
+}
+.tabbar {
+	clear:left;
+	float:left;
+	width:100%;
+	overflow:hidden;
+	font-size: small;
+	background: #dfe2e2;
+	
+}
+.tabbar ul {
+	text-align: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 24px;
+	position: relative;
+}
+.tabbar ul li {
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+    cursor: default;
+}
+.tabbar ul:after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid #AAA;
+    z-index: 1;
+}
+.tabbar ul:before {
+    z-index: 1;
+}
+.tabbar li.active {
+    z-index: 2;
+    border-bottom-color: whitesmoke;
+    
+}
+.tabbar ul li p {
+	padding:.4em .8em;
+	text-decoration:none;
+	border-left: 1px solid grey;
+	border-top: 1px solid grey;
+	border-right: 1px solid grey;
+	line-height:1.3em;
+	border-radius: 5px 5px 0px 0px;
+	margin: 0px 2px 0px 2px;
+	box-shadow: inset 0px -8px 15px -10px rgba(0,0,0,0.5);
+}
+.tabbar ul li.active p {
+	background: whitesmoke;
+	box-shadow: none;
+}
+.tabbar ul li p:hover {
+	background-color: whitesmoke;
+}
+
+/*
+	General classes
+*/
+.row, .col { 
+	overflow: hidden; 
+	position: absolute; 
+}
+.row { 
+	left: 0; 
+	right: 0; 
+	}
+.col { 
+	top: 0; 
+	bottom: 0; 
+}
+.scroll-x { 
+	overflow-x: auto; 
+}
+.scroll-y { 
+	overflow-y: auto; 
+}
+
+
+
+/*
+	SVG
+*/
+svg {
+	margin: 0;
+	padding: 0;
+}
+.axis {
+	fill: none;
+	stroke: black;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	stroke-width: 1;
+	shape-rendering: crispedges;
+}
+.axis .domain {
+	stroke-width: 2
+}
+.axis text {
+	stroke: none;
+	fill: black;
+	shape-rendering: auto;
+}
+.axis .tick text {
+	font-size: small;
+}
+.axis .label {
+	font-size: small;
+}
+.grid {
+	fill: none;
+	stroke: lightgrey;
+	stroke-width: 1;
+	stroke-linecap: square;
+	shape-rendering: crispedges;
+}
+
+.target {
+	fill: forestgreen;
+	stroke: forestgreen;
+}
+.decoy {
+	fill: darkred;
+	stroke: darkred;
+}
+
+.line.target, .line.decoy {
+	fill: none;
+}
+
+.area.target, .area.decoy {
+	fill-opacity: 0.3;
+	stroke: none;
+}
+
+
+.evidenceArc {
+	fill: lightgrey;
+}
+.evidenceArc.passFilter {
+	fill: forestgreen;
+}
+.evidenceArc.unSelected {
+	opacity: 0.5;
+}
+.evidenceArc.selected {
+	fill: steelblue;
+	stroke: black;
+}
+.ions line {
+	stroke: grey;
+}
+.ions.fragment line {
+	stroke: black;
+}
+.ions.parent line {
+	stroke: darkred
+}
+.trace .ms2 {
+	stroke: black;
+	fill: none;
+}
+.trace .ms2.parent {
+	fill: darkred;
+}
