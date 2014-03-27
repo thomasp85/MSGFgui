@@ -1,3 +1,6 @@
+#' @include aaa.R
+NULL
+
 #' Start MSGFgui in the default browser
 #' 
 #' This function load the GUI in the users default browser.
@@ -22,8 +25,16 @@ MSGFgui <- function() {
 #' @return An mzIDCollection object containing the current identification
 #' results in the the MSGFgui browser
 #' 
+#' @importFrom mzID mzIDCollection
+#' 
 #' @export
 #' 
 currentData <- function() {
-    # TODO
+    data <- readRDS(file.path(path.package('MSGFgui'), 'currentData.RDS'))
+    ans <- mzIDCollection()
+    if(length(data)) {
+        ans <- do.call('mzIDCollection', lapply(data, function(x) {x$mzID}))
+    }
+    
+    ans
 }
