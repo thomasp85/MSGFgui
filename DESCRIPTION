@@ -19,3 +19,6 @@ Imports:
     mzID,
     MSGFplus,
     mzR
+Collate:
+    'aaa.R'
+    'MSGFgui.R'
