@@ -424,12 +424,12 @@ parameters <- function(mzID) {
 
 ## SERVER LOGIC
 shinyServer(function(input, output, session) {
-    testdata <- lapply(readRDS('/Users/Thomas/Desktop/testData.RDS'), function(x) {
-        list(
-            name=basename(x@parameters@idFile),
-            mzID=x,
-            mzML=openMSfile(x@parameters@rawFile$location))
-    })
+#     testdata <- lapply(readRDS('/Users/Thomas/Desktop/testData.RDS'), function(x) {
+#         list(
+#             name=basename(x@parameters@idFile),
+#             mzID=x,
+#             mzML=openMSfile(x@parameters@rawFile$location))
+#     })
     dataAdded <- reactiveValues(counter=0)
     dataStore <- list()
     dataFiles <- c()
