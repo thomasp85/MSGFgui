@@ -585,8 +585,8 @@ var SamplesTab = {
 		statPSMtotal: '#nPSMtotal',
 		statPSMfilter: '#nPSMfilter',
 		statID: '#nID',
-		statPeptides: '#Peptides',
-		statProteins: '#Proteins'
+		statPeptides: '#nPeptides',
+		statProteins: '#nProteins',
 		minPlotHeight: 300,
 		plotAspRatio: 1.3,
 		heightAdjustment: 20,
@@ -654,7 +654,7 @@ var SamplesTab = {
 			return a.concat(b);
 		});
 		var peptidesMap = {}
-		psm.forEach(function(d) {
+		dataM.trimPsm(psm).forEach(function(d) {
 			peptidesMap[d.peptide.hash] = d.peptide
 		})
 		var peptides = d3.values(peptidesMap)
