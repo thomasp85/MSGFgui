@@ -127,7 +127,7 @@ renderMzID <- function(mzID, mzML, name) {
     tempMzID$id <- id(mzID)[, names(id(mzID)) %in% idNames]
     scanIndex <- rep(1:length(idScanMapping(mzID)), sapply(idScanMapping(mzID), length))[match(1:nrow(id(mzID)), unlist(idScanMapping(mzID)))]
     tempMzID$id$scan_ref <- scans(mzID)$id[scanIndex]
-    tempMzID$id$rt <- header(mzML)$retentionTime[match(spectrumIDtoAcqNum(scans(mzID)$spectrumid), header(mzML)$acquisitionNum)][scanIndex]
+    tempMzID$id$rt <- header(mzML)$retentionTime[match(scans(mzID)$acquisitionnum, header(mzML)$acquisitionNum)][scanIndex]
     tempMzID$id$peptide_ref <- as.numeric(sub(peptide_refPrefix, '', tempMzID$id$peptide_ref))
     
     tempMzID$peptides <- peptides(mzID)
@@ -512,7 +512,7 @@ shinyServer(function(input, output, session) {
             x$name == scan$sample
         }))
         scanIndex <- which(scans(dataStore[[sampleIndex]]$mzID)$id == scan$scan)
-        scanNum <- spectrumIDtoAcqNum(scans(dataStore[[sampleIndex]]$mzID)$spectrumid[scanIndex])
+        scanNum <- scans(dataStore[[sampleIndex]]$mzID)$acquisitionnum[scanIndex]
         modifications <- list()
         if (!is.null(scan$modifications)) {
             for(i in 1:length(scan$modifications)) {
