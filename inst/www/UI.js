@@ -1,16 +1,9 @@
 /*
 	TODO:
 	
-	Get multisample analysis to work
-	Calculate samplestatistics
-	Disable analysis button during analysis
 	Make scan scatterplot more efficient/remove transitions
-	get progressbar to work
-	Implement filtering
-	Implement global settings
-	Get toolbar to work
+	Calculate peptide statistics
 	Add interactivity to graphs
-	parameter tooltips
 */
 
 
@@ -588,6 +581,12 @@ var SamplesTab = {
 		densityPlot: '#samplesDensity',
 		scatterPlot: '#samplesScatter',
 		sampleCount: '#sampleCount',
+		statScan: '#nScan',
+		statPSMtotal: '#nPSMtotal',
+		statPSMfilter: '#nPSMfilter',
+		statID: '#nID',
+		statPeptides: '#Peptides',
+		statProteins: '#Proteins'
 		minPlotHeight: 300,
 		plotAspRatio: 1.3,
 		heightAdjustment: 20,
@@ -615,8 +614,9 @@ var SamplesTab = {
 		});
 		
 		$(samS.selector + ' select').on('change', function() {
-			SamplesTab.selectSamples($(this).val())
-		})
+			SamplesTab.selectSamples($(this).val());
+			SamplesTab.setStat($(this).val());
+		});
 	},
 	plotDim: function() {
 		var contHeight = $(samS.plotPane).parent().height()-samS.heightAdjustment;
@@ -645,6 +645,47 @@ var SamplesTab = {
 		d3.transition().duration(samS.transitionLength).each(function() {
 			samplesScatter.data(dataM.trimScans(dataM.samples(names)[0].scans));
 		});
+	},
+	getStat: function(names) {
+		var scans = dataM.samples(names).map(function(d) {return d.scans}).reduce(function(a, b) {
+			return a.concat(b);
+		});
+		var psm = scans.map(function(d) {return (d.psm)}).reduce(function(a, b) {
+			return a.concat(b);
+		});
+		var peptidesMap = {}
+		psm.forEach(function(d) {
+			peptidesMap[d.peptide.hash] = d.peptide
+		})
+		var peptides = d3.values(peptidesMap)
+		
+		var evidence = peptides.map(function(d) {return d.evidence}).reduce(function(a, b) {
+			return a.concat(b);
+		})
+		var databaseMap = {}
+		evidence.forEach(function(d) {
+			databaseMap[d.database.hash] = d.database;
+		})
+		var database = d3.values(databaseMap)
+		
+		return {
+			nScan: dataM.trimScans(scans).length,
+			nPSMtotal: psm.length,
+			nPSMfilter: dataM.trimPsm(psm).length,
+			nID: dataM.trimPeptides(peptides).length,
+			nPeptides: dataM.trimEvidence(evidence).length,
+			nProteins: dataM.trimDatabase(database).length
+		}
+	},
+	setStat: function(names) {
+		var stat = this.getStat(names);
+		
+		$(samS.statScan).text(stat.nScan);
+		$(samS.statPSMtotal).text(stat.nPSMtotal);
+		$(samS.statPSMfilter).text(stat.nPSMfilter);
+		$(samS.statID).text(stat.nID);
+		$(samS.statPeptides).text(stat.nPeptides);
+		$(samS.statProteins).text(stat.nProteins)
 	}
 };
 
