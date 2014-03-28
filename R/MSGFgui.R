@@ -13,7 +13,7 @@ NULL
 #' @importFrom shiny runApp
 #' 
 MSGFgui <- function() {
-    runApp(path.package('MSGFgui'))
+    runApp(system.file(package='MSGFgui'))
 }
 
 #' Gets the result data currently in use by another R session running MSGFgui
@@ -30,7 +30,7 @@ MSGFgui <- function() {
 #' @export
 #' 
 currentData <- function() {
-    data <- readRDS(file.path(path.package('MSGFgui'), 'currentData.RDS'))
+    data <- readRDS(system.file(package='MSGFgui', 'currentData.RDS'))
     ans <- mzIDCollection()
     if(length(data)) {
         ans <- do.call('mzIDCollection', lapply(data, function(x) {x$mzID}))

@@ -7,12 +7,13 @@ library(mzR)
 ## UTILITY FUNCTIONS
 getAAtable <- function(){
 #    file <- '/Users/Thomas/Dropbox/GitHub/MSGFgui/inst/extdata/AAtable.csv'
-    file <- R.home(component='library/MSGFgui/extdata/AAtable.csv')
+    file <- system.file(package='MSGFgui', 'extdata', 'AAtable.csv')
     AAtable <- read.csv(file, header=TRUE, as.is=TRUE)
     AAtable
 }
 getAdductTable <- function(){
-    AdductTable <- read.csv(R.home(component='library/MSGFgui/extdata/adductTable.csv'), header=TRUE, as.is=TRUE)
+    file <- system.file(package='MSGFgui', 'extdata', 'adductTable.csv')
+    AdductTable <- read.csv(file, header=TRUE, as.is=TRUE)
     AdductTable
 }
 pepMass <- function(pepseq, modifications, mono=FALSE, neutral=FALSE){
@@ -434,7 +435,7 @@ shinyServer(function(input, output, session) {
     dataFiles <- c()
     analysisButtonCount <- 0
     currentPar <- msgfPar()
-    saveRDS(dataStore, file.path(path.package('MSGFgui'), 'currentData.RDS')) # Reset currentData
+    saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS')) # Reset currentData
     
     par <- reactive({
         msgfPar(
@@ -477,7 +478,7 @@ shinyServer(function(input, output, session) {
         if(length(dataFiles)) {
             invalidateLater(1, session)
         } else {
-            saveRDS(dataStore, file.path(path.package('MSGFgui'), 'currentData.RDS'))
+            saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
         }
     })
     data <- reactive({
