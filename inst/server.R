@@ -365,8 +365,12 @@ traceParent <- function(data, scan, ppm=20, skip=1) {
             }
         }
     }
+    if(nrow(trace) > 0) {
+        return(trace)
+    } else {
+        return(NULL)
+    }
     
-    return(trace)
 }
 ## Temporary mzID getters and setters
 database <- function(mzID) {
