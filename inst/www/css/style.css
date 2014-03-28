@@ -206,7 +206,7 @@ h4 {
 				margin: 0;
 				line-height: 1.5em
 			}
-			#sampleTab .infoArea .stat p span {
+			#sampleTab .infoArea .stat p span:first-child {
 				width: 150px;
 				text-align: right;
 				font-weight: bold;
