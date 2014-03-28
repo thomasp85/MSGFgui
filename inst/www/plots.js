@@ -1115,7 +1115,7 @@ var evidencePlot = function(element, size) {
 			arc.innerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1));
 			arc.outerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1)+arcWidth);
 			
-			newArc.selectAll('.evidenceArc').data(d, function(dd) {return dd.start+':'+dd.end})
+			newArc.selectAll('.evidenceArc').data(d, function(dd) {return dd.hash})
 				.enter().append('path')
 					.attr('class', 'evidenceArc')
 					.attr('d', arc);
