@@ -562,6 +562,11 @@ var dataModel = function() {
 			return filteredEvidenceLookup[d.hash];
 		}).filter(function(f) {return f});
 	};
+	dm.trimDatabase = function(database) {
+		return database.map(function(d) {
+			return filteredDatabaseLookup[d.hash];
+		}).filter(function(f) {return f});
+	};
 	dm.getModifications = function(evidence) {
 		if (evidence.peptide.modifications == null) return null;
 		
