@@ -8,7 +8,6 @@ $.extend(dataSink, {
 	},
 	renderValue: function(el, data) {
 		dataM.add(parseData(data));
-		$('.progressBar p').text('Done!');
 	}
 });
 
