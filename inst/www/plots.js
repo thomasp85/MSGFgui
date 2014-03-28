@@ -536,7 +536,7 @@ var evidencePlot = function(element, size) {
 	var yAxis = d3.svg.axis()
 		.scale(y)
 		.orient("left")
-		.tickFormat(d3.format('s'));
+		.tickFormat(d3.format('.2n'));
 	
 	var xTrace = d3.scale.linear()
 		.range([0, traceWidth])
@@ -601,7 +601,6 @@ var evidencePlot = function(element, size) {
 				};
 			};
 		});
-		
 		return stack;
 	};
 	
