@@ -7,7 +7,9 @@ $.extend(dataSink, {
 		return $(scope).find(".dataSink");
 	},
 	renderValue: function(el, data) {
-		dataM.add(parseData(data));
+		if (data) {
+			dataM.add(parseData(data));
+		}
 	}
 });
 
@@ -50,3 +52,21 @@ $.extend(scanPlot, {
 });
 
 Shiny.outputBindings.register(scanPlot, 'msgf.scanPlot');
+
+/*
+	Analysis button and progressbar
+*/
+var progress = new Shiny.OutputBinding();
+$.extend(progress, {
+	find: function(scope) {
+		return $(scope).find(".msgfProgress");
+	},
+	renderValue: function(el, progressData) {
+		if (progressData) {
+			console.log(progressData)
+			AnalysisPane.setProgress(progressData);
+		}
+	}
+});
+
+Shiny.outputBindings.register(progress, 'msgf.progress');

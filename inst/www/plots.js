@@ -1344,7 +1344,6 @@ var evidencePlot = function(element, size) {
 	plot.selectScan = function(scan) {
 		plotState = 'scan';
 		prepareScan(scan);
-		console.log(scan)
 		var oldFragments = svgArc.selectAll('.fragments');
 		
 		createFragmentAnnotation(scan.scan);

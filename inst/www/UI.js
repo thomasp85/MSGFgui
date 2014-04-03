@@ -552,7 +552,8 @@ var anaS;
 var AnalysisPane = {
 	settings: {
 		selector: '#msgfRun-pane',
-		runButton: '#analysisButton'
+		runButton: '#analysisButton',
+		progressElement: '#runProgress'
 	},
 	init: function() {
 		anaS = this.settings;
@@ -562,9 +563,27 @@ var AnalysisPane = {
 		$(anaS.selector + ' *').on('input change', function() {
 			AnalysisPane.setAnalysisButtonAct();
 		});
+		$(anaS.runButton).on('click', function() {
+			$(this).prop('disabled', true)
+		});
 	},
 	setAnalysisButtonAct: function() {
 		$(anaS.runButton).prop('disabled', !(DataInputSetup.validateData() && ParameterSetup.validateInputs()));
+	},
+	setProgress: function(progress) {
+		var progressBar = $(anaS.progressElement).find('progress');
+		var progressText = $(anaS.progressElement).find('progress+p');
+		console.log([progressBar, progressText])
+		progressBar.prop('max', progress.max)
+			.prop('value', progress.value);
+		
+		progressText.text(progress.text);
+		
+		if (progress.done) {
+			this.setAnalysisButtonAct;
+		} else {
+			$(anaS.runButton).prop('disabled', true)
+		}
 	}
 }
 
@@ -643,7 +662,12 @@ var SamplesTab = {
 	},
 	selectSamples: function(names) {
 		d3.transition().duration(samS.transitionLength).each(function() {
-			samplesScatter.data(dataM.trimScans(dataM.samples(names)[0].scans));
+			var scans = dataM.samples(names).map(function(d) {
+				return d.scans
+			}).reduce(function(a,b) {
+				return a.concat(b)
+			})
+			samplesScatter.data(dataM.trimScans(scans));
 		});
 	},
 	getStat: function(names) {

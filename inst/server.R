@@ -435,6 +435,7 @@ shinyServer(function(input, output, session) {
 #             mzML=openMSfile(x@parameters@rawFile$location))
 #     })
     dataAdded <- reactiveValues(counter=0)
+    progressBarData <- reactiveValues(max=0, value=0, text='Waiting...', done=TRUE)
     dataStore <- list()
     dataFiles <- c()
     analysisButtonCount <- 0
@@ -465,23 +466,33 @@ shinyServer(function(input, output, session) {
             dataFiles <<- isolate({input$datafiles})
             currentPar <<- isolate({par()})
             analysisButtonCount <<- input$analysisButton
+            progressBarData$max <<- length(dataFiles)
+            nextFile <- dataFiles[1]
+        } else {
+            res <- runMSGF(currentPar, dataFiles[1])
+            raw <- openMSfile(dataFiles[1])
+            header(raw)
+            index <- length(dataStore)+1
+            dataStore[[index]] <<- list(
+                name=basename(dataFiles[1]),
+                mzID=res,
+                mzML=raw
+            )
+            dataFiles <<- dataFiles[-1]
+            nextFile <- dataFiles[1]
+            dataAdded$counter <<- isolate(dataAdded$counter)+1
         }
         
-        res <- runMSGF(currentPar, dataFiles[1])
-        raw <- openMSfile(dataFiles[1])
-        header(raw)
-        index <- length(dataStore)+1
-        dataStore[[index]] <<- list(
-            name=basename(dataFiles[1]),
-            mzID=res,
-            mzML=raw
-            )
-        dataFiles <<- dataFiles[-1]
-        dataAdded$counter <<- isolate(dataAdded$counter)+1
-        
         if(length(dataFiles)) {
+            progressBarData$value <<- isolate(progressBarData$value)+1
+            progressBarData$text <<- paste('Analyzing', basename(nextFile))
+            progressBarData$done <<- FALSE
             invalidateLater(1, session)
         } else {
+            progressBarData$value <<- 0
+            progressBarData$max <<- 0
+            progressBarData$text <<- 'Waiting...'
+            progressBarData$done <<- TRUE
             saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
         }
     })
@@ -530,6 +541,7 @@ shinyServer(function(input, output, session) {
         
         renderScan(dataStore[[sampleIndex]]$mzML, scanNum, scan$peptide, modifications)
     })
+    output$runProgress <- reactive({reactiveValuesToList(progressBarData)})
     output$idPlots <- reactive({selectedScan()})
     outputOptions(output, 'idPlots', suspendWhenHidden = FALSE)
     output$samplesDensity <- reactive({scoreDistribution()})

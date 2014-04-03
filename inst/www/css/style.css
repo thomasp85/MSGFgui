@@ -110,6 +110,7 @@ h4 {
 	#run progress {
 		width: 100%;
 		position: absolute;
+		z-index: -1;
 	}
 	#run button {
 		display: table-cell;
