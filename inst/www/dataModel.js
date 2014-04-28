@@ -710,6 +710,24 @@ var dataModel = function() {
 			return ans;
 		});
 	};
+	dm.chargeRange = function() {
+		return psm.length ? d3.extent(psm, function(d) {return d.charge}) : [0, 1];
+	};
+	dm.rtRange = function() {
+		return scans.length ? d3.extent(scans, function(d) {return d.rt}) : [0, 1];
+	};
+	dm.mzRange = function() {
+		return scans.length ? d3.extent(scans, function(d) {return d.mz}) : [0, 1];
+	};
+	dm.proteinLengthRange = function() {
+		return database.length ? d3.extent(database, function(d) {return d.length}) : [0, 1];
+	};
+	dm.peptideLengthRange = function() {
+		return peptides.length ? d3.extent(peptides, function(d) {return d.sequence.length}) : [0, 1];
+	};
+	dm.modificationNames = function() {
+		return modifications.map(function(d) {return d.name});
+	}
 	
 	return dm;
 };
