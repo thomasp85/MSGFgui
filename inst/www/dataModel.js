@@ -194,6 +194,8 @@ var dataModel = function() {
 			qValueHigh: 0.01
 		}
 	};
+	var oldFilter = {};
+	$.extend(true, oldFilter, filter);
 	
 	// METHODS
 	var createSample = function(data) {
