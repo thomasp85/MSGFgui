@@ -16,13 +16,15 @@ Installation
 ------
 MSGFgui and it's sister package MSGFplus is intented for inclusion within the next Bioconductor release. Until then, try it out by installing as follows:
 
-    source("http://bioconductor.org/biocLite.R")
-    biocLite('mzR')
-    biocLite('mzID')
-    install.packages('shiny')
-    install.packages('devtools')
-    install_github('MSGFplus', 'thomasp85')
-    install_github('MSGFgui', 'thomasp85')
+```R
+source("http://bioconductor.org/biocLite.R")
+biocLite('mzR')
+biocLite('mzID')
+install.packages('shiny')
+install.packages('devtools')
+install_github('MSGFplus', 'thomasp85')
+install_github('MSGFgui', 'thomasp85')
+```
 
 Screenshots
 ------
@@ -34,4 +36,5 @@ Sangtae Kim is the developer behind the MS-GF+ algoritm, without which this pack
 
 References
 ------
-[MS-GF+](http://proteomics.ucsd.edu/Software/MSGFPlus/ "MS-GF+")
+[MSGFplus (R package)](https://github.com/thomasp85/MSGFplus "MSGFplus R wrapper")
+[MS-GF+ (Original Java program)](http://proteomics.ucsd.edu/Software/MSGFPlus/ "MS-GF+ java program")
