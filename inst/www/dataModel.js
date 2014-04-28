@@ -213,6 +213,7 @@ var dataModel = function() {
 	};
 	var addModifications = function(mod) {
 		mod.forEach(function(d) {
+			d.Specificity = d.Specificity.toLowerCase().replace('-', '');
 			var newMod = modifications.filter(function(f) {
 				return JSON.stringify(d) == JSON.stringify(f);
 			}).length == 0;
