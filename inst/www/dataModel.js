@@ -355,6 +355,31 @@ var dataModel = function() {
 			return l >= pFilter.lengthLow && (pFilter.lengthHigh == -1 ? true : l <= pFilter.lengthHigh)
 		}
 	};
+	var detectModification = function(mods, evidence) {
+		if (mods.length == 0) return true;
+		if (evidence.peptide.modifications == null) return false;
+		
+		return mods.some(function(d) {
+			var filteredMod = evidence.peptide.modifications.filter(function(f) {
+				return f.massDelta == d.massDelta;
+			})
+			if (filteredMod.length != 0) {
+				if (d.residues != '*') {
+					filteredMod = filteredMod.filter(function(f) {
+						return d.residues.split('').indexOf(evidence.peptide.sequence[f.location-1]) != -1;
+					})
+				}
+				if (filteredMod.length != 0) {
+					if (d.Specificity == 'any') return true;
+					if (d.Specificity == 'nterm') return filteredMod.filter(function(f) {return f.location == 1}).length != 0;
+					if (d.Specificity == 'protnterm') return evidence.start == 1 ? filteredMod.filter(function(f) {return f.location == 1}).length != 0 : false;
+					if (d.Specificity == 'cterm') return filteredMod.filter(function(f) {return f.location == evidence.peptide.sequence.length}).length != 0;
+					if (d.Specificity == 'protcterm') return evidence.end == evidence.database.length ? filteredMod.filter(function(f) {return f.location == evidence.peptide.sequence.length}).length != 0 : false;
+				}
+			}
+			return false;
+		})
+	}
 	var filterPsm = function() {
 		var pFilter = filter.psm;
 		var noFilter = pFilter.chargeLow == 0 && pFilter.chargeHigh == -1 && pFilter.qValueLow == 0 && pFilter.qValueHigh == -1;
