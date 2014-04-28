@@ -650,7 +650,7 @@ var evidencePlot = function(element, size) {
 		var sequence = evidence.peptide.sequence.split('');
 		var modifications = dataM.getModifications(evidence);
 		
-		if (evidence.peptide.modifications) {
+/*		if (evidence.peptide.modifications) {
 			evidence.peptide.modifications.forEach(function(d) {
 				if (modifications[d.location]) {
 					modifications[d.location].push(d.massDelta);
@@ -658,7 +658,7 @@ var evidencePlot = function(element, size) {
 					modifications[d.location] = [d.massDelta];
 				};
 			});
-		};
+		};*/
 		var sequence = sequence.map(function(d, i) {
 			return {
 				singleLetter: d,
