@@ -1472,6 +1472,7 @@ var evidencePlot = function(element, size) {
 	
 	plot.unSelectScan = function() {
 		d3.transition().each(function() {
+			removeTrace();
 			svgScan.selectAll('.spectrum').transition()
 				.attr('transform', 'translate(0, '+height+')')
 				.style('opacity', 0)
