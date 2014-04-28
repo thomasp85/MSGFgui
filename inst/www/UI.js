@@ -1363,6 +1363,8 @@ var ResultPane = {
 		})
 	},
 	setActiveTab: function(tab) {
+		var oldTab = $(resS.tabs + ' ' + resS.tabbar + ' .active').find('p').text();
+		var newTab = $(tab).find('p').text();
 		if ($(tab).hasClass(resS.sampletab.substring(1))) {
 			if (!$(tab).hasClass('active')) {
 				$(resS.tabs + ' .active').removeClass('active');
@@ -1386,6 +1388,8 @@ var ResultPane = {
 				$(resS.tabs + ' ' + resS.filterTab).addClass('active');
 			}
 		}
+		
+		$(this).trigger('change', [oldTab, newTab]);
 	},
 	addIcons: function() {
 		var icons = ['icons/database-add.svg', "icons/database-remove.svg", "icons/browser-download-2.svg", "icons/settings-3.svg", "icons/bulb-2.svg"];
