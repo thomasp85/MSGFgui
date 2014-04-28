@@ -908,8 +908,10 @@ var IdTab = {
 			})
 	},
 	focusProtein: function() {
+		$(idS.scanSelect).val(null).trigger('change');
 		d3.transition().duration(idS.transitionLength).each(function() {
 			identityPlot.unSelectPeptide();
+			identityPlot.unSelectScan();
 		})
 	},
 	resize: function() {
