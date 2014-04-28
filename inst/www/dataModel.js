@@ -728,6 +728,9 @@ var dataModel = function() {
 	dm.modificationNames = function() {
 		return modifications.map(function(d) {return d.name});
 	}
+	dm.empty = function() {
+		return samples.length == 0;
+	};
 	
 	return dm;
 };
