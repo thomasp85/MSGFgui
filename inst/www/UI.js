@@ -657,14 +657,20 @@ var SamplesTab = {
 		samplesDensity.resize(this.plotDim());
 		samplesScatter.resize(this.plotDim());
 	},
-	updateSamples: function(event, sample) {
+	updateSamples: function() {
 		var selectBox = $(samS.selector + ' select');
-		selectBox.append($('<option>', {text: sample.name}));
+		var currentSelect = selectBox.val();
+		
+		selectBox.find('option').remove();
+		dataM.samples().forEach(function(d) {
+			selectBox.append($('<option>', {text: d.name}));
+		})
+		selectBox.val(currentSelect);
 		
 		if(!selectBox.val()) {
 			selectBox.prop('selectedIndex', 0);
-			selectBox.trigger('change');
 		};
+		selectBox.trigger('change');
 	},
 	selectSamples: function(names) {
 		d3.transition().duration(samS.transitionLength).each(function() {
