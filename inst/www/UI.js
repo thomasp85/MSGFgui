@@ -921,6 +921,419 @@ var IdTab = {
 };
 
 
+/*
+	Filter tab
+*/
+var filS;
+var FilterTab = {
+	settings: {
+		selector: '#filterTab',
+		fdrRow: '.fdr',
+		sampleRow: '.sample',
+		databaseRow: '.database',
+		fdrSlider: '#fdrSlider',
+		sampleSelect: '#sampleFilterSelect',
+		sampleCount: '#sampleFilterCount',
+		sampleRegex: '#sampleRegex',
+		chargeSlider: '#chargeSlider',
+		mzSlider: '#mzSlider',
+		rtSlider: '#rtSlider',
+		proteinSelect: '#proteinFilterSelect',
+		proteinCount: '#proteinFilterCount',
+		proteinRegex: '#proteinRegex',
+		proteinSlider: '#proteinSlider',
+		peptideSlider: '#peptideSlider',
+		modificationSelect: '#modificationFilterSelect',
+		modificationCount: '#modificationFilterCount',
+		sliderObjects: {},
+		filterChange: false,
+		tempFilter: {},
+		regexTimers: {sample: null, protein: null},
+		badFilterDialog: '#badFilter'
+	},
+	init: function() {
+		filS = this.settings;
+		
+		$.extend(true, filS.tempFilter, dataM.filter())
+		
+		d3.select(filS.selector).selectAll(filS.fdrRow).selectAll(filS.fdrSlider)
+			.call(FilterTab.createFDRSlider());
+		d3.select(filS.selector).selectAll(filS.sampleRow).selectAll(filS.chargeSlider)
+			.call(FilterTab.createChargeSlider());
+		d3.select(filS.selector).selectAll(filS.sampleRow).selectAll(filS.mzSlider)
+			.call(FilterTab.createMZSlider());
+		d3.select(filS.selector).selectAll(filS.sampleRow).selectAll(filS.rtSlider)
+			.call(FilterTab.createRTSlider());
+		d3.select(filS.selector).selectAll(filS.databaseRow).selectAll(filS.proteinSlider)
+			.call(FilterTab.createProteinSlider());
+		d3.select(filS.selector).selectAll(filS.databaseRow).selectAll(filS.peptideSlider)
+			.call(FilterTab.createPeptideSlider());
+		
+		$(filS.sampleSelect).on('change', function() {
+			FilterTab.selectSamples();
+		})
+		$(filS.sampleRegex).on('input', function() {
+			$(this).removeClass('invalid');
+			
+			if (filS.regexTimers.sample) clearTimeout(filS.regexTimers.sample);
+			
+			filS.regexTimers.sample = setTimeout(function() {
+				FilterTab.regexFilterSamples();
+			}, 500)
+		})
+		$(filS.proteinSelect).on('change', function() {
+			FilterTab.selectProteins();
+		})
+		$(filS.proteinRegex).on('input', function() {
+			$(this).removeClass('invalid');
+			
+			if (filS.regexTimers.protein) clearTimeout();
+			
+			filS.regexTimers.protein = setTimeout(function() {
+				FilterTab.regexFilterProteins();
+			}, 500)
+		})
+		$(filS.modificationSelect).on('change', function() {
+			FilterTab.selectModifications();
+		})
+		
+		$(dataM).bind('change', function() {
+			$.extend(true, filS.tempFilter, dataM.filter())
+			FilterTab.updateView();
+		})
+		$(ResultPane).bind('change', function(event, oldTab, newTab) {
+			if (oldTab == 'Filter' && filS.filterChange) {
+				FilterTab.setFilter();
+			}
+		})
+	},
+	createFDRSlider: function() {
+		var slider = d3.slider()
+			.min(0)
+			.max(1)
+			.value([filS.tempFilter.psm.qValueLow, filS.tempFilter.psm.qValueHigh])
+			.axis(true)
+			.animate(false)
+			.step(0.001);
+			
+		filS.sliderObjects.fdr = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.psm.qValueLow = newVal[0] == filS.sliderObjects.fdr.min() ? 0 : newVal[0];
+			filS.tempFilter.psm.qValueHigh = newVal[1] == filS.sliderObjects.fdr.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+		
+		return slider;
+	},
+	updateFDRSlider: function() {
+		filS.sliderObjects.fdr.value([filS.tempFilter.psm.qValueLow, filS.tempFilter.psm.qValueHigh])
+			.redraw(d3.select(filS.fdrSlider));
+	},
+	createChargeSlider: function() {
+		var range = dataM.chargeRange();
+		
+		var slider = d3.slider()
+			.min(range[0])
+			.max(range[1])
+			.value([range[0], range[1]])
+			.axis(true)
+			.animate(false)
+			.step(1);
+			
+		filS.sliderObjects.charge = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.psm.chargeLow = newVal[0] == filS.sliderObjects.charge.min() ? 0 : newVal[0];
+			filS.tempFilter.psm.chargeHigh = newVal[1] == filS.sliderObjects.charge.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+
+		return slider;
+	},
+	createMZSlider: function() {
+		var range = dataM.mzRange();
+		
+		var slider = d3.slider()
+			.min(range[0])
+			.max(range[1])
+			.value([range[0], range[1]])
+			.axis(true)
+			.animate(false)
+			.step(1);
+			
+		filS.sliderObjects.mz = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.scans.mzLow = newVal[0] == filS.sliderObjects.mz.min() ? 0 : newVal[0];
+			filS.tempFilter.scans.mzHigh = newVal[1] == filS.sliderObjects.mz.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+
+		return slider;
+	},
+	createRTSlider: function() {
+		var range = dataM.rtRange();
+		
+		var slider = d3.slider()
+			.min(range[0])
+			.max(range[1])
+			.value([range[0], range[1]])
+			.axis(true)
+			.animate(false)
+			.step(1);
+			
+		filS.sliderObjects.rt = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.scans.rtLow = newVal[0] == filS.sliderObjects.rt.min() ? 0 : newVal[0];
+			filS.tempFilter.scans.rtHigh = newVal[1] == filS.sliderObjects.rt.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+
+		return slider;
+	},
+	updateSampleFilter: function() {
+		var chargeRange = dataM.chargeRange();
+		var mzRange = dataM.mzRange();
+		var rtRange = dataM.rtRange();
+		var chargeValue = [
+			filS.tempFilter.psm.chargeLow == 0 ? chargeRange[0] : filS.tempFilter.psm.chargeLow,
+			filS.tempFilter.psm.chargeHigh == -1 ? chargeRange[1] : filS.tempFilter.psm.chargeHigh];
+		var mzValue = [
+			filS.tempFilter.scans.mzLow == 0 ? mzRange[0] : filS.tempFilter.scans.mzLow,
+			filS.tempFilter.scans.mzHigh == -1 ? mzRange[1] : filS.tempFilter.scans.mzHigh];
+		var rtValue = [
+			filS.tempFilter.scans.rtLow == 0 ? rtRange[0] : filS.tempFilter.scans.rtLow,
+			filS.tempFilter.scans.rtHigh == -1 ? rtRange[1] : filS.tempFilter.scans.rtHigh];
+		
+		d3.select(filS.sampleSelect).selectAll('option').remove();
+		d3.select(filS.sampleSelect).selectAll('option').data(dataM.allSamples())
+			.enter().append('option')
+				.text(function(d) {return d.name});
+		
+		if (filS.tempFilter.samples.regex) {
+			this.regexFilterSamples();
+		} else {
+			$(filS.sampleSelect).val(filS.tempFilter.samples.names);
+			this.countSamples();
+		}
+		
+		
+		filS.sliderObjects.charge
+			.min(chargeRange[0])
+			.max(chargeRange[1])
+			.value(chargeValue)
+			.redraw(d3.select(filS.chargeSlider));
+		filS.sliderObjects.mz
+			.min(mzRange[0])
+			.max(mzRange[1])
+			.value(mzValue)
+			.redraw(d3.select(filS.mzSlider));
+		filS.sliderObjects.rt
+			.min(rtRange[0])
+			.max(rtRange[1])
+			.value(rtValue)
+			.redraw(d3.select(filS.rtSlider));
+		
+	},
+	createProteinSlider: function() {
+		var range = dataM.proteinLengthRange();
+	
+		var slider = d3.slider()
+			.min(range[0])
+			.max(range[1])
+			.value([range[0], range[1]])
+			.axis(true)
+			.animate(false)
+			.step(1);
+			
+		filS.sliderObjects.protein = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.database.lengthLow = newVal[0] == filS.sliderObjects.protein.min() ? 0 : newVal[0];
+			filS.tempFilter.database.lengthHigh = newVal[1] == filS.sliderObjects.protein.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+
+		return slider;
+	},
+	createPeptideSlider: function() {
+		var range = dataM.peptideLengthRange();
+		
+		var slider = d3.slider()
+			.min(range[0])
+			.max(range[1])
+			.value([range[0], range[1]])
+			.axis(true)
+			.animate(false)
+			.step(1);
+			
+		filS.sliderObjects.peptide = slider;
+		
+		slider.on('change', function(oldVal, newVal) {
+			filS.tempFilter.peptides.lengthLow = newVal[0] == filS.sliderObjects.peptide.min() ? 0 : newVal[0];
+			filS.tempFilter.peptides.lengthHigh = newVal[1] == filS.sliderObjects.peptide.max() ? -1 : newVal[1];
+			filS.filterChange = true;
+		})
+
+		return slider;
+	},
+	updateDatabaseFilter: function() {
+		var proteinLengthRange = dataM.proteinLengthRange();
+		var peptideLengthRange = dataM.peptideLengthRange();
+		var proteinLengthValue = [
+			filS.tempFilter.database.lengthLow == 0 ? proteinLengthRange[0] : filS.tempFilter.database.lengthLow,
+			filS.tempFilter.database.lengthHigh == -1 ? proteinLengthRange[1] : filS.tempFilter.database.lengthHigh];
+		var peptideLengthValue = [
+			filS.tempFilter.peptides.lengthLow == 0 ? peptideLengthRange[0] : filS.tempFilter.peptides.lengthLow,
+			filS.tempFilter.peptides.lengthHigh == -1 ? peptideLengthRange[1] : filS.tempFilter.peptides.lengthHigh];
+		
+		d3.select(filS.proteinSelect).selectAll('option').remove();
+		d3.select(filS.proteinSelect).selectAll('option').data(dataM.allDatabase())
+			.enter().append('option')
+				.text(function(d) {return d.accession});
+		
+		if (filS.tempFilter.database.regex) {
+			this.regexFilterProteins();
+		} else {
+			$(filS.proteinSelect).val(filS.tempFilter.database.names);
+			this.countProteins();
+		}
+		
+		d3.select(filS.modificationSelect).selectAll('option').remove();
+		d3.select(filS.modificationSelect).selectAll('option').data(dataM.modificationNames())
+			.enter().append('option')
+				.text(function(d) {return d});
+		
+		$(filS.modificationSelect).val(filS.tempFilter.peptides.modifications);
+		this.countModifications();
+		
+		filS.sliderObjects.protein
+			.min(proteinLengthRange[0])
+			.max(proteinLengthRange[1])
+			.value(proteinLengthValue)
+			.redraw(d3.select(filS.proteinSlider));
+		filS.sliderObjects.peptide
+			.min(peptideLengthRange[0])
+			.max(peptideLengthRange[1])
+			.value(peptideLengthValue)
+			.redraw(d3.select(filS.peptideSlider));
+	},
+	selectSamples: function() {
+		filS.tempFilter.samples.names = $(filS.sampleSelect).val() || [];
+		filS.tempFilter.samples.regex = null;
+		this.countSamples();
+		$(filS.sampleRegex).val('');
+		filS.filterChange = true;
+	},
+	regexFilterSamples: function() {
+		try {
+			var regex = $(filS.sampleRegex).val()
+			if (regex != '') {
+				filS.tempFilter.samples.regex = new RegExp(regex);
+				var names = $(filS.sampleSelect).find('option').map(function() {return this.value})
+				$(filS.sampleSelect).val(this.regexFilter($.makeArray(names), filS.tempFilter.samples.regex, filS.tempFilter.samples.regexInclude));
+			} else {
+				filS.tempFilter.samples.regex = null;
+				$(filS.sampleSelect).val([]);
+			}
+		} catch (e) {
+			$(filS.sampleRegex).addClass('invalid');
+			filS.tempFilter.samples.regex = null;
+			$(filS.sampleSelect).val([]);
+		}
+		filS.tempFilter.samples.names = [];
+		this.countSamples();
+		filS.filterChange = true;
+	},
+	selectProteins: function() {
+		filS.tempFilter.database.names = $(filS.proteinSelect).val() || [];
+		filS.tempFilter.database.regex = null;
+		this.countProteins();
+		$(filS.proteinRegex).val('');
+		filS.filterChange = true;
+	},
+	regexFilterProteins: function() {
+		try {
+			var regex = $(filS.proteinRegex).val()
+			if (regex != '') {
+				filS.tempFilter.database.regex = new RegExp($(filS.proteinRegex).val());
+				var names = $(filS.proteinSelect).find('option').map(function() {return this.value})
+				$(filS.proteinSelect).val(this.regexFilter($.makeArray(names), filS.tempFilter.database.regex, filS.tempFilter.database.regexInclude));
+			} else {
+				filS.tempFilter.database.regex = null;
+				$(filS.proteinSelect).val([]);
+			}
+		} catch (e) {
+			$(filS.proteinRegex).addClass('invalid');
+			filS.tempFilter.database.regex = null;
+			$(filS.proteinSelect).val([]);
+		}
+		filS.tempFilter.database.names = [];
+		this.countProteins();
+		filS.filterChange = true;
+	},
+	selectModifications: function() {
+		filS.tempFilter.peptides.modifications = $(filS.modificationSelect).val() || [];
+		this.countModifications();
+		filS.filterChange = true;
+	},
+	updateView: function() {
+		this.updateFDRSlider();
+		this.updateSampleFilter();
+		this.updateDatabaseFilter();
+	},
+	setFilter: function() {
+		var success = dataM.filter(filS.tempFilter);
+		if (success) {
+			filS.filterChange = false;
+		} else {
+			this.alertBadFilter();
+		}
+		
+	},
+	countSelection: function(selector) {
+		var value = $(selector).val();
+		var count = value ? value.length : 0;
+		
+		return count ? count : '0 (no filter)';
+	},
+	countSamples: function() {
+		$(filS.sampleCount).text(this.countSelection(filS.sampleSelect))
+	},
+	countProteins: function() {
+		$(filS.proteinCount).text(this.countSelection(filS.proteinSelect))
+	},
+	countModifications: function() {
+		$(filS.modificationCount).text(this.countSelection(filS.modificationSelect))
+	},
+	regexFilter: function(array, regex, include) {
+		return array.filter(function(d) {
+			var test = regex.test(d);
+			return include ? test : !test;
+		})
+	},
+	alertBadFilter: function() {
+		ResultPane.setActiveTab($(resS.tabs + ' ' + resS.filterTab));
+		
+		var modal = createModalDialog(filS.badFilterDialog.substring(1), 'Invalid filter settings');
+		
+		modal.append(
+			$('<div>').append(
+				$('<p>', {text: 'One or more of the applied filtering settings has resulted in the removal of all datapoint.'})
+			).append(
+				$('<p>', {text: 'Please adjust the filtering to be more inclusive.'})
+			)
+		).append(
+			$('<div>').addClass('modalButton').append(
+				$('<button>', {text: 'Ok'}).addClass('topcoat-button--cta').on('click', function(){
+					dismissDialog(filS.badFilterDialog.substring(1))
+				})
+			)
+		)
+	}
+}
 
 /*
 	Result pane
