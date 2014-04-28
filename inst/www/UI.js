@@ -553,7 +553,8 @@ var AnalysisPane = {
 	settings: {
 		selector: '#msgfRun-pane',
 		runButton: '#analysisButton',
-		progressElement: '#runProgress'
+		progressElement: '#runProgress',
+		running: false
 	},
 	init: function() {
 		anaS = this.settings;
@@ -568,20 +569,25 @@ var AnalysisPane = {
 		});
 	},
 	setAnalysisButtonAct: function() {
-		$(anaS.runButton).prop('disabled', !(DataInputSetup.validateData() && ParameterSetup.validateInputs()));
+		var disable = anaS.running;
+		if (!disable) {
+			disable = !(DataInputSetup.validateData() && ParameterSetup.validateInputs())
+		}
+		$(anaS.runButton).prop('disabled', disable);
 	},
 	setProgress: function(progress) {
 		var progressBar = $(anaS.progressElement).find('progress');
 		var progressText = $(anaS.progressElement).find('progress+p');
-		console.log([progressBar, progressText])
 		progressBar.prop('max', progress.max)
 			.prop('value', progress.value);
 		
 		progressText.text(progress.text);
 		
 		if (progress.done) {
-			this.setAnalysisButtonAct;
+			anaS.running = false;
+			this.setAnalysisButtonAct();
 		} else {
+			anaS.running = true;
 			$(anaS.runButton).prop('disabled', true)
 		}
 	}
