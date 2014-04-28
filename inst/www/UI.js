@@ -793,11 +793,14 @@ var IdTab = {
 		d3.select(idS.proteinSelect).selectAll('option').remove();
 		d3.select(idS.proteinSelect).selectAll('option').data(dataM.database())
 			.enter().append('option')
+				.property('value', function(d) {
+					return d.accession;
+				})
 				.text(function(d) {
 					return d.accession;
 				});
 		
-		if (currentSelect && $('idS.proteinSelect option[value='+currentSelect+']').length != 0) {
+		if (currentSelect && $('idS.proteinSelect option[text='+currentSelect+']').length != 0) {
 			$(idS.proteinSelect).val(currentSelect);
 		} else {
 			$(idS.proteinSelect).prop('selectedIndex', 0);
@@ -821,6 +824,9 @@ var IdTab = {
 		d3.select(idS.peptideSelect).selectAll('option').remove();
 		d3.select(idS.peptideSelect).selectAll('option').data(evidence)
 			.enter().append('option')
+				.property('value', function(d) {
+					return d.peptide.sequence;
+				})
 				.text(function(d) {
 					return d.peptide.sequence;
 				});
@@ -859,12 +865,13 @@ var IdTab = {
 					})
 					.attr('value', function(d) {return d.scan.sample.name+':'+d.scan.ref});
 			
-			if (currentSelect && $(idS.scanSelect+' option[value="'+currentSelect+'"]').length != 0) {
+/*			if (currentSelect && $(idS.scanSelect+' option[value="'+currentSelect+'"]').length != 0) {
 				$(idS.scanSelect).val(currentSelect);
 			}
-			
+*/			
 			$(idS.scanCount).text(scans.length);	
 		}
+		$(idS.scanSelect).trigger('change');
 	},
 	selectProtein: function() {
 		var proteinSel = d3.select(idS.proteinSelect);
@@ -873,15 +880,17 @@ var IdTab = {
 			identityPlot.data(proteinSel.selectAll('option').data()[proteinSel.property('selectedIndex')]);
 			identityPlot.unSelectScan();
 		})
-		$(idS.scanSelect).prop('disabled', true);
+		$(idS.scanSelect).prop('disabled', true).val(null).trigger('change');
 		
 	},
 	selectPeptide: function() {
 		d3.transition().duration(idS.transitionLength)
 //			.ease('linear')
 			.each(function() {
-				identityPlot.unSelectScan()
+				identityPlot.unSelectScan();
 			});
+		
+		$(idS.scanSelect).val(null).trigger('change');
 		
 		var peptideSel = d3.select(idS.peptideSelect);
 		
