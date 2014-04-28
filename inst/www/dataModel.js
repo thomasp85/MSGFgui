@@ -426,14 +426,17 @@ var dataModel = function() {
 						include = false;
 					}
 				} else {
-					if (dFilter.regex && dFilter.regex.test(d.accession)) {
-						if (!dFilter.regexInclude) {
-							include = false;
+					if (dFilter.regex) {
+						if (dFilter.regex.test(d.accession)) {
+							if (!dFilter.regexInclude) {
+								include = false;
+							}
+						} else {
+							if (dFilter.regexInclude) {
+								include = false;
+							}
 						}
-					} else {
-						if (dFilter.regexInclude) {
-							include = false;
-						}
+						
 					}
 				}
 				
