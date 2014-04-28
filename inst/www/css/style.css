@@ -247,6 +247,95 @@ h4 {
 			font-weight: bold;
 		}
 
+#filterTab>.col {
+	left: 0;
+	right: 0;
+}
+#filterTab .fdr {
+	height: 120px;
+}
+	#filterTab .fdr>h4{
+		text-align: center;
+	}
+	#filterTab .fdr>div{
+		width: 500px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	
+#filterTab>div>hr {
+	position: relative;
+	top: 100px;
+	margin: 0 20px;
+}
+#filterTab>div>hr:nth-of-type(2) {
+	top: 410px;
+}
+#filterTab .sample {
+	top: 120px;
+	height: 300px;
+}
+	#filterTab .sample>div {
+		width: 675px;
+		margin-right: auto;
+		margin-left: auto;
+		padding: 0 20px;
+	}
+	
+#filterTab .database {
+	top: 440px;
+	height: 300px;
+}
+	#filterTab .database>div {
+		width: 950px;
+		margin-right: auto;
+		margin-left: auto;
+		padding: 0 20px;
+	}
+	
+#filterTab .filterInfo>div>div{
+	display: inline-block;
+	width: 230px;
+	margin-right: 40px;
+	vertical-align: top;
+}
+#filterTab .filterInfo>div>div:last-child{
+	margin-right: 0;
+}
+	#filterTab .filterInfo>div>div+div {
+		width: 400px;
+	}
+		#filterTab .filterInfo>div>div+div>div {
+			width: inherit;
+		}
+		#filterTab .filterInfo .d3-slider {
+			width: 400px;
+		}
+	#filterTab .filterInfo>div>div+div+div {
+		width: 230px;
+	}
+	#filterTab .filterInfo>div>div+div h4:not(:first-child) {
+		margin-top: 45px;
+	}
+	#filterTab .filterInfo input{
+		display: block;
+	}
+	#filterTab .filterInfo p {
+		font-size: x-small;
+		margin-top: 2px;
+		text-align: right;
+	}
+	#filterTab .filterInfo select, #filterTab .filterInfo input{
+		width: 230px;
+		padding: 0;
+		border: 1px solid grey;
+		box-sizing:content-box;
+		-ms-box-sizing:content-box;
+		-moz-box-sizing:content-box;
+		-webkit-box-sizing:content-box;
+	}
+	
+
 .listview, .textview {
 	background: white;
 	border-style: inset;
@@ -308,6 +397,10 @@ table {
 	padding-bottom: 10px;
 	box-shadow: 0px 0px 10px 3px grey
 }
+.modalPopup p {
+	margin: 0 10px;
+	margin-bottom: 20px;
+}
 .modalPopup h5 {
 	width: 100%;
 	text-align: center;
@@ -320,13 +413,15 @@ table {
 	text-align: left;
 }
 .modalButton {
+	position: relative;
+	left: 50%;
+	display: inline-block;
 	margin-top: 10px;
-	margin-left: auto;
-	margin-right: auto;
-	width: 150px
 }
 .modalButton button {
-	width: 49%
+	left: -50%;
+	width: 75px;
+	margin: 0 2px;
 }
 #modificationList tr {
 	width: 100%
@@ -441,7 +536,27 @@ table {
 	overflow-y: auto; 
 }
 
+.centerOuter {
+    display: table;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+.centerOuterInline {
+    display: inline-table;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+.centerMiddle {
+    display: table-cell;
+    vertical-align: middle;
+}
 
+.centerInner {
+    margin-left: auto;
+    margin-right: auto;
+}
 
 /*
 	SVG
@@ -527,4 +642,103 @@ svg {
 }
 .trace .ms2.parent {
 	fill: darkred;
+}
+
+
+
+
+
+
+
+
+/*
+	Sliders
+*/
+.d3-slider {
+    position: relative;
+    font-size: 1.1em;
+    background: lightgrey;
+    z-index: 2;
+    margin: 15px 10px;
+}
+
+.d3-slider-horizontal {
+    height: .3em;
+}  
+
+.d3-slider-range {
+  background:steelblue;
+  left:0px;
+  right:0px;
+  height: 0.3em;
+  position: absolute;
+}
+
+.d3-slider-range-vertical {
+  background:steelblue;
+  left:0px;
+  right:0px;
+  position: absolute;
+  top:0;
+}
+
+.d3-slider-vertical {
+    width: .3em;
+    height: 100px;
+}      
+
+.d3-slider-handle {
+    position: absolute;
+    width: 0.6em;
+    height: 1.2em;
+    background: forestgreen;
+    z-index: 3;
+}
+
+.d3-slider-handle:hover {
+    background: darkgreen;
+}
+
+.d3-slider-horizontal #handle-one.d3-slider-handle {
+    top: -.45em;
+    margin-left: -.6em;
+    border-radius: 50px 0px 0px 50px
+}
+.d3-slider-horizontal #handle-two.d3-slider-handle {
+    top: -.45em;
+    border-radius: 0px 50px 50px 0px
+}
+
+.d3-slider-axis {
+    position: relative;
+    z-index: 1;    
+}
+
+.d3-slider-axis-bottom {
+    top: .3em;
+}
+
+.d3-slider-axis-right {
+    left: .3em;
+}
+
+.d3-slider-axis path {
+    stroke-width: 0;
+    fill: none;
+}
+
+.d3-slider-axis line {
+    fill: none;
+    stroke: #aaa;
+    shape-rendering: crispEdges;
+}
+
+.d3-slider-axis text {
+    font-size: 11px;
+}
+
+.d3-slider-vertical .d3-slider-handle {
+    left: -.25em;
+    margin-left: 0;
+    margin-bottom: -.6em;      
 }
