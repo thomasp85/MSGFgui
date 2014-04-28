@@ -36,5 +36,5 @@ Sangtae Kim is the developer behind the MS-GF+ algoritm, without which this pack
 
 References
 ------
-[MSGFplus (R package)](https://github.com/thomasp85/MSGFplus "MSGFplus R wrapper")
-[MS-GF+ (Original Java program)](http://proteomics.ucsd.edu/Software/MSGFPlus/ "MS-GF+ java program")
+1. [MSGFplus (R package)](https://github.com/thomasp85/MSGFplus "MSGFplus R wrapper")
+2. [MS-GF+ (Original Java program)](http://proteomics.ucsd.edu/Software/MSGFPlus/ "MS-GF+ java program")
