@@ -590,6 +590,24 @@ var dataModel = function() {
 	dm.evidence = function() {
 		return filteredEvidence;
 	};
+	dm.allSamples = function() {
+		return samples;
+	};
+	dm.allScans = function() {
+		return scans;
+	};
+	dm.allPsm = function() {
+		return psm;
+	};
+	dm.allPeptides = function() {
+		return peptides;
+	};
+	dm.allDatabase = function() {
+		return database;
+	};
+	dm.allEvidence = function() {
+		return evidence;
+	};
 	dm.filter = function(newFilter) {
 		if (!arguments.length) return filter;
 		
