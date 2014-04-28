@@ -611,6 +611,8 @@ var dataModel = function() {
 	dm.filter = function(newFilter) {
 		if (!arguments.length) return filter;
 		
+		$.extend(true, oldFilter, filter);
+		
 		if (newFilter.samples) {
 			$.extend(filter.samples, newFilter.samples);
 		}
@@ -630,7 +632,11 @@ var dataModel = function() {
 			$.extend(filter.psm, newFilter.psm);
 		}
 		
-		filterData();
+		if (samples.length != 0) {
+			return filterData();
+		} else {
+			return null;
+		}
 	};
 	dm.trimSamples = function(samples) {
 		return samples.map(function(d) {
