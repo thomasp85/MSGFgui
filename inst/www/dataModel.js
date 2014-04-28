@@ -450,29 +450,80 @@ var dataModel = function() {
 		});
 		
 		filteredDatabaseLookup = tempFilteredDatabaseLookup;
-	}
+	};
 	var filterEvidence = function() {
 		var eFilter = filter.evidence;
 		var noFilter = eFilter.post.length == 0 && eFilter.pre.length == 0;
+		var filteredMod = modifications.filter(function(f) {return filter.peptides.modifications.indexOf(f.name) != -1});
 		
 		filteredEvidence = [];
 		var tempFilteredEvidenceLookup = {};
 		var tempFilteredPeptidesLookup = {};
 		
 		evidence.forEach(function(d) {
-			if (filteredDatabaseLookup[d.database.hash] && testPeptide(d.peptide)) {
-				if (noFilter) {
-					filteredEvidence.push(d);
-					tempFilteredEvidenceLookup[d.hash] = d;
-					tempFilteredPeptidesLookup[d.peptide.hash] = d.peptide;
-				};
+			if (filteredDatabaseLookup[d.database.hash]) {
+				if (detectModification(filteredMod, d)) {
+					if (testPeptide(d.peptide)) {
+						if (noFilter) {
+							filteredEvidence.push(d);
+							tempFilteredEvidenceLookup[d.hash] = d;
+							tempFilteredPeptidesLookup[d.peptide.hash] = d.peptide;
+						};
+					}
+				}
 			};
 		});
 		
 		filteredEvidenceLookup = tempFilteredEvidenceLookup;
 		filteredPeptidesLookup = tempFilteredPeptidesLookup;
 	};
+	var pruneFiltering = function() {
+		var tempFilteredPeptidesLookup = {};
+		var tempFilteredEvidenceLookup = {};
+		var tempFilteredDatabaseLookup = {};
+		
+		filteredPsm.forEach(function(d) {
+			tempFilteredPeptidesLookup[d.peptide.hash] = d.peptide;
+		});
+		filteredPeptides = d3.values(tempFilteredPeptidesLookup);
+		filteredPeptidesLookup = tempFilteredPeptidesLookup;
+		
+		filteredPeptides.forEach(function(d) {
+			d.evidence.forEach(function(dd) {
+				tempFilteredEvidenceLookup[dd.hash] = dd;
+			});
+		});
+		filteredEvidence = d3.values(tempFilteredEvidenceLookup);
+		filteredEvidenceLookup = tempFilteredEvidenceLookup;
+		
+		filteredEvidence.forEach(function(d) {
+			tempFilteredDatabaseLookup[d.database.hash] = d.database;
+		})
+		filteredDatabase = d3.values(tempFilteredDatabaseLookup);
+		filteredDatabaseLookup = tempFilteredDatabaseLookup;
+	};
 	var filterData = function() {
+		applyFilter();
+		
+		if (validFilter()) {
+			$(dm).trigger('change');
+			
+			return true;
+		} else {
+			revertFilter();
+			
+			return false;
+		}
+		
+	};
+	var validFilter = function() {
+		return [filteredDatabase, filteredEvidence, filteredPeptides, filteredPsm, filteredSamples, filteredScans].every(function(d) {return d.length != 0});
+	};
+	var revertFilter = function() {
+		$.extend(true, filter, oldFilter);
+		applyFilter();
+	};
+	var applyFilter = function() {
 		filterDatabase();
 		filterEvidence();
 		filterPeptides();
@@ -480,8 +531,8 @@ var dataModel = function() {
 		filterScans();
 		filterPsm();
 		
-		$(dm).trigger('change')
-	};
+		pruneFiltering();
+	}
 	
 	// PUBLIC
 	
