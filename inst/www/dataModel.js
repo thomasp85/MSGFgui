@@ -173,7 +173,7 @@ var dataModel = function() {
 			regexInclude: true
 		},
 		peptides: {
-			modifications: [], // Not implemented
+			modifications: [],
 			lengthLow: 0,
 			lengthHigh: -1,
 		},
