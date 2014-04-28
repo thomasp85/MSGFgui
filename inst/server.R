@@ -545,5 +545,6 @@ shinyServer(function(input, output, session) {
     output$idPlots <- reactive({selectedScan()})
     outputOptions(output, 'idPlots', suspendWhenHidden = FALSE)
     output$samplesDensity <- reactive({scoreDistribution()})
+    outputOptions(output, 'samplesDensity', suspendWhenHidden = FALSE)
     output$resulttabs <- reactive({data()})
 })
