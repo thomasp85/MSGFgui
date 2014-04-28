@@ -13,7 +13,7 @@
 		
 			
 		<script src="d3.min.js" type="text/javascript"></script>
-		<script src="xxhash.min.lmd.js"></script>
+		<script src="d3.slider.js" type="text/javascript"></script>
 		<script src="shared/jquery.js" type="text/javascript"></script>
 		<script src="jquery.ba-throttle-debounce.min.js" type="text/javascript"></script>
 		<script src="shared/shiny.js" type="text/javascript"></script>
@@ -326,9 +326,54 @@
 					</div>
 				</div>
 				<div id="filterTab" class="row tabpane filterTab">
-					<div></div>
-					<div></div>
-					<div></div>
+					<div class="col scroll-y">
+						<div class="fdr row scroll-x">
+							<h4>FDR</h4>
+							<div id="fdrSlider">
+							</div>
+						</div>
+						<hr/>
+						<div class="sample row scroll-x filterInfo">
+							<div>
+								<div>
+									<h4>Samples</h4>
+									<select id="sampleFilterSelect" multiple size=12></select>
+									<p>Selected:&nbsp<span id="sampleFilterCount">0</span></p>
+									<input id="sampleRegex" placeholder="Regular expression"/>
+								</div>
+								<div>
+									<h4>Charge</h4>
+									<div id="chargeSlider"></div>
+									<h4>Mass-to-charge ratio</h4>
+									<div id="mzSlider"></div>
+									<h4>Retention time</h4>
+									<div id="rtSlider"></div>
+								</div>
+							</div>
+						</div>
+						<hr/>
+						<div class="database row scroll-x filterInfo">
+							<div>
+								<div>
+									<h4>Proteins</h4>
+									<select id="proteinFilterSelect" multiple size=12></select>
+									<p>Selected:&nbsp<span id="proteinFilterCount">0</span></p>
+									<input id="proteinRegex" placeholder="Regular expression"/>
+								</div>
+								<div>
+									<h4>Protein length</h4>
+									<div id="proteinSlider"></div>
+									<h4>Peptide length</h4>
+									<div id="peptideSlider"></div>
+								</div>
+								<div>
+									<h4>Modifications</h4>
+									<select id="modificationFilterSelect" multiple size=12></select>
+									<p>Selected:&nbsp<span id="modificationFilterCount">0</span></p>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<pre id="show" class="shiny-text-output"></pre>
