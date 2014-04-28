@@ -145,7 +145,7 @@ renderMzID <- function(mzID, mzML, name) {
     
     invisible(ans)
 }
-renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, tracePPM=200, ions='aby', neutralLosses=TRUE, skip=1) {
+renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, tracePPM=5, ions='aby', neutralLosses=TRUE, skip=1) {
     ans <- list()
     
     ans$scan <- annotateSpec(getScan(mzML, scan, tracePPM), seq, modifications, fragPPM, ions, neutralLosses)
