@@ -1356,6 +1356,7 @@ var ResultPane = {
 		
 		SamplesTab.init();
 		IdTab.init();
+		setTimeout(function() {FilterTab.init()}, 500);
 		
 		$(resS.tabs + ' ' + resS.tabbar + ' li').on('click', function() {
 			ResultPane.setActiveTab(this);
