@@ -633,9 +633,9 @@ var SamplesTab = {
 			SamplesTab.resize();
 		}));
 		
-		$(dataM).bind('sampleAdded', function(event, sample) {
+		$(dataM).bind('change', function() {
 			$(samS.sampleCount).text(dataM.samples().length);
-			SamplesTab.updateSamples(event, sample);
+			SamplesTab.updateSamples();
 		});
 		
 		$(samS.selector + ' select').on('change', function() {
