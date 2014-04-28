@@ -112,9 +112,12 @@ var ms2Scatter = function(element, size) {
 					.attr('r', dotRadius)
 					.attr('cx', function(d) {return x(d.rt)})
 					.attr('cy', function(d) {return y(d.mz)})
-	
+/*	
 		x.domain([0, d3.max(data, function(d) {return d.rt})]);
 		y.domain([0, d3.max(data, function(d) {return d.mz})]);
+*/		
+		x.domain(dataM.rtRange());
+		y.domain(dataM.mzRange());
 		
 		return d3.transition().each(function() {
 			svg.selectAll("g.x.axis")
