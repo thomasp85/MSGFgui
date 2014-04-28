@@ -63,7 +63,6 @@ $.extend(progress, {
 	},
 	renderValue: function(el, progressData) {
 		if (progressData) {
-			console.log(progressData)
 			AnalysisPane.setProgress(progressData);
 		}
 	}
