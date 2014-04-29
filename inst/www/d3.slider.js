@@ -49,28 +49,50 @@ d3.slider = function module() {
 
       // Slider handle
       //if range slider, create two
-      var handle1, handle2 = null, divRange;
+      var handle1, text1, handle2 = null, text2 = null, divRange;
 
       if ( value.length == 2 ) {
-        handle1 = div.append("a")
-          .classed("d3-slider-handle", true)
-          .attr("xlink:href", "#")
-          .attr('id', "handle-one")
-          .on("click", stopPropagation)
-          .call(drag);
-        handle2 = div.append("a")
-          .classed("d3-slider-handle", true)
-          .attr('id', "handle-two")
-          .attr("xlink:href", "#")
-          .on("click", stopPropagation)
-          .call(drag);
+        handle1 = div.append('div')
+          .classed('d3-slider-handle-group', true)
+          .attr('id', 'group-one')
+          .append("a")
+            .classed("d3-slider-handle", true)
+            .attr("xlink:href", "#")
+            .attr('id', "handle-one")
+            .on("click", stopPropagation)
+            .call(drag);
+	    text1 = div.select('#group-one').append('p')
+	      .classed('d3-slider-handle-text', true)
+	      .attr('id', 'text-one')
+	      .text(parseFloat(scale.tickFormat(100)(value[0])));
+	    
+        handle2 = div.append('div')
+          .classed('d3-slider-handle-group', true)
+          .attr('id', 'group-two')
+          .append("a")
+	        .classed("d3-slider-handle", true)
+	        .attr('id', "handle-two")
+	        .attr("xlink:href", "#")
+	        .on("click", stopPropagation)
+	        .call(drag);
+	    text2 = div.select('#group-two').append('p')
+	      .classed('d3-slider-handle-text', true)
+	      .attr('id', 'text-two')
+	      .text(parseFloat(scale.tickFormat(100)(value[1])));
       } else {
-        handle1 = div.append("a")
-          .classed("d3-slider-handle", true)
-          .attr("xlink:href", "#")
-          .attr('id', "handle-one")
-          .on("click", stopPropagation)
-          .call(drag);
+        handle1 = div.append('div')
+          .classed('d3-slider-handle-group', true)
+          .attr('id', 'group-one')
+          .append("a")
+	        .classed("d3-slider-handle", true)
+	        .attr("xlink:href", "#")
+	        .attr('id', "handle-one")
+	        .on("click", stopPropagation)
+	        .call(drag);
+	    text1 = div.select('#group-one').append('p')
+	      .classed('d3-slider-handle-text', true)
+	      .attr('id', 'text-one')
+	      .text(parseFloat(scale.tickFormat(100)(value)));
       }
       
       // Horizontal slider
@@ -231,6 +253,7 @@ d3.slider = function module() {
             } else {
               handle1.style(position, newPos);
             }
+            text1.text(value.length ? parseFloat(scale.tickFormat(100)(value[0])) : parseFloat(scale.tickFormat(100)(value)));
           } else {
             
             var width = 100 - parseFloat(newPos);
@@ -245,6 +268,7 @@ d3.slider = function module() {
             } else {
               handle2.style(position, newPos);
             }
+            text2.text(parseFloat(scale.tickFormat(100)(value[1])));
           }
         }
 

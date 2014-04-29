@@ -314,13 +314,16 @@ h4 {
 	#filterTab .filterInfo>div>div+div+div {
 		width: 230px;
 	}
+	#filterTab .filterInfo>div>div+div h4 {
+		margin-bottom: 20px;
+	}
 	#filterTab .filterInfo>div>div+div h4:not(:first-child) {
 		margin-top: 45px;
 	}
 	#filterTab .filterInfo input{
 		display: block;
 	}
-	#filterTab .filterInfo p {
+	#filterTab .filterInfo select+p {
 		font-size: x-small;
 		margin-top: 2px;
 		text-align: right;
@@ -698,15 +701,39 @@ svg {
 .d3-slider-handle:hover {
     background: darkgreen;
 }
+.d3-slider-handle-text {
+	position: absolute;
+	font-size: small;
+	opacity: 0;
+	-webkit-transition: opacity 0.5s ease-in-out;
+	-moz-transition: opacity 0.5s ease-in-out;
+	-ms-transition: opacity 0.5s ease-in-out;
+	-o-transition: opacity 0.5s ease-in-out;
+	transition: opacity 0.5s ease-in-out;
+}
+.d3-slider-handle-group:hover .d3-slider-handle-text, 
+.d3-slider-handle-group:active .d3-slider-handle-text {
+	opacity: 1;
+}
 
 .d3-slider-horizontal #handle-one.d3-slider-handle {
     top: -.45em;
     margin-left: -.6em;
     border-radius: 50px 0px 0px 50px
 }
+.d3-slider-horizontal #text-one.d3-slider-handle-text {
+    top: -2.75em;
+    left: 0;
+}
+
 .d3-slider-horizontal #handle-two.d3-slider-handle {
     top: -.45em;
     border-radius: 0px 50px 50px 0px
+}
+.d3-slider-horizontal #text-two.d3-slider-handle-text {
+    top: -2.75em;
+    right: 0;
+    text-align: right;
 }
 
 .d3-slider-axis {
