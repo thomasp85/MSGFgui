@@ -63,3 +63,37 @@ $.extend(scanSelector, {
 });
 
 Shiny.inputBindings.register(scanSelector, 'msgf.scanSelector');
+
+/*
+	Handles changes to the client side global settings object
+*/
+var settingsInput = new Shiny.InputBinding();
+$.extend(settingsInput, {
+	find: function(scope) {
+		return $(settings);
+	},
+	getValue: function(el) {
+		return {
+			trace: settings.trace(),
+			fragment: settings.fragment(),
+			missedIons: settings.missedIons(),
+			plotTrace: settings.plotTrace()
+		}
+	},
+	getId: function(el) {
+		return 'globalSettings';
+	},
+	setValue: function(el, value) {
+		null
+	},
+	subscribe: function(el, callback) {
+		$(el).on("change", function(e) {
+			callback();
+		});
+	},
+	unsubscribe: function(el) {
+		$(el).off();
+	}
+});
+
+Shiny.inputBindings.register(settingsInput, 'msgf.settings');
