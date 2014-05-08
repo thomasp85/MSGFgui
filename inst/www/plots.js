@@ -491,6 +491,7 @@ var evidencePlot = function(element, size) {
 		return newD
 	});
 	var fragmentCornerRadius = 8;
+	var currentScan = '';
 	
 	
 	var svgArc = element.append('svg')
@@ -790,7 +791,8 @@ var evidencePlot = function(element, size) {
 	};
 	
 	var prepareScan = function(scan) {
-		var newScan = scan.scan.mz.map(function(d,i) {
+		var newScan = {}
+		newScan.scan = scan.scan.mz.map(function(d,i) {
 			return {
 				mz: d,
 				intensity: scan.scan.intensity[i],
@@ -799,7 +801,6 @@ var evidencePlot = function(element, size) {
 				index: scan.scan.index[i]
 			};
 		})
-		scan.scan = newScan;
 		
 		if (scan.trace) {
 			var newTrace = scan.trace.intensity.map(function(d,i) {
@@ -812,11 +813,27 @@ var evidencePlot = function(element, size) {
 				};
 			})
 		}
-		scan.trace = newTrace;
+		newScan.trace = newTrace;
+		newScan.id = scan.id;
+		
+		return newScan;
 	};
 	
-	var createFragmentAnnotation = function(scan) {
-		var filteredScan = scan.filter(function(f) {return f.ion});
+	var createFragmentAnnotation = function(scan, settings) {
+		var filteredScan = scan.filter(function(d) {
+			var ans = true;
+			
+			if (!d.ion) return false;
+			
+			
+			if (d.ion.length == 2 && !settings.neutralLoss) {
+				ans = false;
+			}
+			if (!settings.fragmentIons[d.ion[0]]) {
+				ans = false;
+			}
+			return ans;
+		});
 		var peptideLength = svgArc.selectAll('.residue:not(.exterior)').size();
 		var box = svgArc.selectAll('.residues').node().getBBox();
 		
@@ -899,7 +916,7 @@ var evidencePlot = function(element, size) {
 				.style('opacity', 1)
 		})
 		
-	}
+	};
 	
 	var createTrace = function(traceData) {
 		trace = true;
@@ -976,7 +993,7 @@ var evidencePlot = function(element, size) {
 			svgArc.selectAll('.peptide').transition()
 				.attr('transform', 'translate(0,0)')
 		})
-	}
+	};
 	
 	var removeTrace = function() {
 		trace = 'false';
@@ -1000,7 +1017,7 @@ var evidencePlot = function(element, size) {
 				}
 			}
 		})
-	}
+	};
 	
 	var moveProtein = function(direction) {
 		
@@ -1018,7 +1035,7 @@ var evidencePlot = function(element, size) {
 				.selectAll('.arcGroup')
 					.style('opacity', 1)
 		}
-	}
+	};
 	
 	var spectrumHeight = function() {
 		if (svgArc.selectAll('.peptideBox').empty()) {
@@ -1344,12 +1361,18 @@ var evidencePlot = function(element, size) {
 			.style('opacity', 1);
 	};
 	
-	plot.selectScan = function(scan) {
+	plot.selectScan = function(data, settings) {
 		plotState = 'scan';
-		prepareScan(scan);
+		
+		if (data.id == currentScan) return;
+		
+		currentScan = data.id;
+		
+		var scan = prepareScan(data);
+		
 		var oldFragments = svgArc.selectAll('.fragments');
 		
-		createFragmentAnnotation(scan.scan);
+		createFragmentAnnotation(scan.scan, settings);
 		
 		if (scan.trace) {
 			createTrace(scan.trace);
@@ -1412,7 +1435,7 @@ var evidencePlot = function(element, size) {
 				.style('fill', 'forestgreen')
 				.style('text-anchor', 'middle');
 		
-		x.domain([0, d3.max(scan.scan, function(d) {return d.mz})])
+		x.domain([0, d3.max(scan.scan, function(d) {return d.mz})*1.05])
 		y.domain([0, d3.max(scan.scan, function(d) {return d.intensity})])
 		
 				
@@ -1448,6 +1471,21 @@ var evidencePlot = function(element, size) {
 					.attr('y', y(0))
 					.style('opacity', 0)
 			});
+			
+			ions.classed('hidden', function(d) {
+				var ans = false;
+				
+				if (!d.ion) return ans;
+				
+				if (d.ion.length == 2 && !settings.neutralLoss) {
+					ans = true;
+				}
+				if (!settings.fragmentIons[d.ion[0]]) {
+					ans = true;
+				}
+				return ans;
+			})
+			
 			ions.sort(function(a, b) {
 				if (a.ion) {
 					return b.ion ? 0 : 1
@@ -1481,6 +1519,38 @@ var evidencePlot = function(element, size) {
 				.style('opacity', 0)
 				.remove();
 			if (plotState == 'scan') moveProtein('down');
+		})
+	};
+	
+	plot.updateScan = function(settings) {
+		if (plotState != 'scan') return;
+		
+		var ions = svgScan.selectAll('.spectrum').selectAll('.plot-area').selectAll('.ions');
+		var scan = ions.data();
+		
+		ions.classed('hidden', function(d) {
+			var ans = false;
+			
+			if (!d.ion) return ans;
+			
+			if (d.ion.length == 2 && !settings.neutralLoss) {
+				ans = true;
+			}
+			if (!settings.fragmentIons[d.ion[0]]) {
+				ans = true;
+			}
+			return ans;
+		})
+		
+		var oldFragments = svgArc.selectAll('.fragments');
+		
+		createFragmentAnnotation(scan, settings);
+		
+		d3.transition().each(function() {
+			oldFragments.transition()
+				.style('opacity', 0)
+		}).each('end', function() {
+			oldFragments.remove()
 		})
 	};
 	
