@@ -498,7 +498,8 @@ shinyServer(function(input, output, session) {
             dataStore[[index]] <<- list(
                 name=basename(dataFiles[1]),
                 mzID=res,
-                mzML=raw
+                mzML=raw,
+                id=sampleID()
             )
             dataFiles <<- dataFiles[-1]
             nextFile <- dataFiles[1]
@@ -528,7 +529,7 @@ shinyServer(function(input, output, session) {
         sNames <- input$samplesSelect
         if(length(sNames) == 0) return(NULL)
         
-        dist <- getScoreDistribution(dataStore[sapply(dataStore, function(x) {x$name %in% sNames})])
+        dist <- getScoreDistribution(dataStore[sapply(dataStore, function(x) {x$id %in% sNames})])
         list(
             target = list(
                 x=dist$target$x,
