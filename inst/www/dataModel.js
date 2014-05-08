@@ -574,7 +574,75 @@ var dataModel = function() {
 		
 		$(dm).trigger('sampleAdded', [sample]);
 	};
-	dm.samples = function(names) {
+	dm.remove = function(sample) {
+		if (samplesLookup[sample]) {
+			var keptSamples = samples.map(function(d) {return d.name});
+			keptSamples.splice(keptSamples.indexOf(sample), 1);
+			var sampleRemovingFilter = {
+				samples: {
+					names: keptSamples,
+					regex: null,
+					regexInclude: true
+				},
+				database: {
+					lengthLow: 0,
+					lengthHigh: -1,
+					names: [],
+					regex: null,
+					regexInclude: true
+				},
+				peptides: {
+					modifications: [],
+					lengthLow: 0,
+					lengthHigh: -1,
+				},
+				evidence: {
+					post: [], // Not implemented
+					pre: [] // Not implemented
+				},
+				scans: {
+					mzLow: 0,
+					mzHigh: -1,
+					rtLow: 0,
+					rtHigh: -1
+				},
+				psm: {
+					chargeLow: 0,
+					chargeHigh: -1,
+					qValueLow: 0,
+					qValueHigh: -1
+				}
+			};
+			
+			applyFilter(sampleRemovingFilter)
+			
+			samples = filteredSamples;
+			scans = filteredScans;
+			psm = filteredPsm;
+			peptides = filteredPeptides;
+			database = filteredDatabase;
+			evidence = filteredEvidence;
+			
+			samplesLookup = filteredSamplesLookup;
+			databaseLookup = filteredDatabaseLookup;
+			peptidesLookup = filteredPeptidesLookup;
+			evidenceLookup = filteredEvidenceLookup;
+			
+			peptides.forEach(function(d) {
+				for (var i = d.psm.length; i; i--) {
+					if(!filteredPsmLookup[d.psm[i-1].hash]) d.psm.splice(i-1, 1)
+				}
+			})
+			
+			applyFilter(filter);
+			
+			$(dm).trigger('change');
+			
+			return true;
+		} else {
+			return false;
+		}
+	};
 	dm.samples = function(ids) {
 		if (!arguments.length) return filteredSamples;
 		
