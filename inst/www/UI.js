@@ -203,16 +203,16 @@ var globalSettings = function() {
 					break;
 				case 'nscans':
 					elements.sort(function(a,b) {
-						var A = dataM.trimEvidence(a.evidence).reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
-						var B = dataM.trimEvidence(b.evidence).reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						var A = dataM.trimEvidence(a.evidence).map(function(d) {return dataM.trimPsm(d.peptide.psm).length}).reduce(function(a,b) {return a+b});
+						var B = dataM.trimEvidence(b.evidence).map(function(d) {return dataM.trimPsm(d.peptide.psm).length}).reduce(function(a,b) {return a+b});
 						
 						return sortFunctions.numeric[currentSort.order](A,B);
 					});
 					break;
 				case 'nscanstotal':
 					elements.sort(function(a,b) {
-						var A = a.evidence.reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
-						var B = b.evidence.reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						var A = a.evidence.map(function(d) {return d.peptide.psm.length}).reduce(function(a,b) {return a+b});
+						var B = b.evidence.map(function(d) {return d.peptide.psm.length}).reduce(function(a,b) {return a+b});
 						
 						return sortFunctions.numeric[currentSort.order](A,B);
 					});
