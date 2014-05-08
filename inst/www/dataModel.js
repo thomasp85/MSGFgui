@@ -291,7 +291,7 @@ var dataModel = function() {
 		};
 	};
 	
-	var filterSamples = function() {
+	var filterSamples = function(filter) {
 		var sFilter = filter.samples;
 		var noFilter = sFilter.names.length == 0 && sFilter.regex == null;
 		
@@ -324,7 +324,7 @@ var dataModel = function() {
 		
 		filteredSamplesLookup = tempFilteredSamplesLookup;
 	};
-	var filterScans = function() {
+	var filterScans = function(filter) {
 		var sFilter = filter.scans;
 		var noFilter = sFilter.mzLow == 0 && sFilter.mzHigh == -1 && sFilter.rtLow == 0 && sFilter.rtHigh == -1;
 		
@@ -345,10 +345,10 @@ var dataModel = function() {
 		
 		filteredScansLookup = tempFilteredScansLookup;
 	};
-	var filterPeptides = function() {
+	var filterPeptides = function(filter) {
 		filteredPeptides = d3.values(filteredPeptidesLookup);
 	};
-	var testPeptide = function(peptide) {
+	var testPeptide = function(peptide, filter) {
 		var pFilter = filter.peptides;
 		var noFilter = pFilter.modifications.length == 0 && pFilter.lengthLow == 0 && pFilter.lengthHigh == -1;
 		
@@ -384,7 +384,7 @@ var dataModel = function() {
 			return false;
 		})
 	}
-	var filterPsm = function() {
+	var filterPsm = function(filter) {
 		var pFilter = filter.psm;
 		var noFilter = pFilter.chargeLow == 0 && pFilter.chargeHigh == -1 && pFilter.qValueLow == 0 && pFilter.qValueHigh == -1;
 		
@@ -410,8 +410,7 @@ var dataModel = function() {
 		filteredScansLookup = tempFilteredScansLookup;
 		filteredScans = d3.values(tempFilteredScansLookup);
 	};
-	// TODO: Remove database entries if not in samplelist
-	var filterDatabase = function() {
+	var filterDatabase = function(filter) {
 		var dFilter = filter.database;
 		var noFilter = dFilter.lengthLow == 0 && dFilter.lengthHigh == -1 && dFilter.names.length == 0 && dFilter.regex == null;
 		
@@ -455,7 +454,7 @@ var dataModel = function() {
 		
 		filteredDatabaseLookup = tempFilteredDatabaseLookup;
 	};
-	var filterEvidence = function() {
+	var filterEvidence = function(filter) {
 		var eFilter = filter.evidence;
 		var noFilter = eFilter.post.length == 0 && eFilter.pre.length == 0;
 		var filteredMod = modifications.filter(function(f) {return filter.peptides.modifications.indexOf(f.name) != -1});
@@ -467,7 +466,7 @@ var dataModel = function() {
 		evidence.forEach(function(d) {
 			if (filteredDatabaseLookup[d.database.hash]) {
 				if (detectModification(filteredMod, d)) {
-					if (testPeptide(d.peptide)) {
+					if (testPeptide(d.peptide, filter)) {
 						if (noFilter) {
 							filteredEvidence.push(d);
 							tempFilteredEvidenceLookup[d.hash] = d;
