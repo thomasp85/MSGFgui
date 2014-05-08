@@ -40,6 +40,26 @@ pepMass <- function(pepseq, modifications, mono=FALSE, neutral=FALSE){
     }
     mass
 }
+sampleID <- function() {
+    # Random ID generator based on UUID implementation by thelatemail: http://stackoverflow.com/questions/10492817/how-can-i-generate-a-guid-in-r
+    baseuuid <- paste(sample(c(letters[1:6],0:9),30,replace=TRUE),collapse="")
+    
+    paste(
+        substr(baseuuid,1,8),
+        "-",
+        substr(baseuuid,9,12),
+        "-",
+        "4",
+        substr(baseuuid,13,15),
+        "-",
+        sample(c("8","9","a","b"),1),
+        substr(baseuuid,16,18),
+        "-",
+        substr(baseuuid,19,30),
+        sep="",
+        collapse=""
+    )
+}
 modStringToMod <- function(modString) {
     mod <- strsplit(modString, ';', fixed=TRUE)[[1]]
     modPar <- list()
@@ -103,7 +123,7 @@ spectrumIDtoAcqNum <- function(spectrumid) {
     regExp <- '^\\D*(\\d+)\\D*$'
     as.numeric(sub(regExp, '\\1', spectrumid, perl=T))
 }
-renderMzID <- function(mzID, mzML, name) {
+renderMzID <- function(mzID, mzML, name, id) {
     idNames <- c('peptide_ref', 'experimentalmasstocharge', 'chargestate', 'ms-gf:denovoscore', 'ms-gf:qvalue', 'id')
     evidenceNames <- c('post', 'pre', 'end', 'start', 'peptide_ref', 'dbsequence_ref')
     databaseNames <- c('accession', 'length', 'id', 'description')
@@ -113,6 +133,8 @@ renderMzID <- function(mzID, mzML, name) {
     ans <- list()
     
     ans$name <- name
+    
+    ans$id <- id
     
     ans$scoreDistribution <- list(
         decoy = density(id(mzID)$`ms-gf:rawscore`[id(mzID)$peptide_ref %in% evidence(mzID)$peptide_ref[evidence(mzID)$isdecoy]], from = 0),
@@ -524,7 +546,7 @@ shinyServer(function(input, output, session) {
         if (is.null(scan)) return(NULL)
         
         sampleIndex <- which(sapply(dataStore, function(x) {
-            x$name == scan$sample
+            x$id == scan$sampleID
         }))
         scanIndex <- which(scans(dataStore[[sampleIndex]]$mzID)$id == scan$scan)
         scanNum <- scans(dataStore[[sampleIndex]]$mzID)$acquisitionnum[scanIndex]
