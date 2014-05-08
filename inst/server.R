@@ -167,12 +167,14 @@ renderMzID <- function(mzID, mzML, name, id) {
     
     invisible(ans)
 }
-renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, tracePPM=5, ions='aby', neutralLosses=TRUE, skip=1) {
+renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, tracePPM=5, ions='abcxyz', neutralLosses=TRUE, showTrace=FALSE) {
     ans <- list()
     
     ans$scan <- annotateSpec(getScan(mzML, scan, tracePPM), seq, modifications, fragPPM, ions, neutralLosses)
     
-    ans$trace <- traceParent(mzML, scan, tracePPM, skip)
+    ans$trace <- if(showTrace) {traceParent(mzML, scan, tracePPM)} else {NULL}
+    
+    ans$id <- sampleID()
     
     ans
 }
@@ -203,7 +205,7 @@ getScan <- function(data, scan, ppm=20) {
     }
     spec
 }
-fragPattern <- function(pepseq, modifications=list(), ions='aby', neutralLosses=TRUE){
+fragPattern <- function(pepseq, modifications=list(), ions='abcxyz', neutralLosses=TRUE){
     AAtable <- getAAtable()
     ions <- strsplit(ions, '')[[1]]
     pepseq <- toupper(pepseq)
@@ -260,7 +262,7 @@ fragPattern <- function(pepseq, modifications=list(), ions='aby', neutralLosses=
     ans <- ans[-which(sapply(ans$mz, is.na)), ]
     ans
 }
-annotateSpec <- function(spec, pepseq, modifications=list(), ppm=20, ions='aby', neutralLosses=TRUE) {
+annotateSpec <- function(spec, pepseq, modifications=list(), ppm=20, ions='abcxyz', neutralLosses=TRUE) {
     ionlab <- data.frame(spec, ion=NA, index=NA, stringsAsFactors=FALSE)
     ionlist <- fragPattern(pepseq, modifications, ions=ions, neutralLosses=neutralLosses)
     for(i in 1:nrow(ionlist)){
