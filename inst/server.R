@@ -3,6 +3,7 @@ library(shiny)
 library(MSGFplus)
 library(mzID)
 library(mzR)
+require(tools)
 
 ## UTILITY FUNCTIONS
 getAAtable <- function(){
