@@ -26,6 +26,7 @@ d3.slider = function module() {
       dispatch = d3.dispatch("slide", "slideend", "change"),
       formatPercent = d3.format(".2%"),
       tickFormat = d3.format(".0"),
+      numberFormat = function(n) {return Math.abs(n)>1 ? parseFloat(n.toFixed(2)) : parseFloat(n.toPrecision(2))},
       sliderLength;
 
   function slider(selection) {
@@ -64,7 +65,7 @@ d3.slider = function module() {
 	    text1 = div.select('#group-one').append('p')
 	      .classed('d3-slider-handle-text', true)
 	      .attr('id', 'text-one')
-	      .text(parseFloat(scale.tickFormat(100)(value[0])));
+	      .text(numberFormat(value[0]));
 	    
         handle2 = div.append('div')
           .classed('d3-slider-handle-group', true)
@@ -78,7 +79,7 @@ d3.slider = function module() {
 	    text2 = div.select('#group-two').append('p')
 	      .classed('d3-slider-handle-text', true)
 	      .attr('id', 'text-two')
-	      .text(parseFloat(scale.tickFormat(100)(value[1])));
+	      .text(numberFormat(value[1]));
       } else {
         handle1 = div.append('div')
           .classed('d3-slider-handle-group', true)
@@ -92,7 +93,7 @@ d3.slider = function module() {
 	    text1 = div.select('#group-one').append('p')
 	      .classed('d3-slider-handle-text', true)
 	      .attr('id', 'text-one')
-	      .text(parseFloat(scale.tickFormat(100)(value)));
+	      .text(numberFormat(value));
       }
       
       // Horizontal slider
@@ -253,7 +254,7 @@ d3.slider = function module() {
             } else {
               handle1.style(position, newPos);
             }
-            text1.text(value.length ? parseFloat(scale.tickFormat(100)(value[0])) : parseFloat(scale.tickFormat(100)(value)));
+            text1.text(value.length ? numberFormat(value[0]) : numberFormat(value));
           } else {
             
             var width = 100 - parseFloat(newPos);
@@ -268,7 +269,7 @@ d3.slider = function module() {
             } else {
               handle2.style(position, newPos);
             }
-            text2.text(parseFloat(scale.tickFormat(100)(value[1])));
+            text2.text(numberFormat(value[1]));
           }
         }
 
@@ -359,10 +360,14 @@ d3.slider = function module() {
 	  
 	  
 	  var handle1 = selection.select('#handle-one')
+	  var text1 = selection.select('#text-one')
+	  text1.text(numberFormat(value.length ? value[0] : value))
 	  
 	  if (value.length == 2) {
 		  var handle2 = selection.select('#handle-two')
+		  var text2 = selection.select('#text-two')
 		  var divRange = selection.select('.d3-slider-range')
+		  text2.text(numberFormat(value[1]))
 	  }
 	  
 	  
