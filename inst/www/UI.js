@@ -6,7 +6,382 @@
 	Add interactivity to graphs
 */
 
+var globalSettings = function() {
+	var sortFunctions = {
+		alpha: {
+			ascending: function(a,b) {
+				return a<b ? -1 : a==b ? 0 : 1;
+			},
+			descending: function(b,a) {
+				return a<b ? -1 : a==b ? 0 : 1;
+			}
+		},
+		numeric: {
+			ascending: function(a,b) {
+				return a-b;
+			},
+			descending: function(a,b) {
+				return b-a;
+			}
+		}
+	}
+	
+	var traceAccuracy = 5;
+	var fragmentAccuracy = 60;
+	var allowedMissedIons = 1;
+	var ionLimit = null;
+	var neutralLosses = true;
+	var plotIon = {a:true, b:true, c:false, x:false, y:true, z:false};
+	var plotTrace = true;
+	
+	// Supported sort attributes: accession, length, coverage, fullcoverage, nscans, nscanstotal
+	var proteinSort = [{attr: 'coverage', order: 'descending'}];
+	// Supported sort attributes: position, length, sequence, nmodifications
+	var peptideSort = [{attr: 'position', order: 'ascending'}];
+	// Supported sort attributes: sample, rt, mz, charge, qvalue
+	var scanSort = [{attr: 'sample', order: 'ascending'}, {attr: 'charge', order: 'ascending'}, {attr: 'rt', order: 'ascending'}];
+	
+	var changedSettings = {};
+	
+	settings = {}
+	
+	settings.trace = function(ppm) {
+		if (!arguments.length) return traceAccuracy;
+		
+		if (traceAccuracy != ppm) {
+			traceAccuracy = ppm;
+			changedSettings.trace = true;
+		}
+		return settings;
+	};
+	settings.fragment = function(ppm) {
+		if (!arguments.length) return fragmentAccuracy;
+		
+		if (fragmentAccuracy != ppm) {
+			fragmentAccuracy = ppm;
+			changedSettings.fragment = true;
+		}
+		return settings;
+	};
+	settings.missedIons = function(n) {
+		if (!arguments.length) return allowedMissedIons;
+		
+		if (allowedMissedIons != n) {
+			allowedMissedIons = n;
+			changedSettings.missedIons = true;
+		}
+		return settings;
+	};
+	settings.ionLimit = function(n) {
+		if (!arguments.length) return ionLimit;
+		
+		if (ionLimit != n) {
+			ionLimit = n;
+			changedSettings.ionLimit = true;
+		}
+		return settings;
+	};
+	settings.plotNeutralLoss = function(bool) {
+		if (!arguments.length) return neutralLosses;
+		
+		if (neutralLosses != bool) {
+			neutralLosses = bool;
+			changedSettings.neutralLosses = true;
+		}
+		return settings;
+	};
+	settings.fragmentIons = function(arr) {
+		if (!arguments.length) return plotIon;
+		
+		for (i in plotIon) {
+			var present = arr.indexOf(i) != -1;
+			if (present != plotIon[i]) {
+				plotIon[i] = present;
+				changedSettings.fragmentIons = true;
+			}
+		}
+		return settings;
+	};
+	settings.plotTrace = function(bool) {
+		if (!arguments.length) return plotTrace;
+		
+		if (plotTrace != bool) {
+			plotTrace = bool;
+			changedSettings.plotTrace = true;
+		}
+		return settings;
+	};
+	
+	settings.proteinSort = function(sort, add) {
+		if (!arguments.length) return proteinSort.slice(0);
+		if (add) {
+			proteinSort.push(sort);
+			changedSettings.proteinSort = true;
+		} else {
+			sort = Array.isArray(sort) ? sort : [sort];
+			if (JSON.stringify(proteinSort) != JSON.stringify(sort)) {
+				proteinSort = sort;
+				changedSettings.proteinSort = true;
+			}
+		}
+		
+		return settings
+	};
+	settings.evidenceSort = function(sort, add) {
+		if (!arguments.length) return peptideSort.slice(0);
+		
+		if (add) {
+			peptideSort.push(sort);
+			changedSettings.evidenceSort = true;
+		} else {
+			sort = Array.isArray(sort) ? sort : [sort];
+			if (JSON.stringify(peptideSort) != JSON.stringify(sort)) {
+				peptideSort = sort;
+				changedSettings.evidenceSort = true;
+			}
+		}
+		
+		return settings
+	};
+	settings.psmSort = function(sort, add) {
+		if (!arguments.length) return scanSort.slice(0);
+		
+		if (add) {
+			scanSort.push(sort);
+			changedSettings.psmSort = true;
+		} else {
+			sort = Array.isArray(sort) ? sort : [sort];
+			if (JSON.stringify(scanSort) != JSON.stringify(sort)) {
+				scanSort = sort;
+				changedSettings.psmSort = true;
+			}
+		}
+		
+		return settings
+	};
+	
+	settings.sortProteins = function(array) {
+		var sort = proteinSort.slice(0);
+		
+		var elements = array.slice(0)
 
+		while (sort.length) {
+			var currentSort = sort.pop();
+			
+			switch (currentSort.attr) {
+				case 'accession':
+					elements.sort(function(a,b) {
+						var A = a.accession;
+						var B = b.accession;
+						
+						return sortFunctions.alpha[currentSort.order](A,B);
+					});
+					break;
+				case 'length':
+					elements.sort(function(a,b) {
+						var A = a.length;
+						var B = b.length;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'coverage':
+					elements.sort(function(a,b) {
+						var A = dataM.trimEvidence(a.evidence).length;
+						var B = dataM.trimEvidence(b.evidence).length;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'fullcoverage':
+					elements.sort(function(a,b) {
+						var A = a.evidence.length;
+						var B = b.evidence.length;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'nscans':
+					elements.sort(function(a,b) {
+						var A = dataM.trimEvidence(a.evidence).reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						var B = dataM.trimEvidence(b.evidence).reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'nscanstotal':
+					elements.sort(function(a,b) {
+						var A = a.evidence.reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						var B = b.evidence.reduce(function(a,b) {return a.peptide.psm.length+b.peptide.psm.length}, 0);
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+			}
+		}
+		return elements;
+	};
+	settings.sortEvidence = function(array) {
+		var sort = peptideSort.slice(0);
+		
+		var elements = array.slice(0);
+		
+		while (sort.length) {
+			var currentSort = sort.pop();
+			
+			switch (currentSort.attr) {
+				case 'position':
+					elements.sort(function(a,b) {
+						var A = a.start;
+						var B = b.start;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'length':
+					elements.sort(function(a,b) {
+						var A = a.peptide.sequence.length;
+						var B = b.peptide.sequence.length;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'sequence':
+					elements.sort(function(a,b) {
+						var A = a.peptide.sequence;
+						var B = b.peptide.sequence;
+						
+						return sortFunctions.alpha[currentSort.order](A,B);
+					});
+					break;
+				case 'nmodifications':
+					elements.sort(function(a,b) {
+						var A = a.peptide.modifications ? a.peptide.modifications.length : 0;
+						var B = b.peptide.modifications ? b.peptide.modifications.length : 0;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+			}
+		}
+		return elements;
+	};
+	settings.sortPsm = function(array) {
+		var sort = scanSort.slice(0);
+		
+		var elements = array.slice(0);
+		
+		while (sort.length) {
+			var currentSort = sort.pop();
+			
+			switch (currentSort.attr) {
+				case 'sample':
+					elements.sort(function(a,b) {
+						var A = a.scan.sample.name;
+						var B = b.scan.sample.name;
+						
+						return sortFunctions.alpha[currentSort.order](A,B);
+					});
+					break;
+				case 'rt':
+					elements.sort(function(a,b) {
+						var A = a.scan.rt;
+						var B = b.scan.rt;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'mz':
+					elements.sort(function(a,b) {
+						var A = a.scan.mz;
+						var B = b.scan.mz;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'charge':
+					elements.sort(function(a,b) {
+						var A = a.charge;
+						var B = b.charge;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+				case 'qvalue':
+					elements.sort(function(a,b) {
+						var A = a.qvalue;
+						var B = b.qvalue;
+						
+						return sortFunctions.numeric[currentSort.order](A,B);
+					});
+					break;
+			}
+		}
+		return elements;
+	};
+	
+	settings.sortMethodNames = function() {
+		return {
+			protein: {
+				accession: 'Name', 
+				length: 'Length', 
+				coverage: 'Filtered coverage', 
+				fullcoverage: 'Total coverage', 
+				nscans: '# Filtered scans', 
+				nscanstotal: '# Total scans'
+
+			},
+			evidence: {
+				position: 'Position', 
+				length: 'Length', 
+				sequence: 'Sequence', 
+				nmodifications: '# Modifications'
+			},
+			psm: {
+				sample: 'Sample name', 
+				rt: 'Retention time', 
+				mz: 'Mass-to-charge', 
+				charge: 'Charge', 
+				qvalue: 'Qvalue'
+			}
+		}
+	}
+	settings.sortMethodTypes = function() {
+		return {
+			protein: {
+				accession: 'alpha', 
+				length: 'amount', 
+				coverage: 'numeric', 
+				fullcoverage: 'numeric', 
+				nscans: 'numeric', 
+				nscanstotal: 'numeric'
+
+			},
+			evidence: {
+				position: 'numeric', 
+				length: 'amount', 
+				sequence: 'alpha', 
+				nmodifications: 'numeric'
+			},
+			psm: {
+				sample: 'alpha', 
+				rt: 'numeric', 
+				mz: 'numeric', 
+				charge: 'numeric', 
+				qvalue: 'numeric'
+			}
+		}
+	}
+	
+	settings.sentChanges = function() {
+		$(settings).trigger('change', [d3.keys(changedSettings)]);
+		changedSettings = {};
+	}
+	
+	return settings;
+}
+
+var settings = globalSettings();
 
 
 // Constants
