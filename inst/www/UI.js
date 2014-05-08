@@ -410,21 +410,54 @@ var createModalDialog = function(id, title) {
 }
 
 var dismissDialog = function(id) {
+	Shiny.unbindAll();
 	$('#'+id).remove();
+	Shiny.bindAll();
 }
+
+var filePathModal = function(id, title) {
+	var modal = createModalDialog(id, title);
+	
+	modal.addClass('filePathModal').append(
+		$('<div>').append(
+			$('<label>', {text: 'Filepath'}).append(
+				$('<input>', {type: 'text'}).prop('autofocus', true).on('input change', function() {
+					filePathValidate('#'+id);
+				})
+			)
+		)
+	).append(
+		$('<div>').addClass('errorContainer')
+	).append(
+		$('<div>').addClass('modalButton').append(
+			$('<button>', {text: 'Add'}).addClass('topcoat-button--cta').prop('disabled', true)
+		).append(
+			$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
+				dismissDialog(id)
+			})
+		)
+	);
+	
+	return modal
+};
+var filePathValidate = function(id) {
+	$(id + ' .topcoat-button--cta').prop('disabled', $(id + ' input').val() == '');
+};
 
 // Adopted from http://stackoverflow.com/questions/17964108/select-multiple-html-table-rows-with-ctrlclick-and-shiftclick
 
-var rowSelector = function(table) {
-	var lastSelectedRow;
+var rowSelector = function(row, single, forceSelect) {
+	var table = $(row).parent();
+	var lastSelectedRow = table.data('lastRow');
+
 	
 	function toggleRow(row) {
 	    $(row).toggleClass('selected');
-	    lastSelectedRow = row;
+	    table.data('lastRow', row);
 	}
 	
 	function selectRowsBetweenIndexes(indexes) {
-		var trs = $(table).find('tr');
+		var trs = table.find('tr');
 	    indexes.sort(function(a, b) {
 	        return a - b;
 	    });
@@ -435,25 +468,23 @@ var rowSelector = function(table) {
 	}
 	
 	function clearAll() {
-		$(table).find('tr').removeClass('selected');
+		table.find('tr').removeClass('selected');
 	}
-	
-	return function(row) {
-	    if (window.event.button === 0) {
-	        if (!window.event.metaKey && !window.event.ctrlKey && !window.event.shiftKey) {
-	        	var selected = $(row).hasClass('selected');
-	        	var nSelected = $(table).find('.selected').length;
-	            clearAll();
-	            if (!selected || nSelected != 1) {
-	        	    toggleRow(row);		            
-	            }
-	        } else if (window.event.metaKey || window.event.ctrlKey) {
-		        toggleRow(row);
-		    } else if (window.event.shiftKey) {
-	            selectRowsBetweenIndexes([lastSelectedRow.rowIndex, row.rowIndex])
-	        }
-	    }
-	}
+
+    if (window.event.button === 0) {
+        if ((!window.event.metaKey && !window.event.ctrlKey && !window.event.shiftKey) || single) {
+        	var selected = $(row).hasClass('selected');
+        	var nSelected = table.find('.selected').length;
+            clearAll();
+            if ((!selected || nSelected != 1) || forceSelect) {
+        	    toggleRow(row);		            
+            }
+        } else if ((window.event.metaKey || window.event.ctrlKey) && !single) {
+	        toggleRow(row);
+	    } else if (window.event.shiftKey && !single) {
+            selectRowsBetweenIndexes([lastSelectedRow.rowIndex, row.rowIndex])
+        }
+    }
 }
 
 
@@ -481,7 +512,6 @@ var ModificationParameters = {
 	},
 	init: function() {
 		modS = this.settings;
-		this.modificationTableSelector = rowSelector(modS.selector)
 		
 		
 		$(modS.addButton).on('click', function() {
@@ -497,11 +527,10 @@ var ModificationParameters = {
 		});
 		
 		$(modS.selector + ' tr').on('mousedown', function() {
-			ModificationParameters.modificationTableSelector(this);
+			rowSelector(this);
 			ModificationParameters.setModButtonAct();
 		})
 	},
-	modificationTableSelector: null,
 	validateModPar: function() {
 		
 		if ($(modS.modalSelectors.name).val() == '' ||
@@ -542,7 +571,7 @@ var ModificationParameters = {
 		var parString = this.createModString();
 		
 		var row = $('<tr>', {'data-collapse': parString}).on('mousedown', function() {
-			ModificationParameters.modificationTableSelector(this);
+			rowSelector(this);
 			ModificationParameters.setModButtonAct();
 		}).addClass(selected ? 'selected' : '').append(
 			$('<td>', {text: $(modS.modalSelectors.type + ' option:selected').text()})
@@ -821,8 +850,6 @@ var DataInputSetup = {
 	init: function() {
 		dataS = this.settings;
 		
-		this.dataRowSelector = rowSelector(dataS.datafiles)
-		
 		$(dataS.databaseButton).on('click', function() {
 			DataInputSetup.databaseModal();
 		});
@@ -835,35 +862,8 @@ var DataInputSetup = {
 			DataInputSetup.removeDatafiles();
 		});
 	},
-	dataRowSelector: null,
-	filePathModal: function(id, title) {
-		var modal = createModalDialog(id, title);
-		
-		modal.append(
-			$('<div>').append(
-				$('<label>', {text: 'Filepath'}).append(
-					$('<input>', {type: 'text'}).prop('autofocus', true).on('input change', function() {
-						DataInputSetup.filePathValidate('#'+id);
-					})
-				)
-			)
-		).append(
-			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: 'Add'}).addClass('topcoat-button--cta').prop('disabled', true)
-			).append(
-				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
-					dismissDialog(id)
-				})
-			)
-		);
-		
-		return modal
-	},
-	filePathValidate: function(id) {
-		$(id + ' .topcoat-button--cta').prop('disabled', $(id + ' input').val() == '');
-	},
 	databaseModal: function() {
-		var modal = this.filePathModal(dataS.databaseInput.substring(1), 'Set database location');
+		var modal = filePathModal(dataS.databaseInput.substring(1), 'Set database location');
 		
 		modal.find('.topcoat-button--cta').on('click', function() {
 			DataInputSetup.updateDatabase();
@@ -883,7 +883,7 @@ var DataInputSetup = {
 		dismissDialog(dataS.databaseInput.substring(1));
 	},
 	dataModal: function() {
-		var modal = this.filePathModal(dataS.dataInput.substring(1), 'Add data file');
+		var modal = filePathModal(dataS.dataInput.substring(1), 'Add data file');
 		
 		modal.find('.topcoat-button--cta').on('click', function() {
 			DataInputSetup.addDatafile();
@@ -895,7 +895,7 @@ var DataInputSetup = {
 		
 		$(dataS.datafiles + ' tbody').append(
 			$('<tr>', {'data-collapse': path}).on('mousedown', function() {
-				DataInputSetup.dataRowSelector(this);
+				rowSelector(this);
 				DataInputSetup.setRemoveButtonAct();
 			}).append(
 				$('<td>', {text: filename}).addClass('ellipsis')
@@ -1038,7 +1038,7 @@ var SamplesTab = {
 		
 		selectBox.find('option').remove();
 		dataM.samples().forEach(function(d) {
-			selectBox.append($('<option>', {text: d.name}));
+			selectBox.append($('<option>', {text: d.name, value: d.id}));
 		})
 		selectBox.val(currentSelect);
 		
@@ -1134,6 +1134,21 @@ var IdTab = {
 		$(dataM).bind('change', function() {
 			IdTab.updateProteinSelect();
 		});
+		$(settings).bind('change', function(elem, changes) {
+			console.log(changes)
+			if (changes.indexOf('proteinSort') != -1) {
+				IdTab.updateProteinSelect()
+			}
+			if (changes.indexOf('evidenceSort') != -1) {
+				IdTab.updatePeptideSelect()
+			}
+			if (changes.indexOf('psmSort') != -1) {
+				IdTab.updateScanSelect(true)
+			}
+			if (changes.indexOf('neutralLosses') != -1 || changes.indexOf('fragmentIons') != -1) {
+				identityPlot.updateScan({neutralLoss: settings.plotNeutralLoss(), fragmentIons: settings.fragmentIons()})
+			}
+		})
 		
 		$(window).resize($.throttle(idS.resizeThrottle, function() {
 			IdTab.resize();
@@ -1166,25 +1181,23 @@ var IdTab = {
 
 		
 		d3.select(idS.proteinSelect).selectAll('option').remove();
-		d3.select(idS.proteinSelect).selectAll('option').data(dataM.database())
+		d3.select(idS.proteinSelect).selectAll('option').data(settings.sortProteins(dataM.database()))
 			.enter().append('option')
 				.property('value', function(d) {
-					return d.accession;
+					return d.hash;
 				})
 				.text(function(d) {
 					return d.accession;
 				});
 		
-		if (currentSelect && $('idS.proteinSelect option[text='+currentSelect+']').length != 0) {
+		if (currentSelect && $(idS.proteinSelect+' option[text="'+currentSelect+'"]').length != 0) {
 			$(idS.proteinSelect).val(currentSelect);
 		} else {
 			$(idS.proteinSelect).prop('selectedIndex', 0);
+			$(idS.proteinSelect).trigger('change');
 		}
 		
-		this.updatePeptideSelect();
-		
 		$(idS.proteinCount).text(dataM.database().length);
-		$(idS.proteinSelect).trigger('change');
 	},
 	updatePeptideSelect: function() {
 		var currentSelect = $(idS.peptideSelect).val();
@@ -1197,23 +1210,24 @@ var IdTab = {
 		});
 		
 		d3.select(idS.peptideSelect).selectAll('option').remove();
-		d3.select(idS.peptideSelect).selectAll('option').data(evidence)
+		d3.select(idS.peptideSelect).selectAll('option').data(settings.sortEvidence(evidence))
 			.enter().append('option')
 				.property('value', function(d) {
-					return d.peptide.sequence;
+					return d.hash;
 				})
 				.text(function(d) {
 					return d.peptide.sequence;
 				});
 		
-		if (currentSelect && $('idS.peptideSelect option[value='+currentSelect+']').length != 0) {
+		if (currentSelect && $(idS.peptideSelect+' option[value="'+currentSelect+'"]').length != 0) {
 			$(idS.peptideSelect).val(currentSelect);
+		} else {
+			$(idS.peptideSelect).trigger('change')
 		}
 		
 		$(idS.peptideCount).text(evidence.length);
-		this.updateScanSelect();
 	},
-	updateScanSelect: function() {
+	updateScanSelect: function(keepSelect) {
 		var currentSelect = $(idS.scanSelect).val();
 		
 		var peptideSel = d3.select(idS.peptideSelect)
@@ -1222,6 +1236,7 @@ var IdTab = {
 		
 		if (peptideSel.selectAll('option').empty()) {
 			$(idS.scanCount).text(0);
+			$(idS.scanSelect).trigger('change');
 		} else {
 			if (peptideSel.property('value')) {
 				var scans = peptideSel.selectAll('option').data()[peptideSel.property('selectedIndex')].peptide.psm
@@ -1233,20 +1248,21 @@ var IdTab = {
 			scans = dataM.trimPsm(scans);
 			
 			
-			d3.select(idS.scanSelect).selectAll('option').data(scans)
+			d3.select(idS.scanSelect).selectAll('option').data(settings.sortPsm(scans))
 				.enter().append('option')
 					.text(function(d) {
 						return 'rt: '+d.scan.rt+', mz: '+d.scan.mz+', charge: '+d.charge+' ('+d.scan.sample.name+')';
 					})
 					.attr('value', function(d) {return d.scan.sample.name+':'+d.scan.ref});
 			
-/*			if (currentSelect && $(idS.scanSelect+' option[value="'+currentSelect+'"]').length != 0) {
+			if (keepSelect && (currentSelect && $(idS.scanSelect+' option[value="'+currentSelect+'"]').length != 0)) {
 				$(idS.scanSelect).val(currentSelect);
+			} else {
+				$(idS.scanSelect).trigger('change');
 			}
-*/			
+			
 			$(idS.scanCount).text(scans.length);	
 		}
-		$(idS.scanSelect).trigger('change');
 	},
 	selectProtein: function() {
 		var proteinSel = d3.select(idS.proteinSelect);
@@ -1402,7 +1418,7 @@ var FilterTab = {
 		return slider;
 	},
 	updateFDRSlider: function() {
-		filS.sliderObjects.fdr.value([filS.tempFilter.psm.qValueLow, filS.tempFilter.psm.qValueHigh])
+		filS.sliderObjects.fdr.value([filS.tempFilter.psm.qValueLow, filS.tempFilter.psm.qValueHigh == -1 ? 1 : filS.tempFilter.psm.qValueHigh])
 			.redraw(d3.select(filS.fdrSlider));
 	},
 	createChargeSlider: function() {
@@ -1565,7 +1581,7 @@ var FilterTab = {
 			filS.tempFilter.peptides.lengthHigh == -1 ? peptideLengthRange[1] : filS.tempFilter.peptides.lengthHigh];
 		
 		d3.select(filS.proteinSelect).selectAll('option').remove();
-		d3.select(filS.proteinSelect).selectAll('option').data(dataM.allDatabase())
+		d3.select(filS.proteinSelect).selectAll('option').data(settings.sortProteins(dataM.allDatabase()))
 			.enter().append('option')
 				.text(function(d) {return d.accession});
 		
@@ -1722,12 +1738,44 @@ var ResultPane = {
 		tabbar: '.tabbar',
 		sampletab: '.sampleTab',
 		idTab: '.idTab',
-		filterTab: '.filterTab'
+		filterTab: '.filterTab',
+		addButton: '#addToDB',
+		removeButton: '#removeFromDB',
+		saveButton: '#saveResults',
+		settingsButton: '#setSettings',
+		helpButton: '#helpDialogButton',
+		infoModal: '#infoModal',
+		addModal: '#mzidAddModal',
+		removeModal: '#sampleRemoveModal',
+		settingsModal: '#globalSettingsModal',
+		spinner: new Spinner({
+			lines: 13, // The number of lines to draw
+			length: 5, // The length of each line
+			width: 2, // The line thickness
+			radius: 6, // The radius of the inner circle
+			corners: 0.6, // Corner roundness (0..1)
+			rotate: 54, // The rotation offset
+			direction: 1, // 1: clockwise, -1: counterclockwise
+			color: '#000', // #rgb or #rrggbb or array of colors
+			speed: 1, // Rounds per second
+			trail: 54, // Afterglow percentage
+			shadow: false, // Whether to render a shadow
+			hwaccel: false, // Whether to use hardware acceleration
+			className: 'spinner', // The CSS class to assign to the spinner
+			zIndex: 2e9, // The z-index (defaults to 2000000000)
+			top: '50%', // Top position relative to parent
+			left: '50%' // Left position relative to parent
+		}).stop()
 	},
 	init: function() {
 		resS = this.settings;
 		
 		this.addIcons();
+		
+		$(resS.helpButton).on('click', function() {ResultPane.showInfo()});
+		$(resS.addButton).on('click', function() {ResultPane.showAddData()});
+		$(resS.removeButton).on('click', function() {ResultPane.showRemoveSample()});
+		$(resS.settingsButton).on('click', function() {ResultPane.showSettings()});
 		
 		SamplesTab.init();
 		IdTab.init();
@@ -1769,11 +1817,393 @@ var ResultPane = {
 	addIcons: function() {
 		var icons = ['icons/database-add.svg', "icons/database-remove.svg", "icons/browser-download-2.svg", "icons/settings-3.svg", "icons/bulb-2.svg"];
 		
-		icons.forEach(function(d) {
+		icons.forEach(function(d, i) {
 			$.get(d, function(data) {
-				$(resS.icons).append($(data).find('svg'));
+				$(resS.icons).find('*:nth-child('+(i+1)+')').append($(data).find('svg'));
 			})
 		});
+	},
+	showInfo: function() {
+		var modal = createModalDialog(resS.infoModal.substring(1), 'Help');
+		
+		modal.append(
+			$('<div>').append(
+				$('<p>', {text: 'There should be some text here'})
+			)
+		).append(
+			$('<div>').addClass('modalButton').append(
+				$('<button>', {text: 'Ok'}).addClass('topcoat-button--cta').on('click', function(){
+					dismissDialog(resS.infoModal.substring(1))
+				})
+			)
+		)
+	},
+	showAddData: function() {
+		Shiny.unbindAll();
+		
+		var modal = filePathModal(resS.addModal.substring(1), 'Add mzIdentML file');
+		
+		modal.addClass('validateFile')
+			.attr('id', 'mzidAddModalValidate');
+		
+		modal.find('input').attr('name', 'mzidFilePath');
+		
+		modal.find('.topcoat-button--cta')
+			.addClass('action-button')
+			.attr('id', 'addMZID')
+			.on('click', function() {
+				$(resS.addModal).find('.errorMessage').remove();
+				$(resS.addModal).find('button, input').prop('disabled', true);
+				resS.spinner.spin($(resS.addModal).find('.errorContainer').get()[0]);
+			});
+			
+		Shiny.bindAll();
+		
+		modal.on('valid', function() {
+			resS.spinner.stop();
+			dismissDialog(resS.addModal.substring(1));
+		});
+		modal.on('invalid', function(event, message) {
+			resS.spinner.stop();
+			$(resS.addModal).find('button, input').prop('disabled', false);
+			$(resS.addModal).find('.topcoat-button--cta').prop('disabled', true);
+			$(resS.addModal).find('.errorContainer')
+				.append($('<p>', {text: message}).addClass('errorMessage')
+			);
+		})
+	},
+	showRemoveSample: function() {
+		//Shiny.unbindAll()
+		var modal = createModalDialog(resS.removeModal.substring(1), 'Remove samples');
+		
+		modal.append(
+			$('<div>').append(
+				$('<select>', {multiple: true})
+					.attr('name', 'sampleRemoveList')
+					.prop('size', 9)
+					.on('change', function() {
+						$(resS.removeModal).find('.topcoat-button--cta').prop('disabled', !($(this).val() && $(this).val().length != 0))
+					})
+			)
+		).append(
+			$('<div>').addClass('modalButton').append(
+				$('<button>', {text: 'Remove'})
+					.addClass('topcoat-button--cta action-button')
+					.attr('id', 'removeSample')
+					.prop('disabled', true)
+					.on('click', function() {
+						var values = $(resS.removeModal).find('select').val()
+						
+						values.forEach(function(d) {
+							dataM.remove(d);
+						})
+						
+						dismissDialog(resS.removeModal.substring(1));
+					})
+			).append(
+				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
+					dismissDialog(resS.removeModal.substring(1))
+				})
+			)
+		)
+		
+		$.each(dataM.allSamples(), function() {
+			modal.find('select').append($('<option>', {text: this.name, value: this.id}))
+		})
+		
+		Shiny.bindAll()
+	},	
+	showSettings: function() {
+		var modal = createModalDialog(resS.settingsModal.substring(1), 'Settings');
+		
+		var fragmentIons = settings.fragmentIons();
+		
+		modal.append(
+			$('<div>').append(
+				$('<div>').addClass('tabbar').append(
+					$('<ul>').append(
+						$('<li>').addClass('first active').append(
+							$('<p>', {text: 'Sorting'})
+						).on('click', function() {
+							var index = $(this).index()
+							
+							$(this).toggleClass('active', true).siblings().removeClass('active');
+							
+							$(modal.find('.tabpane').get(index)).toggleClass('active', true)
+								.siblings().removeClass('active');
+						})
+					).append(
+						$('<li>').addClass('last').append(
+							$('<p>', {text: 'Scan plot'})
+						).on('click', function() {
+							var index = $(this).index()
+							
+							$(this).toggleClass('active', true).siblings().removeClass('active');
+							
+							$(modal.find('.tabpane').get(index)).toggleClass('active', true)
+								.siblings().removeClass('active');
+						})
+					)
+				)
+			).append(
+				$('<div>').addClass('tabpane active').append(
+					$('<div>').append(
+						$('<p>', {text: 'Proteins'})
+					).append(
+						$('<div>').addClass('listview proteinSort').append(
+							$('<table>').append(
+								$('<tr>').append(
+									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+								).on('dblclick', function() {
+									$(this).before(ResultPane.addSortCondition('protein'));
+								})
+							)
+						)
+					)
+				).append(
+					$('<div>').append(
+						$('<p>', {text: 'Peptides'})
+					).append(
+						$('<div>').addClass('listview evidenceSort').append(
+							$('<table>').append(
+								$('<tr>').append(
+									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+								).on('dblclick', function() {
+									$(this).before(ResultPane.addSortCondition('evidence'));
+								})
+							)
+						)
+					)
+				).append(
+					$('<div>').append(
+						$('<p>', {text: 'Scans'})
+					).append(
+						$('<div>').addClass('listview psmSort').append(
+							$('<table>').append(
+								$('<tr>').append(
+									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+								).on('dblclick', function() {
+									$(this).before(ResultPane.addSortCondition('psm'));
+								})
+							)
+						)
+					)
+				)
+			).append(
+				$('<div>').addClass('tabpane').append(
+					$('<div>').append(
+						$('<p>', {text: 'Fragment ions'})
+					).append(
+						$('<div>').addClass('table plotIons').append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'a'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['a'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						).append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'b'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['b'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						).append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'c'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['c'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						).append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'x'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['x'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						).append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'y'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['y'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						).append(
+							$('<label>').addClass('topcoat-checkbox').append(
+								$('<span>', {text: 'z'})
+							).append(
+								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['z'])
+							).append(
+								$('<div>').addClass('topcoat-checkbox__checkmark')
+							)
+						)
+					).append(
+						$('<label>').addClass('topcoat-checkbox neutralLoss').append(
+							$('<span>', {text: 'Neutral losses'})
+						).append(
+							$('<input>', {type: 'checkbox'}).prop('checked', settings.plotNeutralLoss())
+						).append(
+							$('<div>').addClass('topcoat-checkbox__checkmark')
+						)
+					).append(
+						$('<label>').addClass('fragmentAcc').append(
+							$('<span>', {text: 'Fragment ion accuracy'})
+						).append(
+							$('<input>', {type: 'number'}).val(settings.fragment())
+						).append(
+							$('<span>', {text: 'ppm'})
+						)
+					)
+				).append(
+					$('<div>').append(
+						$('<p>', {text: 'Parent ion'})
+					).append(
+						$('<label>').addClass('traceAcc').append(
+							$('<span>', {text: 'Parent ion accuracy'})
+						).append(
+							$('<input>', {type: 'number'}).val(settings.trace())
+						).append(
+							$('<span>', {text: 'ppm'})
+						)
+					).append(
+						$('<label>').addClass('topcoat-checkbox plotTrace').append(
+							$('<span>', {text: 'Plot trace'})
+						).append(
+							$('<input>', {type: 'checkbox'}).prop('checked', settings.plotTrace())
+						).append(
+							$('<div>').addClass('topcoat-checkbox__checkmark')
+						)
+					).append(
+						$('<label>').addClass('ionGaps').append(
+							$('<span>', {text: 'Allowed ion gaps'})
+						).append(
+							$('<input>', {type: 'number'}).val(settings.missedIons())
+						)
+					)
+				)
+			)
+		).append(
+			$('<div>').addClass('modalButton').append(
+				$('<button>', {text: 'Set'})
+					.addClass('topcoat-button--cta')
+					.on('click', function() {
+						ResultPane.applySettings();
+						dismissDialog(resS.settingsModal.substring(1));
+					})
+			).append(
+				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
+					dismissDialog(resS.settingsModal.substring(1))
+				})
+			)
+		)
+		
+		settings.proteinSort().forEach(function(d) {
+			modal.find('.listview.proteinSort tr:last-child').before(ResultPane.addSortCondition('protein', d))
+		})
+		settings.evidenceSort().forEach(function(d) {
+			modal.find('.listview.evidenceSort tr:last-child').before(ResultPane.addSortCondition('evidence', d))
+		})
+		settings.psmSort().forEach(function(d) {
+			modal.find('.listview.psmSort tr:last-child').before(ResultPane.addSortCondition('psm', d))
+		})
+		
+		
+	},
+	addSortCondition: function(sortTarget, value) {
+		var sortMethods = settings.sortMethodNames();
+		var sortTypes = settings.sortMethodTypes();
+		
+		var row = $('<tr>').append(
+			$('<td>').addClass('attrSelect').append(
+				$('<select>').on('change', function() {
+					var self = this;
+					row.find('.sortDir i').removeClass('fa-sort-alpha-asc fa-sort-alpha-desc fa-sort-numeric-asc fa-sort-numeric-desc fa-sort-amount-asc fa-sort-amount-desc ')
+						.addClass(function(index) {
+							return 'fa-sort-' + (sortTypes[sortTarget][$(self).val()] || 'numeric') + (index ? '-desc' : '-asc');
+						})
+				})
+			)
+		).append(
+			$('<td>').addClass('sortDir').append(
+				$('<p>').append(
+					$('<i>').addClass('fa fa-lg')
+				).on('click', function() {
+					$(this).siblings().removeClass('selected')
+					$(this).toggleClass('selected', true)
+				})
+			).append(
+				$('<p>').append(
+					$('<i>').addClass('fa fa-lg')
+				).on('click', function() {
+					$(this).siblings().removeClass('selected')
+					$(this).toggleClass('selected', true)
+				})
+			)
+		).append(
+			$('<td>').addClass('removeSort').append(
+				$('<p>').append(
+					$('<i>').addClass('fa fa-lg fa-minus-circle')
+				).on('click', function() {
+					row.remove();
+				})
+			)
+		)
+		
+		for (i in sortMethods[sortTarget]) {
+			row.find('.attrSelect select').append($('<option>', {value: i, text: sortMethods[sortTarget][i]}));
+		}
+		
+		if (value) {
+			row.find('.attrSelect select').val(value.attr).trigger('change')
+			row.find('.sortDir p').addClass(function(index) {
+				if (value.order == 'ascending') {
+					return index ? '' : 'selected';
+				} else if (value.order == 'descending') {
+					return index ? 'selected' : '';
+				}
+			})
+		} else {
+			row.find('.attrSelect select').trigger('change');
+			row.find('.sortDir p:first-child').addClass('selected');
+		}
+		
+		return row;
+	},
+	applySettings: function() {
+		var parseSorting = function(selector) {
+			var ans = [];
+			$(selector).find('tr:not(:last-child)').each(function(i) {
+				ans.push({
+					attr: $(this).find('select').val(),
+					order: $(this).find('.sortDir p.selected').index() ? 'descending' : 'ascending'
+				})
+			})
+			return ans;
+		};
+		fragmentIons = [];
+		
+		['a', 'b', 'c', 'x', 'y', 'z'].forEach(function(d, i) {
+			if ($('.plotIons input')[i].checked) {
+				fragmentIons.push(d);
+			}
+		})
+		
+		settings.fragmentIons(fragmentIons)
+			.plotNeutralLoss($('.neutralLoss input').prop('checked'))
+			.fragment(parseFloat($('.fragmentAcc input').val()))
+			.trace(parseFloat($('.traceAcc input').val()))
+			.plotTrace($('.plotTrace input').prop('checked'))
+			.missedIons(parseFloat($('.ionGaps input').val()))
+			.proteinSort(parseSorting('.proteinSort table'))
+			.evidenceSort(parseSorting('.evidenceSort table'))
+			.psmSort(parseSorting('.psmSort table'))
+			.sentChanges();
 	}
 }
 
