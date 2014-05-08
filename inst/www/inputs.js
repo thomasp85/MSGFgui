@@ -44,7 +44,7 @@ $.extend(scanSelector, {
 		
 		return {
 			scan: data.scan.ref,
-			sample: data.scan.sample.name,
+			sampleID: data.scan.sample.id,
 			peptide: data.peptide.sequence,
 			modifications: data.peptide.modifications
 		}
