@@ -69,3 +69,22 @@ $.extend(progress, {
 });
 
 Shiny.outputBindings.register(progress, 'msgf.progress');
+
+/*
+	Handles the return of R file validation
+*/
+var validateFile = new Shiny.OutputBinding();
+$.extend(validateFile, {
+	find: function(scope) {
+		return $(scope).find(".validateFile");
+	},
+	renderValue: function(el, message) {
+		if (message.valid) {
+			$(el).trigger('valid')
+		} else {
+			if (message.reason != '') $(el).trigger('invalid', [message.reason])
+		}
+	}
+});
+
+Shiny.outputBindings.register(validateFile, 'msgf.validateFile');
