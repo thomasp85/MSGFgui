@@ -659,7 +659,14 @@ shinyServer(function(input, output, session) {
             }
         }
         
-        renderScan(dataStore[[sampleIndex]]$mzML, scanNum, scan$peptide, modifications)
+        renderScan(dataStore[[sampleIndex]]$mzML, 
+                   scanNum,
+                   scan$peptide, 
+                   modifications, 
+                   fragPPM=input$globalSettings$fragment,
+                   tracePPM=input$globalSettings$trace,
+                   showTrace=input$globalSettings$plotTrace
+                   )
     })
     output$runProgress <- reactive({reactiveValuesToList(progressBarData)})
     output$idPlots <- reactive({selectedScan()})
