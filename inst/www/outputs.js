@@ -45,7 +45,7 @@ $.extend(scanPlot, {
 	renderValue: function(el, data) {
 		if (data) {
 			d3.transition().duration(1000).each(function() {
-				identityPlot.selectScan(data);
+				identityPlot.selectScan(data, {neutralLoss: settings.plotNeutralLoss(), fragmentIons: settings.fragmentIons()});
 			})
 		}
 	}
