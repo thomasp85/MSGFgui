@@ -276,7 +276,101 @@ annotateSpec <- function(spec, pepseq, modifications=list(), ppm=20, ions='aby',
     }
     ionlab
 }
-getIonTrace <- function(data, index, mz, ppm, skip=1){
+getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
+    widthMod <- 1.5
+    ms1Indexes <- which(header(data)$msLevel == 1)
+    indexIndex <- which(ms1Indexes == index)
+    mzRes <- (mz/1000000)*ppm*2
+    mzMin <- mz-mzRes/2
+    
+    
+    indexWindow <- c((indexIndex-ceiling(widthMod*meanwidth)), (indexIndex+ceiling(widthMod*meanwidth)))
+    windowSeed <- ceiling(diff(indexWindow)/2)
+    if (indexWindow[1] < 1) {
+        windowSeed <- windowSeed - length(seq(from=indexWindow[1], to=0))
+        indexWindow[1] <- 1
+    }
+    if (indexWindow[2] > length(ms1Indexes)) {
+        indexWindow[2] <- length(ms1Indexes)
+    }
+    unfinished <- 0
+    while (TRUE) {
+        if (unfinished) {
+            if (unfinished == 1) {
+                addScans <- seq(from=indexWindow[2]+1, length=meanwidth/2)
+                trace <- rbind(trace, get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes))
+                indexWindow[2] <- max(addScans)
+            } else {
+                addScans <- seq(to=indexWindow[1]-1, length=meanwidth/2)
+                trace <- rbind(get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes), trace)
+                windowSeed <- windowSeed+(indexWindow-min(addScans))
+                indexWindow[1] <- min(addScans)
+            }
+            scanWindow <- ms1Indexes[indexWindow[1]:indexWindow[2]]
+        } else {
+            scanWindow <- ms1Indexes[indexWindow[1]:indexWindow[2]]
+            trace <- get3Dmap(data, scanWindow, lowMz=mzMin, highMz=mzMin, resMz=mzRes)
+        }
+        smooth <- predict(loess(trace[,1] ~ seq(1,nrow(trace)), span=0.25))
+        differential <- sign(diff(smooth))
+        middle <- windowSeed
+        indexPos <- differential[middle]
+        
+        if (indexPos == 1) {
+            distTop <- which(differential[middle:length(differential)] == -1)[1]
+            if (is.null(distTop)) {
+                if (indexWindow[2] > length(ms1Indexes)) {
+                    indexWindow[2] <- length(ms1Indexes)
+                    top <- nrow(smooth)
+                    break
+                }
+                unfinished = 1
+            } else {
+                top = middle+distTop-1
+                break
+            }
+        } else if (indexPos == -1) {
+            distTop <- which(rev(differential[1:middle]) == 1)[1]
+            if (is.null(distTop)) {
+                if (indexWindow[1] < 1) {
+                    indexWindow[1] <- 1
+                    top <- 1
+                    break
+                }
+                unfinished = -1
+            } else {
+                top = middle-distTop
+                break
+            }
+        } else {
+            
+        }
+    }
+    max <- smooth[top]
+    gauss <- function(p) {
+        d=max*dnorm(seq_along(smooth), top, p)
+        sum((d-smooth)^2)
+    }
+    
+    bw <- 2.35*optimize(gauss, c(0.1, meanwidth*2))$minimum
+    
+    scans <- round(c(-bw*3, bw*3) + (indexWindow[1]:indexWindow[2])[top])
+    if (scans[1] < 1) scans[1] <- 1
+    if (scans[2] > length(ms1Indexes)) scans[2] <- length(ms1Indexes)
+    if (scans[1] < indexWindow[1]) {
+        addScans <- seq(from=scans[1], to=indexWindow[1]-1)
+        trace <- rbind(get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes), trace)
+        top <- top+(indexWindow-min(addScans))
+        indexWindow[1] <- scans[1]
+    }
+    if (scans[2] > indexWindow[2]) {
+        addScans <- seq(from=indexWindow[2]+1, to=scans[2])
+        trace <- rbind(trace, get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes))
+        indexWindow[2] <- scans[2]
+    }
+    data.frame(intensity=trace[round(top-bw*3):round(top+bw*3), 1], retention=header(data, ms1Indexes[scans[1]:scans[2]])$retentionTime, acquisitionNum=header(data, ms1Indexes[scans[1]:scans[2]])$acquisitionNum)
+}
+getIonTrace2 <- function(data, index, mz, ppm, skip=1){
     indexRange <- c(1, length(data))
     mzWin <- c(mz-(mz/1000000)*ppm, mz+(mz/1000000)*ppm)
     scan <- peaks(data, index)
@@ -360,14 +454,14 @@ getIonTrace <- function(data, index, mz, ppm, skip=1){
     }
     data.frame(intensity, retention, acquisitionNum)
 }
-traceParent <- function(data, scan, ppm=20, skip=1) {
+traceParent <- function(data, scan, ppm=20) {
     scans <- header(data)
     scanInfo <- scans[scans$acquisitionNum == scan, ]
     parentInfo <- scans[scans$acquisitionNum == scanInfo$precursorScanNum, ]
     
     if(nrow(parentInfo) == 0) return(NULL)
     
-    trace <- getIonTrace(data, which(scans$acquisitionNum == scanInfo$precursorScanNum), scanInfo$precursorMZ, ppm=ppm, skip=skip)
+    trace <- getIonTrace(data, which(scans$acquisitionNum == scanInfo$precursorScanNum), scanInfo$precursorMZ, ppm=ppm)
     
     trace$parent <- trace$retention == parentInfo$retentionTime
     
