@@ -137,10 +137,13 @@ h4 {
 		width: 30px;
 		height: 30px;
 	}
-		.iconmenu svg:first-child {
+	.iconmenu div, .iconmenu a {
+		display: inline-block;
+	}
+		.iconmenu div:first-child {
 			margin-left: 30px;
 		}
-		.iconmenu svg:last-child {
+		.iconmenu div:last-child {
 			float: right;
 			margin-right: 30px
 		}
@@ -176,32 +179,27 @@ h4 {
 	bottom: 0;
 }
 	#sampleTab .infoArea>div {
-		left: 10px;
-		width: 230px;
+		width: 500px;
+		margin: auto;
 	}
+		#sampleTab .infoArea>div>div {
+			display: table-cell;
+			width: 250px;
+			padding: 0 10px;
+		}
 		#sampleTab .infoArea select{
 			width: 230px;
-		}
-	#sampleTab .infoArea>div+div.col{
-		left: 250px;
-		right: 0;
-		width: auto;
-	}
-		#sampleTab .infoArea>div+div div div{
-			width: 510px;
-		}
-		
-		#sampleTab .infoArea>div+div div div div{
-			display: inline-block;
-			width: 250px;
 		}
 			#sampleTab .infoArea .samples p {
 				font-size: x-small;
 				margin-top: 2px;
-				float: right;
+				text-align: right;
 			}
 			#sampleTab .infoArea .samples p span:first-child {
 				font-weight: bold;
+			}
+			#sampleTab .infoArea .stat div {
+				width: 230px;
 			}
 			#sampleTab .infoArea .stat p {
 				margin: 0;
@@ -241,7 +239,7 @@ h4 {
 		#idTab .infoArea p {
 			font-size: x-small;
 			margin-top: 2px;
-			float: right;
+			text-align: right;
 		}
 		#idTab .infoArea p span:first-child {
 			font-weight: bold;
@@ -351,6 +349,9 @@ h4 {
 .listview {
 	overflow: scroll;
 }
+.listview table {
+	min-width: 100%
+}
 
 
 .rightButtonPane {
@@ -400,7 +401,7 @@ table {
 	padding-bottom: 10px;
 	box-shadow: 0px 0px 10px 3px grey
 }
-.modalPopup p {
+#modalSetPar .modalPopup p {
 	margin: 0 10px;
 	margin-bottom: 20px;
 }
@@ -411,7 +412,7 @@ table {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
-.modalPopup input, .modalPopup select {
+#modalSetPar .modalPopup input, #modalSetPar .modalPopup select {
 	width: 150px;
 	text-align: left;
 }
@@ -428,6 +429,11 @@ table {
 }
 #modificationList tr {
 	width: 100%
+}
+select[name=sampleRemoveList] {
+	width: 80%;
+	left: 10%;
+	position: relative;
 }
 .listview {
     -webkit-touch-callout: none;
@@ -447,13 +453,122 @@ table {
 .selected {
 	background: lightblue;
 }
-#databaseModal label, #dataModal label {
+.filePathModal label {
 	margin-left: 20px;
 	margin-right: 20px;
 }
-#databaseModal input, #dataModal input {
+.filePathModal input {
 	width: 70%;
-	margin-left: 10px
+	margin-left: 10px;
+	text-align: left;
+}
+.filePathModal .errorContainer {
+	position: relative;
+	height: 30px;
+	margin: 10px 0;
+}
+.filePathModal p.errorMessage {
+	color: darkred;
+	font-size: small;
+	text-align: center;
+}
+.filePathModal .modalButton {
+	margin-top: 0;
+}
+#globalSettingsModal .tabbar {
+	background: darkgrey;
+}
+#globalSettingsModal .tabpane {
+	clear: both;
+	margin: 0 10px;
+	background: whitesmoke;
+	padding: 5px 10px 2px 10px;
+	border-radius: 10px;
+}
+#globalSettingsModal .tabpane div:not(:first-child)>p{
+	padding-top: 20px;
+}
+#globalSettingsModal .listview {
+	height: 70px;
+}
+#globalSettingsModal .listview:last-child {
+	margin-bottom: 10px;
+}
+#globalSettingsModal .listview table{
+	width: 50%;
+	padding: 2px 0;
+}
+#globalSettingsModal .listview table p{
+	display: inline;
+	padding: 6px 4px 3px 4px;
+	margin: 0 6px;
+	border-radius: 3px;
+	vertical-align: middle;
+	vertical-align: -webkit-baseline-middle;
+}
+#globalSettingsModal .listview table p:not(.selected){
+	color: grey;
+}
+#globalSettingsModal .listview table td{
+	vertical-align: middle;
+}
+#globalSettingsModal .listview table td:first-child{
+	width: 50%;
+}#globalSettingsModal .listview table td:nth-child(2){
+	text-align: center;
+}
+#globalSettingsModal .listview table td:last-child{
+	width: 1.5em;
+}
+#globalSettingsModal .listview table td:last-child p{
+	color: firebrick;
+	margin-right: 0;
+	padding-right: 0;
+}
+#globalSettingsModal .listview table tr:last-child{
+	text-align: center;
+	color: grey;
+	font-style: italic;
+}
+#globalSettingsModal .table {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	margin: 5px 0;
+}
+#globalSettingsModal .table .topcoat-checkbox {
+	display: table-cell;
+	margin: 0 auto;
+	padding: 0 10px;
+}
+#globalSettingsModal .table .topcoat-checkbox span {
+	width: auto;
+}
+#globalSettingsModal label {
+	display: block;
+	margin: 10px 0;
+}
+#globalSettingsModal span {
+	width: auto;
+	font-size: small;
+	vertical-align: baseline;
+}
+#globalSettingsModal span:first-child {
+	width: 50%;
+	text-align: right;
+	margin: 0 2.5px;
+}
+#globalSettingsModal span:first-child::after {
+	content: ' ';
+	margin-left: 2.5px;
+}
+#globalSettingsModal .modalPopup input[type=number] {
+	text-align: right;
+	width: 40px;
+	margin-right: 5px;
+}
+#globalSettingsModal .tabpane p {
+	margin: 0;
 }
 #database, #datafiles {
 	width: 100%;
@@ -633,8 +748,11 @@ svg {
 .ions line {
 	stroke: grey;
 }
-.ions.fragment line {
+.ions.fragment:not(.hidden) line {
 	stroke: black;
+}
+.ions.fragment.hidden text {
+	visibility: hidden;
 }
 .ions.parent line {
 	stroke: darkred
