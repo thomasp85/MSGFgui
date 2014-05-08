@@ -506,7 +506,7 @@ var dataModel = function() {
 		filteredDatabaseLookup = tempFilteredDatabaseLookup;
 	};
 	var filterData = function() {
-		applyFilter();
+		applyFilter(filter);
 		
 		if (validFilter()) {
 			$(dm).trigger('change');
@@ -524,15 +524,15 @@ var dataModel = function() {
 	};
 	var revertFilter = function() {
 		$.extend(true, filter, oldFilter);
-		applyFilter();
+		applyFilter(filter);
 	};
-	var applyFilter = function() {
-		filterDatabase();
-		filterEvidence();
-		filterPeptides();
-		filterSamples();
-		filterScans();
-		filterPsm();
+	var applyFilter = function(filter) {
+		filterDatabase(filter);
+		filterEvidence(filter);
+		filterPeptides(filter);
+		filterSamples(filter);
+		filterScans(filter);
+		filterPsm(filter);
 		
 		pruneFiltering();
 	}
