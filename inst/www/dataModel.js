@@ -115,6 +115,7 @@ var parseData = function(data) {
 	
 	return {
 		name: data.name,
+		id: data.id,
 		scoreDistribution: data.scoreDistribution,
 		modificationList: modificationList,
 		database: database,
@@ -130,6 +131,8 @@ var dataModel = function() {
 	var dm = {};
 
 	// PRIVATE DATA
+	var oldIdList = {};
+	
 	var samples = [];
 	var scans = [];
 	var psm = [];
@@ -201,6 +204,7 @@ var dataModel = function() {
 	var createSample = function(data) {
 		var sample = {
 			name: data.name,
+			id: data.id,
 			scoreDistribution: data.scoreDistribution,
 			scans: data.scans
 		};
@@ -297,22 +301,22 @@ var dataModel = function() {
 		samples.forEach(function(d) {
 			if (noFilter) {
 				filteredSamples.push(d);
-				tempFilteredSamplesLookup[d.name] = d;
+				tempFilteredSamplesLookup[d.id] = d;
 			} else if (sFilter.names.length != 0) {
 				if (sFilter.names.indexOf(d.name) != -1) {
 					filteredSamples.push(d);
-					tempFilteredSamplesLookup[d.name] = d;
+					tempFilteredSamplesLookup[d.id] = d;
 				}
 			} else {
 				if (sFilter.regex.test(d.name)) {
 					if (sFilter.regexInclude) {
 						filteredSamples.push(d);
-						tempFilteredSamplesLookup[d.name] = d;
+						tempFilteredSamplesLookup[d.id] = d;
 					}
 				} else {
 					if (!sFilter.regexInclude) {
 						filteredSamples.push(d);
-						tempFilteredSamplesLookup[d.name] = d;
+						tempFilteredSamplesLookup[d.id] = d;
 					}
 				}
 			}
@@ -537,9 +541,12 @@ var dataModel = function() {
 	// PUBLIC
 	
 	dm.add = function(data) {
-		var sample = createSample(data)
+		if (oldIdList[data.id]) return null;
+		
+		var sample = createSample(data);
 		samples.push(sample);
-		samplesLookup[sample.name] = sample;
+		samplesLookup[sample.id] = sample;
+		oldIdList[sample.id] = true;
 		
 		addModifications(data.modificationList);
 		
@@ -569,10 +576,11 @@ var dataModel = function() {
 		$(dm).trigger('sampleAdded', [sample]);
 	};
 	dm.samples = function(names) {
+	dm.samples = function(ids) {
 		if (!arguments.length) return filteredSamples;
 		
-		return names.map(function(name) {
-			return filteredSamplesLookup[name];
+		return ids.map(function(id) {
+			return filteredSamplesLookup[id];
 		});
 	};
 	dm.scans = function() {
@@ -640,7 +648,7 @@ var dataModel = function() {
 	};
 	dm.trimSamples = function(samples) {
 		return samples.map(function(d) {
-			return filteredSamplesLookup[d.name];
+			return filteredSamplesLookup[d.id];
 		}).filter(function(f) {return f});
 	};
 	dm.trimScans = function(scans) {
