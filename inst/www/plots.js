@@ -101,6 +101,27 @@ var ms2Scatter = function(element, size) {
 				.text("m/z");
 	};
 	
+	plot.reset = function() {
+		svg.selectAll('.plot-area').remove()
+		
+		svg.append('g')
+			.attr('class', 'plot-area')
+			.style('clip-path', 'url(#scatterClip)');
+		
+		x.domain([0, 1000]);
+		y.domain([0, 1000]);
+		
+		svg.selectAll("g.x.axis")
+			.call(xAxis);
+		svg.selectAll("g.x.grid")
+			.call(xGrid);
+				
+		svg.selectAll("g.y.axis")
+			.call(yAxis);
+		svg.selectAll("g.y.grid")
+			.call(yGrid);
+	}
+	
 	plot.data = function(data) {
 		svg.selectAll('.plot-area')
 			.selectAll('.dot').remove();
@@ -293,6 +314,32 @@ var fdrDensity = function(element, size) {
 					.attr('d', line);
 	};
 	
+	plot.reset = function(datalength) {
+		var preparedData = {
+			target: dummyData(datalength, [0,100]),
+			decoy: dummyData(datalength, [0,100])
+		};
+		
+		x.domain([0, 100]);
+		
+		y.domain([0, 1]);
+		
+		return d3.transition().each(function() {
+			svg.selectAll('g.x.axis')
+				.call(xAxis);
+			svg.selectAll('g.y.axis')
+				.call(yAxis);
+		
+			svg.selectAll('.plot-area')
+				.selectAll('.line').data([preparedData.target, preparedData.decoy]).transition()
+					.attr('d', line);
+					
+			svg.selectAll('.plot-area')
+				.selectAll('.area').data([preparedData.target, preparedData.decoy]).transition()
+					.attr('d', area);
+		});
+	}
+	
 	plot.data = function(data) {
 		var preparedData = {
 			target: prepareData(data.target),
@@ -301,7 +348,7 @@ var fdrDensity = function(element, size) {
 		
 		x.domain([0, d3.max(preparedData.target.concat(preparedData.decoy), function(d) {return d.x})]);
 		
-		y.domain([0, d3.max(preparedData.target.concat(preparedData.decoy), function(d) {return d.y})]);
+		y.domain([0, d3.max(preparedData.target.concat(preparedData.decoy), function(d) {return d.y}) || 1]);
 		
 		return d3.transition().each(function() {
 			svg.selectAll('g.x.axis')
@@ -1094,6 +1141,16 @@ var evidencePlot = function(element, size) {
 					})
 	};
 	
+	plot.reset = function() {
+		currentData = null;
+		svgArc.selectAll('.plot-area').remove();
+		
+		svgScan.selectAll('.trace, .spectrum').remove();
+		
+		svgArc.append('g')
+			.attr('class', 'plot-area');
+	}
+	
 	plot.data = function(data) {
 		plotState = 'protein';
 		currentData = data;
@@ -1557,13 +1614,3 @@ var evidencePlot = function(element, size) {
 	return plot;
 };
 var identityPlot;
-
-/*
-	A class to create two way bound sliders
-*/
-var slider = function() {
-	var low = 0;
-	var high = 1;
-	var horizontal = true;
-	
-}
