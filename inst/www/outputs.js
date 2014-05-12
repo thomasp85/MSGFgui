@@ -26,7 +26,11 @@ $.extend(kde, {
 	renderValue: function(el, data) {
 		if(data) {
 			d3.transition().duration(samS.transitionLength).each(function() {
-				samplesDensity.data(data)				
+				samplesDensity.data(data);		
+			})
+		} else {
+			d3.transition().duration(samS.transitionLength).each(function() {
+				samplesDensity.reset(512);				
 			})
 		};
 	}
