@@ -395,6 +395,7 @@ var COMPOSITION_REGEX = /^(([CHNOSP]|Br|Cl|Fe|Se)-?\d*)+$/;
 
 
 var createModalDialog = function(id, title) {
+	$('#tooltip').remove();
 	$('body').append(
 		$('<div>', {id: id}).append(
 			$('<div>').addClass('clearBackground')
