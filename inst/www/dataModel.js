@@ -576,6 +576,40 @@ var dataModel = function() {
 	};
 	dm.remove = function(sample) {
 		if (samplesLookup[sample]) {
+			if (samples.length == 1) {
+				samples = [];
+				scans = [];
+				psm = [];
+				peptides = [];
+				database = [];
+				evidence = [];
+				
+				modifications = [];
+				
+				samplesLookup = {};
+				databaseLookup = {};
+				peptidesLookup = {};
+				evidenceLookup = {};
+				
+				filteredSamples = [];
+				filteredScans = [];
+				filteredPsm = [];
+				filteredPeptides = [];
+				filteredDatabase = [];
+				filteredEvidence = [];
+				
+				filteredSamplesLookup = {};
+				filteredScansLookup = {};
+				filteredPsmLookup = {};
+				filteredPeptidesLookup = {};
+				filteredDatabaseLookup = {};
+				filteredEvidenceLookup = {};
+				
+				$(dm).trigger('change');
+				
+				return true;
+			};
+			
 			var keptSamples = samples.map(function(d) {return d.name});
 			keptSamples.splice(keptSamples.indexOf(sample), 1);
 			var sampleRemovingFilter = {
