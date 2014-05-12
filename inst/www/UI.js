@@ -1010,8 +1010,13 @@ var SamplesTab = {
 		}));
 		
 		$(dataM).bind('change', function() {
-			$(samS.sampleCount).text(dataM.samples().length);
-			SamplesTab.updateSamples();
+			if (dataM.empty()) {
+				samplesScatter.reset();
+				SamplesTab.resetSamples();
+			} else {
+				$(samS.sampleCount).text(dataM.samples().length);
+				SamplesTab.updateSamples();
+			}
 		});
 		
 		$(samS.selector + ' select').on('change', function() {
@@ -1038,14 +1043,17 @@ var SamplesTab = {
 		var currentSelect = selectBox.val();
 		
 		selectBox.find('option').remove();
-		dataM.samples().forEach(function(d) {
-			selectBox.append($('<option>', {text: d.name, value: d.id}));
-		})
-		selectBox.val(currentSelect);
 		
-		if(!selectBox.val()) {
-			selectBox.prop('selectedIndex', 0);
-		};
+		if (!dataM.empty()) {
+			dataM.samples().forEach(function(d) {
+				selectBox.append($('<option>', {text: d.name, value: d.id}));
+			})
+			selectBox.val(currentSelect);
+			
+			if(!selectBox.val()) {
+				selectBox.prop('selectedIndex', 0);
+			};
+		}
 		selectBox.trigger('change');
 	},
 	selectSamples: function(names) {
@@ -1057,6 +1065,17 @@ var SamplesTab = {
 			})
 			samplesScatter.data(dataM.trimScans(scans));
 		});
+	},
+	resetSamples: function() {
+		var selectBox = $(samS.selector + ' select');
+		selectBox.find('option').remove();
+		
+		$(samS.statScan).text(0);
+		$(samS.statPSMtotal).text(0);
+		$(samS.statPSMfilter).text(0);
+		$(samS.statID).text(0);
+		$(samS.statPeptides).text(0);
+		$(samS.statProteins).text(0);
 	},
 	getStat: function(names) {
 		var scans = dataM.samples(names).map(function(d) {return d.scans}).reduce(function(a, b) {
@@ -1090,6 +1109,8 @@ var SamplesTab = {
 		}
 	},
 	setStat: function(names) {
+		if (dataM.empty()) return
+		
 		var stat = this.getStat(names);
 		
 		$(samS.statScan).text(stat.nScan);
@@ -1097,7 +1118,7 @@ var SamplesTab = {
 		$(samS.statPSMfilter).text(stat.nPSMfilter);
 		$(samS.statID).text(stat.nID);
 		$(samS.statPeptides).text(stat.nPeptides);
-		$(samS.statProteins).text(stat.nProteins)
+		$(samS.statProteins).text(stat.nProteins);
 	}
 };
 
@@ -1133,6 +1154,9 @@ var IdTab = {
 		identityPlot.init();
 		
 		$(dataM).bind('change', function() {
+			if (dataM.empty()) {
+				identityPlot.reset();
+			}
 			IdTab.updateProteinSelect();
 		});
 		$(settings).bind('change', function(elem, changes) {
@@ -1204,11 +1228,17 @@ var IdTab = {
 		var currentSelect = $(idS.peptideSelect).val();
 		
 		var proteinSel = d3.select(idS.proteinSelect);
-		var evidence = dataM.trimEvidence(proteinSel.selectAll('option').data()[proteinSel.property('selectedIndex')].evidence);
 		
-		evidence = evidence.filter(function(d) {
-			return dataM.trimPsm(d.peptide.psm).length;
-		});
+		if (!proteinSel.selectAll('option').empty()) {
+			var evidence = dataM.trimEvidence(proteinSel.selectAll('option').data()[proteinSel.property('selectedIndex')].evidence);
+			
+			evidence = evidence.filter(function(d) {
+				return dataM.trimPsm(d.peptide.psm).length;
+			});
+		} else {
+			var evidence = []
+		}
+		
 		
 		d3.select(idS.peptideSelect).selectAll('option').remove();
 		d3.select(idS.peptideSelect).selectAll('option').data(settings.sortEvidence(evidence))
@@ -1267,11 +1297,13 @@ var IdTab = {
 	},
 	selectProtein: function() {
 		var proteinSel = d3.select(idS.proteinSelect);
+		if (!proteinSel.selectAll('option').empty()) {
+			d3.transition().duration(idS.transitionLength).each(function() {
+				identityPlot.data(proteinSel.selectAll('option').data()[proteinSel.property('selectedIndex')]);
+				identityPlot.unSelectScan();
+			})
+		}
 		
-		d3.transition().duration(idS.transitionLength).each(function() {
-			identityPlot.data(proteinSel.selectAll('option').data()[proteinSel.property('selectedIndex')]);
-			identityPlot.unSelectScan();
-		})
 		$(idS.scanSelect).prop('disabled', true).val(null).trigger('change');
 		
 	},
