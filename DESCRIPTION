@@ -16,7 +16,7 @@ biocViews: MassSpectrometry, Proteomics, GUI
 VignetteBuilder: knitr
 Imports:
     shiny,
-    mzID,
+    mzID (>= 1.2),
     MSGFplus,
     mzR
 Collate:
