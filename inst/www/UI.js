@@ -1906,7 +1906,7 @@ var ResultPane = {
 		})
 	},
 	showRemoveSample: function() {
-		//Shiny.unbindAll()
+		Shiny.unbindAll()
 		var modal = createModalDialog(resS.removeModal.substring(1), 'Remove samples');
 		
 		modal.append(
