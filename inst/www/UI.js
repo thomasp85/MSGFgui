@@ -1852,7 +1852,8 @@ var ResultPane = {
 		
 		icons.forEach(function(d, i) {
 			$.get(d, function(data) {
-				$(resS.icons).find('*:nth-child('+(i+1)+')').append($(data).find('svg'));
+				$(resS.icons).find('*:nth-child('+(i+1)+')')
+					.append($(data).find('svg').attr('class', 'tt'));
 			})
 		});
 	},
@@ -2243,4 +2244,5 @@ var ResultPane = {
 $(document).ready(function() {
 	AnalysisPane.init();
 	ResultPane.init();
+	tooltip.init();
 });
