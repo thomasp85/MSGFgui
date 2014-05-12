@@ -17,7 +17,6 @@ h4 {
 .lefts.col {
 	width: 390px;
 	padding: 5px;
-	z-index: 1;
 	box-shadow: 0px 0px 15px rgba(0,0,0,0.5)
 }
 
@@ -54,13 +53,17 @@ h4 {
 	#parameters>div {
 		width: 100%;
 		margin: 5px 0px 5px 0px;
-	}	
+		overflow: hidden;
+	}
+	#parameters label {
+		width: 100%;
+	}
 	.formInput {
 		display: inline-block;
-		width: 185px;
+		width: 48%;
 	}
 	label span {
-		width: 190px;
+		width: 48%;
 		text-align: right;
 		vertical-align: top;
 		margin-right: 10px; 
@@ -75,15 +78,9 @@ h4 {
 	input[type='text']:invalid{
 		background-color: lightcoral;
 	}
-	input[type='file'] {
-		visibility: hidden;
-		height: 0;
-		width: 0;
-		margin: 0;
-		padding: 0;
-	}
 	select.fill {
-		width: 185px;
+		box-sizing: content-box;
+		width: 100%;
 	}
 	#parameters .listview {
 		height: 60px;
@@ -347,7 +344,7 @@ h4 {
 	table-layout: fixed;
 }
 .listview {
-	overflow: scroll;
+	overflow: auto;
 }
 .listview table {
 	min-width: 100%
@@ -370,7 +367,11 @@ h4 {
 	margin-right: auto;
 }
 .topcoat-button-bar .topcoat-button {
-	width: 33.33%
+	width: 33.33%;
+}
+.topcoat-button-bar .topcoat-button i{
+	font-size: 16px;
+	vertical-align: text-bottom;
 }
 table {
 	font-size: 12px;
@@ -886,4 +887,38 @@ svg {
     left: -.25em;
     margin-left: 0;
     margin-bottom: -.6em;      
+}
+
+
+/*
+	Tooltip
+*/
+
+#tooltip {
+	position: absolute;
+	background: whitesmoke;
+	border: 1px solid grey;
+	border-radius: 5px;
+	z-index: 1000;
+	box-shadow: 0px 0px 20px black;
+	opacity: 0;
+	visibility: hidden;
+	-webkit-transition: opacity 0.25s ease-in;
+	-moz-transition: opacity 0.25s ease-in;
+	transition: opacity 0.25s ease-in;
+}
+#tooltip.fadein {
+	visibility: visible;
+	opacity: 1;
+}
+.tooltipTitle {
+	position: relative;
+	z-index: 2000;
+}
+.tooltip {
+	font-size: small;
+	text-align: justify;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 5px;
 }
