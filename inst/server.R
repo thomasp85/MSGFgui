@@ -547,12 +547,7 @@ parameters <- function(mzID) {
 
 ## SERVER LOGIC
 shinyServer(function(input, output, session) {
-#     testdata <- lapply(readRDS('/Users/Thomas/Desktop/testData.RDS'), function(x) {
-#         list(
-#             name=basename(x@parameters@idFile),
-#             mzID=x,
-#             mzML=openMSfile(x@parameters@rawFile$location))
-#     })
+    # Client setup
     dataAdded <- reactiveValues(counter=0)
     progressBarData <- reactiveValues(max=0, value=0, text='Waiting...', done=TRUE)
     dataStore <- list()
@@ -561,6 +556,8 @@ shinyServer(function(input, output, session) {
     currentPar <- msgfPar()
     saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS')) # Reset currentData
     
+    
+    # Run MSGFplus analysis
     par <- reactive({
         msgfPar(
             database=input$database,
@@ -616,12 +613,18 @@ shinyServer(function(input, output, session) {
             saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
         }
     })
+    output$runProgress <- reactive({reactiveValuesToList(progressBarData)})
+    
+    # Send mzid data to client
     data <- reactive({
         index <- dataAdded$counter
         if(index != 0) {
             do.call('renderMzID', dataStore[[length(dataStore)]])
         }
     })
+    output$resulttabs <- reactive({data()})
+    
+    # FDR score distribution plot
     scoreDistribution <- reactive({
         sNames <- input$samplesSelect
         if(length(sNames) == 0) return(NULL)
@@ -638,6 +641,10 @@ shinyServer(function(input, output, session) {
                 )
             )
     })
+    output$samplesDensity <- reactive({scoreDistribution()})
+    outputOptions(output, 'samplesDensity', suspendWhenHidden = FALSE)
+    
+    # Scan plot
     selectedScan <- reactive({
         scan <- input$scanSelect
         
@@ -668,12 +675,8 @@ shinyServer(function(input, output, session) {
                    showTrace=input$globalSettings$plotTrace
                    )
     })
-    output$runProgress <- reactive({reactiveValuesToList(progressBarData)})
     output$idPlots <- reactive({selectedScan()})
     outputOptions(output, 'idPlots', suspendWhenHidden = FALSE)
-    output$samplesDensity <- reactive({scoreDistribution()})
-    outputOptions(output, 'samplesDensity', suspendWhenHidden = FALSE)
-    output$resulttabs <- reactive({data()})
     
     # Add mzID files
     mzidFilePath <- reactiveValues(path='', rawPath='', valid=FALSE, reason='')
