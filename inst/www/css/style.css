@@ -926,13 +926,9 @@ svg {
 
 
 select, .listview, .textview, input{
-	padding: 0;
 	border: 1px solid grey;
-	box-sizing:content-box;
-	-ms-box-sizing:content-box;
-	-moz-box-sizing:content-box;
-	-webkit-box-sizing:content-box;
-}
-input {
-	padding: 1px 0;
+	box-sizing:border-box;
+	-ms-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
 }
