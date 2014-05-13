@@ -22,6 +22,7 @@ biocLite('mzR')
 biocLite('mzID')
 install.packages('shiny')
 install.packages('devtools')
+library(devtools)
 install_github('MSGFplus', 'thomasp85')
 install_github('MSGFgui', 'thomasp85')
 ```
