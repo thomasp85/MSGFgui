@@ -27,6 +27,24 @@ install_github('MSGFplus', 'thomasp85')
 install_github('MSGFgui', 'thomasp85')
 ```
 
+Usage
+------
+After installation the GUI can be launched from R by:
+
+```R
+library(MSGFgui)
+MSGFgui()
+```
+
+By launching a second R session while the GUI is running, the current identification data in the GUI can be accessed in R by:
+
+```R
+library(MSGFgui)
+data <- currentData()
+```
+
+The communication is one-way one-time though - modifications and deletion in the data from the second R session is not propagated to the GUI and if new data is added in the GUI the `currentData()` call has to be repeated for this to be visible in R.
+
 Screenshots
 ------
 _Comming soon_
