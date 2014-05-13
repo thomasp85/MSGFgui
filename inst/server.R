@@ -665,7 +665,6 @@ shinyServer(function(input, output, session) {
                 }
             }
         }
-        
         renderScan(dataStore[[sampleIndex]]$mzML, 
                    scanNum,
                    scan$peptide, 
@@ -752,17 +751,14 @@ shinyServer(function(input, output, session) {
         
         if(is.null(toRemove)) return()
         
-        print(dataStore)
         for(i in toRemove) {
             index <- which(sapply(dataStore, function(x) {
                 x$id == i
             }))
-            print(index)
             close(dataStore[[index]]$mzML)
             
             dataStore <<- dataStore[-index]
         }
-        print(dataStore)
         saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
     })
     
