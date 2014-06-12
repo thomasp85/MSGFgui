@@ -8,7 +8,7 @@ $.extend(tableList, {
 		return $(scope).find(".tableList");
 	},
 	getValue: function(el) {
-		return $(el).find('tr').map(function(){return $(this).attr('data-collapse')}).get();
+		return $.extend({}, $(el).find('tr').map(function(){return $(this).data('collapse')}).toArray());
 	},
 	setValue: function(el, value) {
 		$(el).each(function(i, e) {

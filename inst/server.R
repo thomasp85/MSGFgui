@@ -1,5 +1,6 @@
 ## IMPORTS
 library(shiny)
+library(shinyFiles)
 library(MSGFplus)
 library(mzID)
 library(mzR)
@@ -371,7 +372,7 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
         trace <- rbind(trace, get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes))
         indexWindow[2] <- scans[2]
     }
-    data.frame(intensity=trace[round(top-bw*3):round(top+bw*3), 1], retention=header(data, ms1Indexes[scans[1]:scans[2]])$retentionTime, acquisitionNum=header(data, ms1Indexes[scans[1]:scans[2]])$acquisitionNum)
+    data.frame(intensity=trace[max(0, round(top-bw*3)):min(nrow(trace), round(top+bw*3)), 1], retention=header(data, ms1Indexes[scans[1]:scans[2]])$retentionTime, acquisitionNum=header(data, ms1Indexes[scans[1]:scans[2]])$acquisitionNum)
 }
 getIonTrace2 <- function(data, index, mz, ppm, skip=1){
     indexRange <- c(1, length(data))
@@ -548,19 +549,40 @@ parameters <- function(mzID) {
 ## SERVER LOGIC
 shinyServer(function(input, output, session) {
     # Client setup
-    dataAdded <- reactiveValues(counter=0)
+    dataAdded <- reactiveValues(counter=0, oldCount=0)
     progressBarData <- reactiveValues(max=0, value=0, text='Waiting...', done=TRUE)
     dataStore <- list()
     dataFiles <- c()
     analysisButtonCount <- 0
     currentPar <- msgfPar()
     saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS')) # Reset currentData
-    
+    filesystem <- getVolumes()
+    output$dataAddButton <- shinyFileChoose(input, 'dataAddButton', session=session, roots=filesystem, filetypes=c('mzML', 'mzData', 'mzXML'))
+    datafileSelection <- reactive({
+        if(length(input$datafiles) == 0) return(character())
+        
+        roots <- filesystem()
+        sapply(input$datafiles, function(x) {
+            lastPath <- do.call('file.path', as.list(x$path))
+            file.path(roots[x$root], lastPath)
+        })
+    })
+    output$databaseButton <- shinyFileChoose(input, 'databaseButton', session=session, roots=filesystem, filetypes=c('fasta'))
+    databaseSelection <- reactive({
+        if(length(input$database) == 0) return(character())
+        
+        roots <- filesystem()
+        sapply(input$database, function(x) {
+            lastPath <- do.call('file.path', as.list(x$path))
+            file.path(roots[x$root], lastPath)
+        })
+    })
+    output$addToDB <- shinyFileChoose(input, 'addToDB', session=session, roots=filesystem, filetypes=c('mzid'))
     
     # Run MSGFplus analysis
     par <- reactive({
         msgfPar(
-            database=input$database,
+            database=databaseSelection(),
             tolerance=list(value=as.numeric(input$tolValue), unit=input$tolUnit),
             isotopeError=input$isoLow:input$isoHigh,
             tda=ifelse(is.null(input$tda), FALSE, TRUE),
@@ -579,7 +601,7 @@ shinyServer(function(input, output, session) {
         if(input$analysisButton == 0) return(c())
         
         if(input$analysisButton != analysisButtonCount) {
-            dataFiles <<- isolate({input$datafiles})
+            dataFiles <<- isolate({datafileSelection()})
             currentPar <<- isolate({par()})
             analysisButtonCount <<- input$analysisButton
             progressBarData$max <<- length(dataFiles)
@@ -607,7 +629,7 @@ shinyServer(function(input, output, session) {
             invalidateLater(1, session)
         } else {
             progressBarData$value <<- 0
-            progressBarData$max <<- 0
+            progressBarData$max <<- 1
             progressBarData$text <<- 'Waiting...'
             progressBarData$done <<- TRUE
             saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
@@ -619,7 +641,11 @@ shinyServer(function(input, output, session) {
     data <- reactive({
         index <- dataAdded$counter
         if(index != 0) {
-            do.call('renderMzID', dataStore[[length(dataStore)]])
+            dataAdded$oldCount <- isolate({dataAdded$oldCount})+1
+            if(isolate({dataAdded$oldCount}) < isolate({dataAdded$counter})) {
+                invalidateLater(1, session)
+            }
+            do.call('renderMzID', dataStore[[length(dataStore)-isolate({dataAdded$counter-dataAdded$oldCount})]])
         }
     })
     output$resulttabs <- reactive({data()})
@@ -680,68 +706,85 @@ shinyServer(function(input, output, session) {
     # Add mzID files
     mzidFilePath <- reactiveValues(path='', rawPath='', valid=FALSE, reason='')
     mzidValidator <- observe({
-        if(is.null(input$addMZID) || input$addMZID == 0) return(c())
+        if(is.null(input$resultFiles)) return(c())
         
-        path <- isolate(input$mzidFilePath)
-        
-        mzidFilePath$path <- ''
-        mzidFilePath$path <- path
-        
-        if(!file.exists(path)) {
-            mzidFilePath$valid <- FALSE
-            mzidFilePath$reason <- 'No file at location'
-            return()
-        }
-        
-        tryCatch({
-            fileInfo <- mzIDparameters(path=path)
-            if(fileInfo@software$name[fileInfo@software$id == 'ID_software'] != 'MS-GF+') {
+        roots <- filesystem()
+        files <- sapply(input$resultFiles, function(x) {
+            lastPath <- do.call('file.path', as.list(x$path))
+            file.path(roots[x$root], lastPath)
+        })
+        validFiles <- FALSE
+        isolate({
+            for(index in 1:length(files)) {
+                path <- files[index]
+                mzidFilePath$path <- path
+                
+                session$sendCustomMessage(type='validatorUpdates', list(status='validating', filename=basename(path)))
+                
+                if(!file.exists(path)) {
+                    mzidFilePath$valid <- FALSE
+                    mzidFilePath$reason <- 'No file at location'
+                } else {
+                    tryCatch({
+                        fileInfo <- mzIDparameters(path=path)
+                        if(fileInfo@software$name[fileInfo@software$id == 'ID_software'] != 'MS-GF+') {
+                            mzidFilePath$valid <- FALSE
+                            mzidFilePath$reason <- 'Not generated by MS-GF+'
+                        } else {
+                            possiblePaths <- c(fileInfo@rawFile$location, 
+                                               file.path(dirname(path), fileInfo@rawFile$name),
+                                               file.path(dirname(fileInfo@idFile), fileInfo@rawFile$name))
+                            if(!any(file.exists(possiblePaths))) {
+                                mzidFilePath$valid <- FALSE
+                                mzidFilePath$reason <- 'Raw data file not detected'
+                            } else {
+                                rawPath <- possiblePaths[file.exists(possiblePaths)][1]
+                                if(!tolower(file_ext(rawPath)) %in% c('mzml', 'mzxml', 'mzdata')) {
+                                    mzidFilePath$valid <- FALSE
+                                    mzidFilePath$reason <- 'Invalid raw data file format'
+                                } else {
+                                    mzidFilePath$rawPath <- rawPath
+                                    mzidFilePath$valid <- TRUE
+                                    mzidFilePath$reason <- ''
+                                }
+                            }
+                        }
+                    }, error = function(cond){
+                        mzidFilePath$valid <- FALSE
+                        mzidFilePath$reason <- 'Invalid filetype'
+                    })
+                }
+                if(mzidFilePath$valid) {
+                    session$sendCustomMessage(type='validatorUpdates', list(status='importing', filename=basename(path)))
+                    
+                    validFiles <- TRUE
+                    res=mzID(mzidFilePath$path)
+                    raw=openMSfile(mzidFilePath$rawPath)
+                    header(raw)
+                    dataStore[[length(dataStore)+1]] <<- list(
+                        name=basename(mzidFilePath$rawPath),
+                        mzID=res,
+                        mzML=raw,
+                        id=sampleID()
+                    )
+                    dataAdded$counter <<- isolate(dataAdded$counter)+1
+                }
+                session$sendCustomMessage(type='resultValidator', list(filename=basename(path), valid=mzidFilePath$valid, reason=mzidFilePath$reason))
+                session$sendCustomMessage(type='validatorUpdates', list(status='done', filename=basename(path)))
+                
+                mzidFilePath$path <- ''
+                mzidFilePath$rawPath <- ''
                 mzidFilePath$valid <- FALSE
-                mzidFilePath$reason <- 'Not generated by MS-GF+'
-                return()
+                mzidFilePath$reason <- ''
             }
-            possiblePaths <- c(fileInfo@rawFile$location, 
-                               file.path(dirname(path), fileInfo@rawFile$name),
-                               file.path(dirname(fileInfo@idFile), fileInfo@rawFile$name))
-            if(!any(file.exists(possiblePaths))) {
-                mzidFilePath$valid <- FALSE
-                mzidFilePath$reason <- 'Raw data file not detected'
-                return()
-            }
-            rawPath <- possiblePaths[file.exists(possiblePaths)][1]
-            if(!tolower(file_ext(rawPath)) %in% c('mzml', 'mzxml', 'mzdata')) {
-                mzidFilePath$valid <- FALSE
-                mzidFilePath$reason <- 'Invalid raw data file format'
-                return()
-            }
-            mzidFilePath$rawPath <- rawPath
-            mzidFilePath$valid <- TRUE
-            mzidFilePath$reason <- ''
-            return()
-        }, error = function(cond){
-            mzidFilePath$valid <- FALSE
-            mzidFilePath$reason <- 'Invalid filetype'
-            return()
         })
         
-    })
-    output$mzidAddModalValidate <- reactive({
-        if(mzidFilePath$valid) {
-            res=mzID(mzidFilePath$path)
-            raw=openMSfile(mzidFilePath$rawPath)
-            header(raw)
-            dataStore[[length(dataStore)+1]] <<- list(
-                name=basename(mzidFilePath$rawPath),
-                mzID=res,
-                mzML=raw,
-                id=sampleID()
-            )
+        if(validFiles) {
             saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS'))
-            dataAdded$counter <<- isolate(dataAdded$counter)+1
         }
         
-        list(valid=mzidFilePath$valid, reason=mzidFilePath$reason)
-        })
+        session$sendCustomMessage(type='validatorUpdates', list(status='finished'))
+    })
     
     # Remove sample
     sampleRemover <- observe({

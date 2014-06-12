@@ -396,54 +396,41 @@ var COMPOSITION_REGEX = /^(([CHNOSP]|Br|Cl|Fe|Se)-?\d*)+$/;
 
 var createModalDialog = function(id, title) {
 	$('#tooltip').remove();
-	$('body').append(
-		$('<div>', {id: id}).append(
-			$('<div>').addClass('clearBackground')
-		).append(
-			$('<div>').addClass('modalPopup').append(
-				$('<div>').append(
-					$('<h5>', {text: title})
-				)
-			)
-		)
-	);
-	return $('#'+id+' .modalPopup div');
-}
-
-var dismissDialog = function(id) {
-	Shiny.unbindAll();
-	$('#'+id).remove();
-	Shiny.bindAll();
-}
-
-var filePathModal = function(id, title) {
-	var modal = createModalDialog(id, title);
+	var backdrop = $('<div>').addClass('modal-backdrop fade').appendTo($('body'));
 	
-	modal.addClass('filePathModal').append(
-		$('<div>').append(
-			$('<label>', {text: 'Filepath'}).append(
-				$('<input>', {type: 'text'}).prop('autofocus', true).on('input change', function() {
-					filePathValidate('#'+id);
-				})
-			)
-		)
-	).append(
-		$('<div>').addClass('errorContainer')
-	).append(
-		$('<div>').addClass('modalButton').append(
-			$('<button>', {text: 'Add'}).addClass('topcoat-button--cta').prop('disabled', true)
-		).append(
-			$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
-				dismissDialog(id)
+	var modal = $('<div>', {id: id}).addClass('modal hide fade').append(
+		$('<div>').addClass('modal-header').append(
+			$('<button>', {type: 'button', html: '&times;'}).addClass('close').on('click', function() {
+				dismissDialog(modal)
 			})
+		).append(
+			$('<h3>', {text: title})
 		)
-	);
+	).append(
+		$('<div>').addClass('modal-body')
+	).append(
+		$('<div>').addClass('modal-footer')
+	).data('backdrop', backdrop).appendTo($('body'))
+	return modal;
+}
+var showModal = function(modal) {
+	modal.removeClass('hide');
+	setTimeout(function() {
+		modal.addClass('in')
+			.data('backdrop').addClass('in');
+	}, 1);
+}
+var dismissDialog = function(modal) {
+	Shiny.unbindAll();
+	$(modal).removeClass('in');
+	var backdrop = $(modal).data('backdrop').removeClass('in');
 	
-	return modal
-};
-var filePathValidate = function(id) {
-	$(id + ' .topcoat-button--cta').prop('disabled', $(id + ' input').val() == '');
-};
+	setTimeout(function() {
+		modal.remove();
+		backdrop.remove();
+		Shiny.bindAll();
+	}, 300);
+}
 
 // Adopted from http://stackoverflow.com/questions/17964108/select-multiple-html-table-rows-with-ctrlclick-and-shiftclick
 
@@ -538,9 +525,9 @@ var ModificationParameters = {
 			($(modS.modalSelectors.composition).val() == '' &&
 			$(modS.modalSelectors.mass).val() == '')
 		) {
-			$(modS.modalSelectors.popup + ' .topcoat-button--cta').prop('disabled', true);
+			$(modS.modalSelectors.popup + ' .btn-primary').prop('disabled', true);
 		} else {
-			$(modS.modalSelectors.popup + ' .topcoat-button--cta').prop('disabled', false);
+			$(modS.modalSelectors.popup + ' .btn-primary').prop('disabled', false);
 		};
 		
 		var resPar = $(modS.modalSelectors.residues).val();
@@ -604,8 +591,6 @@ var ModificationParameters = {
 		this.createModificationRow(false).appendTo(modS.selector);
 		
 		$(modS.selector).trigger('change')
-		
-		dismissDialog()
 	},
 	removeModification: function() {
 		$(modS.selector + ' .selected').remove();
@@ -620,8 +605,6 @@ var ModificationParameters = {
 		);
 		
 		$(modS.selector).trigger('change')
-		
-		dismissDialog()
 	},
 	createSetModDialog: function(edit) {
 		if (typeof edit === 'undefined') {
@@ -635,115 +618,126 @@ var ModificationParameters = {
 		
 		var modal = createModalDialog(ids.popup, 'Set allowed modifications')
 					
-		modal.append(
-			$('<div>').append(
-				$('<label>').append(
-					$('<span>', {text: 'Name'})
+		modal.find('.modal-body').append(
+			$('<form>').addClass('form-horizontal').append(
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Name', 'for': ids.name}).addClass('control-label')
 				).append(
-					$('<input>', {id: ids.name, type: 'text'}).prop('autofocus', true)
-				)
-			).append(
-				$('<label>').append(
-					$('<span>', {text: 'Composition'})
-				).append(
-					$('<input>', {id: ids.composition, type: 'text', pattern: COMPOSITION_REGEX.toString().replace(/\//g, '')})
-				)
-			).append(
-				$('<label>').append(
-					$('<span>', {text: 'Molecular weight'})
-				).append(
-					$('<input>', {id: ids.mass, type: 'text', pattern: NUMERIC_REGEX.toString().replace(/\//g, '')})
-				)
-			).append(
-				$('<label>').append(
-					$('<span>', {text: 'Residues'})
-				).append(
-					$('<select>', {id: ids.residues}).prop('multiple', true).append(
-						$('<option>', {text: 'All', value: '*'}).prop('selected', true)
-					).append(
-						$('<option>', {text: 'Alanine', value: 'A'})
-					).append(
-						$('<option>', {text: 'Arginine', value: 'R'})
-					).append(
-						$('<option>', {text: 'Asparagine', value: 'N'})
-					).append(
-						$('<option>', {text: 'Aspartic acid', value: 'D'})
-					).append(
-						$('<option>', {text: 'Cysteine', value: 'C'})
-					).append(
-						$('<option>', {text: 'Glutamine', value: 'Q'})
-					).append(
-						$('<option>', {text: 'Glutamic acid', value: 'E'})
-					).append(
-						$('<option>', {text: 'Glycine', value: 'G'})
-					).append(
-						$('<option>', {text: 'Histidine', value: 'H'})
-					).append(
-						$('<option>', {text: 'Isoleucine', value: 'I'})
-					).append(
-						$('<option>', {text: 'Leucine', value: 'L'})
-					).append(
-						$('<option>', {text: 'Lysine', value: 'K'})
-					).append(
-						$('<option>', {text: 'Methionine', value: 'M'})
-					).append(
-						$('<option>', {text: 'Phenylalanine', value: 'F'})
-					).append(
-						$('<option>', {text: 'Proline', value: 'P'})
-					).append(
-						$('<option>', {text: 'Serine', value: 'S'})
-					).append(
-						$('<option>', {text: 'Threonine', value: 'T'})
-					).append(
-						$('<option>', {text: 'Tryptophan', value: 'W'})
-					).append(
-						$('<option>', {text: 'Tyrosine', value: 'Y'})
-					).append(
-						$('<option>', {text: 'Valine', value: 'V'})
+					$('<div>').addClass('controls').append(
+						$('<input>', {id: ids.name, type: 'text'}).prop('autofocus', true)
 					)
 				)
 			).append(
-				$('<label>').append(
-					$('<span>', {text: 'Modification type'})
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Composition', 'for': ids.composition}).addClass('control-label')
 				).append(
-					$('<select>', {id: ids.type}).append(
-						$('<option>', {text: 'Fixed', value: 'fix'}).prop('selected', true)
-					).append(
-						$('<option>', {text: 'Variable', value: 'opt'})
+					$('<div>').addClass('controls').append(
+						$('<input>', {id: ids.composition, type: 'text', pattern: COMPOSITION_REGEX.toString().replace(/\//g, '')})
 					)
 				)
 			).append(
-				$('<label>').append(
-					$('<span>', {text: 'Position'})
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Molecular weight', 'for': ids.mass}).addClass('control-label')
 				).append(
-					$('<select>', {id: ids.position}).append(
-						$('<option>', {text: 'Anywhere', value: 'any'}).prop('selected', true)
-					).append(
-						$('<option>', {text: 'Peptide N-term', value: 'nterm'})
-					).append(
-						$('<option>', {text: 'Peptide C-term', value: 'cterm'})
-					).append(
-						$('<option>', {text: 'Protein N-term', value: 'protnterm'})
-					).append(
-						$('<option>', {text: 'Protein C-term', value: 'protcterm'})
+					$('<div>').addClass('controls').append(
+						$('<input>', {id: ids.mass, type: 'text', pattern: NUMERIC_REGEX.toString().replace(/\//g, '')})
+					)
+				)
+			).append(
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Residues', 'for': ids.residues}).addClass('control-label')
+				).append(
+					$('<div>').addClass('controls').append(
+						$('<select>', {id: ids.residues}).prop('multiple', true).append(
+							$('<option>', {text: 'All', value: '*'}).prop('selected', true)
+						).append(
+							$('<option>', {text: 'Alanine', value: 'A'})
+						).append(
+							$('<option>', {text: 'Arginine', value: 'R'})
+						).append(
+							$('<option>', {text: 'Asparagine', value: 'N'})
+						).append(
+							$('<option>', {text: 'Aspartic acid', value: 'D'})
+						).append(
+							$('<option>', {text: 'Cysteine', value: 'C'})
+						).append(
+							$('<option>', {text: 'Glutamine', value: 'Q'})
+						).append(
+							$('<option>', {text: 'Glutamic acid', value: 'E'})
+						).append(
+							$('<option>', {text: 'Glycine', value: 'G'})
+						).append(
+							$('<option>', {text: 'Histidine', value: 'H'})
+						).append(
+							$('<option>', {text: 'Isoleucine', value: 'I'})
+						).append(
+							$('<option>', {text: 'Leucine', value: 'L'})
+						).append(
+							$('<option>', {text: 'Lysine', value: 'K'})
+						).append(
+							$('<option>', {text: 'Methionine', value: 'M'})
+						).append(
+							$('<option>', {text: 'Phenylalanine', value: 'F'})
+						).append(
+							$('<option>', {text: 'Proline', value: 'P'})
+						).append(
+							$('<option>', {text: 'Serine', value: 'S'})
+						).append(
+							$('<option>', {text: 'Threonine', value: 'T'})
+						).append(
+							$('<option>', {text: 'Tryptophan', value: 'W'})
+						).append(
+							$('<option>', {text: 'Tyrosine', value: 'Y'})
+						).append(
+							$('<option>', {text: 'Valine', value: 'V'})
+						)
+					)
+				)
+			).append(
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Modification type', 'for': ids.type}).addClass('control-label')
+				).append(
+					$('<div>').addClass('controls').append(
+						$('<select>', {id: ids.type}).append(
+							$('<option>', {text: 'Fixed', value: 'fix'}).prop('selected', true)
+						).append(
+							$('<option>', {text: 'Variable', value: 'opt'})
+						)
+					)
+				)
+			).append(
+				$('<div>').addClass('control-group').append(
+					$('<label>', {text: 'Position', 'for': ids.position}).addClass('control-label')
+				).append(
+					$('<div>').addClass('controls').append(
+						$('<select>', {id: ids.position}).append(
+							$('<option>', {text: 'Anywhere', value: 'any'}).prop('selected', true)
+						).append(
+							$('<option>', {text: 'Peptide N-term', value: 'nterm'})
+						).append(
+							$('<option>', {text: 'Peptide C-term', value: 'cterm'})
+						).append(
+							$('<option>', {text: 'Protein N-term', value: 'protnterm'})
+						).append(
+							$('<option>', {text: 'Protein C-term', value: 'protcterm'})
+						)
 					)
 				)
 			)
+		);
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function(){
+				dismissDialog(modal)
+			})
 		).append(
-			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: edit ? 'Update' : 'Add'}).addClass('topcoat-button--cta').prop('disabled', true).on('click', function() {
-					if (edit) {
-						ModificationParameters.editModification();
-					} else {
-						ModificationParameters.addModification();
-					}
-					dismissDialog(ids.popup)
-				})
-			).append(
-				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function(){
-					dismissDialog(ids.popup)
-				})
-			)
+			$('<button>', {text: edit ? 'Update' : 'Add', type: 'button'}).addClass('btn btn-primary').prop('disabled', true).on('click', function() {
+				if (edit) {
+					ModificationParameters.editModification();
+				} else {
+					ModificationParameters.addModification();
+				}
+				dismissDialog(modal)
+			})
 		);
 		
 		if (edit) {
@@ -783,6 +777,8 @@ var ModificationParameters = {
 		$(modS.modalSelectors.composition + ', ' + modS.modalSelectors.mass).on('input', function() {
 			ModificationParameters.switchMassComp();
 		});
+		
+		showModal(modal)
 	}
 }
 
@@ -851,60 +847,49 @@ var DataInputSetup = {
 	init: function() {
 		dataS = this.settings;
 		
-		$(dataS.databaseButton).on('click', function() {
-			DataInputSetup.databaseModal();
+		$(dataS.databaseButton).on('fileselect', function(el, file) {
+			DataInputSetup.updateDatabase(file);
 		});
 		
-		$(dataS.dataAddButton).on('click', function() {
-			DataInputSetup.dataModal();
+		$(dataS.dataAddButton).on('fileselect', function(el, files) {
+			DataInputSetup.addDatafiles(files);
 		});
 		
 		$(dataS.dataRemoveButton).on('click', function() {
 			DataInputSetup.removeDatafiles();
 		});
 	},
-	databaseModal: function() {
-		var modal = filePathModal(dataS.databaseInput.substring(1), 'Set database location');
-		
-		modal.find('.topcoat-button--cta').on('click', function() {
-			DataInputSetup.updateDatabase();
-		})
-	},
-	updateDatabase: function() {
-		var path = $(dataS.databaseInput + ' input').val();
-		var filename = path.replace(/^.*[\\\/]/, '');
-		
+	updateDatabase: function(file) {
+		file = {path: file.files.toArray()[0], root: file.root};
 		$(dataS.database + ' tr').replaceWith(
-			$('<tr>', {'data-collapse': path}).append(
-				$('<td>', {text: filename}).addClass('ellipsis')
+			$('<tr>').data('collapse', file).append(
+				$('<td>', {text: file.path[file.path.length-1]}).addClass('ellipsis')
 			)
 		);
 		$(dataS.database).trigger('change');
-		
-		dismissDialog(dataS.databaseInput.substring(1));
 	},
-	dataModal: function() {
-		var modal = filePathModal(dataS.dataInput.substring(1), 'Add data file');
+	addDatafiles: function(files) {
+		var parsedFiles = [];
 		
-		modal.find('.topcoat-button--cta').on('click', function() {
-			DataInputSetup.addDatafile();
+		files.files.toArray().forEach(function(d) {
+			parsedFiles.push({
+				path: d,
+				root: files.root
+			});
+		});
+		
+		parsedFiles.forEach(function(d) {
+			$(dataS.datafiles + ' tbody').append(
+				$('<tr>').data('collapse', d).on('mousedown', function() {
+					rowSelector(this);
+					DataInputSetup.setRemoveButtonAct();
+				}).append(
+					$('<td>', {text: d.path[d.path.length-1]}).addClass('ellipsis')
+				)
+			);
 		})
-	},
-	addDatafile: function() {
-		var path = $(dataS.dataInput + ' input').val();
-		var filename = path.replace(/^.*[\\\/]/, '');
 		
-		$(dataS.datafiles + ' tbody').append(
-			$('<tr>', {'data-collapse': path}).on('mousedown', function() {
-				rowSelector(this);
-				DataInputSetup.setRemoveButtonAct();
-			}).append(
-				$('<td>', {text: filename}).addClass('ellipsis')
-			)
-		);
 		$(dataS.datafiles).trigger('change');
-		
-		dismissDialog(dataS.dataInput.substring(1));
 	},
 	removeDatafiles: function() {
 		$(dataS.datafiles + ' tr.selected').remove();
@@ -952,10 +937,11 @@ var AnalysisPane = {
 		$(anaS.runButton).prop('disabled', disable);
 	},
 	setProgress: function(progress) {
-		var progressBar = $(anaS.progressElement).find('progress');
-		var progressText = $(anaS.progressElement).find('progress+p');
-		progressBar.prop('max', progress.max)
-			.prop('value', progress.value);
+		var progressBar = $(anaS.progressElement).find('.bar');
+		var progressText = $(anaS.progressElement).find('.bar+p');
+		progressBar.css({
+			width: Math.round(100*progress.value/progress.max)+'%'
+		})
 		
 		progressText.text(progress.text);
 		
@@ -1160,7 +1146,6 @@ var IdTab = {
 			IdTab.updateProteinSelect();
 		});
 		$(settings).bind('change', function(elem, changes) {
-			console.log(changes)
 			if (changes.indexOf('proteinSort') != -1) {
 				IdTab.updateProteinSelect()
 			}
@@ -1743,19 +1728,17 @@ var FilterTab = {
 		
 		var modal = createModalDialog(filS.badFilterDialog.substring(1), 'Invalid filter settings');
 		
-		modal.append(
-			$('<div>').append(
-				$('<p>', {text: 'One or more of the applied filtering settings has resulted in the removal of all datapoint.'})
-			).append(
-				$('<p>', {text: 'Please adjust the filtering to be more inclusive.'})
-			)
+		modal.find('.modal-body').append(
+			$('<p>', {text: 'One or more of the applied filtering settings has resulted in the removal of all datapoint.'})
 		).append(
-			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: 'Ok'}).addClass('topcoat-button--cta').on('click', function(){
-					dismissDialog(filS.badFilterDialog.substring(1))
-				})
-			)
+			$('<p>', {text: 'Please adjust the filtering to be more inclusive.'})
 		)
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Ok', type: 'button'}).addClass('btn btn-primary').on('click', function(){
+					dismissDialog(modal)
+				})
+		)
+		showModal(modal);
 	}
 }
 
@@ -1780,33 +1763,21 @@ var ResultPane = {
 		infoModal: '#infoModal',
 		addModal: '#mzidAddModal',
 		removeModal: '#sampleRemoveModal',
-		settingsModal: '#globalSettingsModal',
-		spinner: new Spinner({
-			lines: 13, // The number of lines to draw
-			length: 5, // The length of each line
-			width: 2, // The line thickness
-			radius: 6, // The radius of the inner circle
-			corners: 0.6, // Corner roundness (0..1)
-			rotate: 54, // The rotation offset
-			direction: 1, // 1: clockwise, -1: counterclockwise
-			color: '#000', // #rgb or #rrggbb or array of colors
-			speed: 1, // Rounds per second
-			trail: 54, // Afterglow percentage
-			shadow: false, // Whether to render a shadow
-			hwaccel: false, // Whether to use hardware acceleration
-			className: 'spinner', // The CSS class to assign to the spinner
-			zIndex: 2e9, // The z-index (defaults to 2000000000)
-			top: '50%', // Top position relative to parent
-			left: '50%' // Left position relative to parent
-		}).stop()
+		settingsModal: '#globalSettingsModal'
 	},
 	init: function() {
 		resS = this.settings;
 		
 		this.addIcons();
 		
+		Shiny.addCustomMessageHandler('resultValidator', function(message) {
+			ResultPane.validateResultFile(message);
+		});
+		Shiny.addCustomMessageHandler('validatorUpdates', function(message) {
+			ResultPane.updateValidator(message);
+		});
 		$(resS.helpButton).on('click', function() {ResultPane.showInfo()});
-		$(resS.addButton).on('click', function() {ResultPane.showAddData()});
+		$(resS.addButton).on('fileselect', function(el, files) {ResultPane.showAddData(files)});
 		$(resS.removeButton).on('click', function() {ResultPane.showRemoveSample()});
 		$(resS.settingsButton).on('click', function() {ResultPane.showSettings()});
 		
@@ -1860,91 +1831,121 @@ var ResultPane = {
 	showInfo: function() {
 		var modal = createModalDialog(resS.infoModal.substring(1), 'Help');
 		
-		modal.append(
-			$('<div>').append(
-				$('<p>', {text: 'There should be some text here'})
-			)
-		).append(
+		modal.find('.modal-body').append(
+			$('<p>', {text: 'There should be some text here'})
+		)
+		modal.find('.modal-footer').append(
 			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: 'Ok'}).addClass('topcoat-button--cta').on('click', function(){
-					dismissDialog(resS.infoModal.substring(1))
+				$('<button>', {text: 'Ok', type: 'button'}).addClass('btn btn-primary').on('click', function(){
+					dismissDialog(modal)
 				})
 			)
 		)
+		showModal(modal);
 	},
-	showAddData: function() {
-		Shiny.unbindAll();
+	showAddData: function(files) {
+		var parsedFiles = [];
 		
-		var modal = filePathModal(resS.addModal.substring(1), 'Add mzIdentML file');
-		
-		modal.addClass('validateFile')
-			.attr('id', 'mzidAddModalValidate');
-		
-		modal.find('input').attr('name', 'mzidFilePath');
-		
-		modal.find('.topcoat-button--cta')
-			.addClass('action-button')
-			.attr('id', 'addMZID')
-			.on('click', function() {
-				$(resS.addModal).find('.errorMessage').remove();
-				$(resS.addModal).find('button, input').prop('disabled', true);
-				resS.spinner.spin($(resS.addModal).find('.errorContainer').get()[0]);
+		files.files.toArray().forEach(function(d) {
+			parsedFiles.push({
+				path: d,
+				root: files.root
 			});
-			
-		Shiny.bindAll();
-		
-		modal.on('valid', function() {
-			resS.spinner.stop();
-			dismissDialog(resS.addModal.substring(1));
 		});
-		modal.on('invalid', function(event, message) {
-			resS.spinner.stop();
-			$(resS.addModal).find('button, input').prop('disabled', false);
-			$(resS.addModal).find('.topcoat-button--cta').prop('disabled', true);
-			$(resS.addModal).find('.errorContainer')
-				.append($('<p>', {text: message}).addClass('errorMessage')
-			);
+		
+		var modal = createModalDialog(resS.addModal.substring(1), 'Validating result files');
+		
+		modal.find('.close').css({
+			display: 'none'
+		});
+		
+		var filelist = modal.find('.modal-body').append(
+			$('<div>').addClass('listview').append(
+				$('<table>')
+			)
+		).find('table');
+		
+		parsedFiles.forEach(function(d) {
+			filelist.append(
+				$('<tr>').data('collapse', d).append(
+					$('<td>').append(
+						$('<div>', {text: d.path[d.path.length-1]})
+					)
+				).append(
+					$('<td>').append(
+						$('<i>').addClass('fa fa-circle-o-notch fa-spin')
+					)
+				)
+			)
 		})
+		
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Ok', type: 'button'}).addClass('btn btn-primary').prop('disabled', true).on('click', function() {
+				dismissDialog(modal)
+			})
+		)
+		
+		showModal(modal);
+		Shiny.onInputChange('resultFiles', $.extend({}, parsedFiles));
+	},
+	validateResultFile: function(message) {
+		var row = $(resS.addModal).find('table tr:contains('+message.filename+')')
+		if (message.valid) {
+			row.addClass('valid').find('td:last-child i').attr('class', 'fa fa-check')
+		} else {
+			row.addClass('invalid').find('td:last-child i').attr('class', 'fa fa-warning');
+			row.find('td:first-child div').append(
+				$('<p>', {text: message.reason})
+			)
+		}
+	},
+	updateValidator: function(message) {
+		console.log(message)
+		if (message.status == 'finished') {
+			$(resS.addModal).find('.modal-footer button').prop('disabled', false);
+		} else {
+			var row = $(resS.addModal).find('table tr:contains('+message.filename+')')
+			row.removeClass('validating importing').addClass(message.status)
+		}
 	},
 	showRemoveSample: function() {
 		Shiny.unbindAll()
 		var modal = createModalDialog(resS.removeModal.substring(1), 'Remove samples');
 		
-		modal.append(
+		modal.find('.modal-body').append(
 			$('<div>').append(
 				$('<select>', {multiple: true})
 					.attr('name', 'sampleRemoveList')
 					.prop('size', 9)
 					.on('change', function() {
-						$(resS.removeModal).find('.topcoat-button--cta').prop('disabled', !($(this).val() && $(this).val().length != 0))
+						modal.find('.btn-primary').prop('disabled', !($(this).val() && $(this).val().length != 0))
 					})
 			)
+		)
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+				dismissDialog(modal)
+			})
 		).append(
-			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: 'Remove'})
-					.addClass('topcoat-button--cta action-button')
-					.attr('id', 'removeSample')
-					.prop('disabled', true)
-					.on('click', function() {
-						var values = $(resS.removeModal).find('select').val()
-						
-						values.forEach(function(d) {
-							dataM.remove(d);
-						})
-						
-						dismissDialog(resS.removeModal.substring(1));
+			$('<button>', {text: 'Remove', type: 'button'})
+				.addClass('btn btn-primary action-button')
+				.attr('id', 'removeSample')
+				.prop('disabled', true)
+				.on('click', function() {
+					var values = $(resS.removeModal).find('select').val()
+					
+					values.forEach(function(d) {
+						dataM.remove(d);
 					})
-			).append(
-				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
-					dismissDialog(resS.removeModal.substring(1))
+					
+					dismissDialog(modal);
 				})
-			)
 		)
 		
 		$.each(dataM.allSamples(), function() {
 			modal.find('select').append($('<option>', {text: this.name, value: this.id}))
 		})
-		
+		showModal(modal)
 		Shiny.bindAll()
 	},	
 	showSettings: function() {
@@ -1952,7 +1953,7 @@ var ResultPane = {
 		
 		var fragmentIons = settings.fragmentIons();
 		
-		modal.append(
+		modal.find('.modal-body').append(
 			$('<div>').append(
 				$('<div>').addClass('tabbar').append(
 					$('<ul>').append(
@@ -1981,161 +1982,148 @@ var ResultPane = {
 				)
 			).append(
 				$('<div>').addClass('tabpane active').append(
-					$('<div>').append(
-						$('<p>', {text: 'Proteins'})
-					).append(
-						$('<div>').addClass('listview proteinSort').append(
-							$('<table>').append(
-								$('<tr>').append(
-									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-								).on('dblclick', function() {
-									$(this).before(ResultPane.addSortCondition('protein'));
-								})
+					$('<form>').addClass('form-horizontal').append(
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Proteins'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('listview proteinSort controls').append(
+								$('<table>').append(
+									$('<tr>').append(
+										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+									).on('dblclick', function() {
+										$(this).before(ResultPane.addSortCondition('protein'));
+									})
+								)
 							)
 						)
-					)
-				).append(
-					$('<div>').append(
-						$('<p>', {text: 'Peptides'})
 					).append(
-						$('<div>').addClass('listview evidenceSort').append(
-							$('<table>').append(
-								$('<tr>').append(
-									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-								).on('dblclick', function() {
-									$(this).before(ResultPane.addSortCondition('evidence'));
-								})
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Peptides'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('listview evidenceSort controls').append(
+								$('<table>').append(
+									$('<tr>').append(
+										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+									).on('dblclick', function() {
+										$(this).before(ResultPane.addSortCondition('evidence'));
+									})
+								)
 							)
 						)
-					)
-				).append(
-					$('<div>').append(
-						$('<p>', {text: 'Scans'})
 					).append(
-						$('<div>').addClass('listview psmSort').append(
-							$('<table>').append(
-								$('<tr>').append(
-									$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-								).on('dblclick', function() {
-									$(this).before(ResultPane.addSortCondition('psm'));
-								})
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Scans'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('listview psmSort controls').append(
+								$('<table>').append(
+									$('<tr>').append(
+										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+									).on('dblclick', function() {
+										$(this).before(ResultPane.addSortCondition('psm'));
+									})
+								)
 							)
 						)
 					)
 				)
 			).append(
 				$('<div>').addClass('tabpane').append(
-					$('<div>').append(
-						$('<p>', {text: 'Fragment ions'})
+					$('<form>').addClass('form-horizontal').append(
+						$('<h5>', {text: 'Fragment ions'})
 					).append(
-						$('<div>').addClass('table plotIons').append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'a'})
-							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['a'])
-							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
-							)
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Ions'}).addClass('control-label')
 						).append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'b'})
+							$('<div>').addClass('plotIons controls').append(
+								$('<label>', {text: 'a'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['a'])
+								)
 							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['b'])
+								$('<label>', {text: 'b'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['b'])
+								)
 							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
-							)
-						).append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'c'})
+								$('<label>', {text: 'c'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['c'])
+								)
 							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['c'])
+								$('<label>', {text: 'x'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['x'])
+								)
 							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
-							)
-						).append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'x'})
+								$('<label>', {text: 'y'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['y'])
+								)
 							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['x'])
-							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
-							)
-						).append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'y'})
-							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['y'])
-							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
-							)
-						).append(
-							$('<label>').addClass('topcoat-checkbox').append(
-								$('<span>', {text: 'z'})
-							).append(
-								$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['z'])
-							).append(
-								$('<div>').addClass('topcoat-checkbox__checkmark')
+								$('<label>', {text: 'z'}).addClass('checkbox inline').append(
+									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['z'])
+								)
 							)
 						)
 					).append(
-						$('<label>').addClass('topcoat-checkbox neutralLoss').append(
-							$('<span>', {text: 'Neutral losses'})
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Neutral losses'}).addClass('control-label')
 						).append(
-							$('<input>', {type: 'checkbox'}).prop('checked', settings.plotNeutralLoss())
-						).append(
-							$('<div>').addClass('topcoat-checkbox__checkmark')
+							$('<div>').addClass('controls neutralLoss').append(
+								$('<input>', {type: 'checkbox'}).prop('checked', settings.plotNeutralLoss())
+							)
 						)
 					).append(
-						$('<label>').addClass('fragmentAcc').append(
-							$('<span>', {text: 'Fragment ion accuracy'})
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Fragment ion accuracy'}).addClass('control-label')
 						).append(
-							$('<input>', {type: 'number'}).val(settings.fragment())
-						).append(
-							$('<span>', {text: 'ppm'})
-						)
-					)
-				).append(
-					$('<div>').append(
-						$('<p>', {text: 'Parent ion'})
-					).append(
-						$('<label>').addClass('traceAcc').append(
-							$('<span>', {text: 'Parent ion accuracy'})
-						).append(
-							$('<input>', {type: 'number'}).val(settings.trace())
-						).append(
-							$('<span>', {text: 'ppm'})
+							$('<div>').addClass('controls fragmentAcc').append(
+								$('<input>', {type: 'number'}).val(settings.fragment())
+							).append(
+								$('<span>', {text: 'ppm'})
+							)
 						)
 					).append(
-						$('<label>').addClass('topcoat-checkbox plotTrace').append(
-							$('<span>', {text: 'Plot trace'})
+						$('<h5>', {text: 'Parent ion'})
+					).append(
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Parent ion accuracy'}).addClass('control-label')
 						).append(
-							$('<input>', {type: 'checkbox'}).prop('checked', settings.plotTrace())
-						).append(
-							$('<div>').addClass('topcoat-checkbox__checkmark')
+							$('<div>').addClass('controls traceAcc').append(
+								$('<input>', {type: 'number'}).val(settings.trace())
+							).append(
+								$('<span>', {text: 'ppm'})
+							)
 						)
 					).append(
-						$('<label>').addClass('ionGaps').append(
-							$('<span>', {text: 'Allowed ion gaps'})
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Plot trace'}).addClass('control-label')
 						).append(
-							$('<input>', {type: 'number'}).val(settings.missedIons())
+							$('<div>').addClass('controls plotTrace').append(
+								$('<input>', {type: 'checkbox'}).prop('checked', settings.plotTrace())
+							)
+						)
+					).append(
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Allowed ion gaps'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('controls ionGaps').append(
+								$('<input>', {type: 'number'}).val(settings.missedIons())
+							)
 						)
 					)
 				)
 			)
-		).append(
-			$('<div>').addClass('modalButton').append(
-				$('<button>', {text: 'Set'})
-					.addClass('topcoat-button--cta')
-					.on('click', function() {
-						ResultPane.applySettings();
-						dismissDialog(resS.settingsModal.substring(1));
-					})
-			).append(
-				$('<button>', {text: 'Cancel'}).addClass('topcoat-button').on('click', function() {
-					dismissDialog(resS.settingsModal.substring(1))
-				})
-			)
 		)
+		
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+				dismissDialog(modal)
+			})
+		).append(
+			$('<button>', {text: 'Save', type: 'button'})
+				.addClass('btn btn-primary')
+				.on('click', function() {
+					ResultPane.applySettings();
+					dismissDialog(modal);
+				})
+		)
+		
 		
 		settings.proteinSort().forEach(function(d) {
 			modal.find('.listview.proteinSort tr:last-child').before(ResultPane.addSortCondition('protein', d))
@@ -2147,7 +2135,7 @@ var ResultPane = {
 			modal.find('.listview.psmSort tr:last-child').before(ResultPane.addSortCondition('psm', d))
 		})
 		
-		
+		showModal(modal);
 	},
 	addSortCondition: function(sortTarget, value) {
 		var sortMethods = settings.sortMethodNames();
