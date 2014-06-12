@@ -396,6 +396,11 @@ select[name=sampleRemoveList] {
 	background: #006dcc;
 	color: white;
 }
+#globalSettingsModal .tabbar {
+	background: none;
+	width: 80%;
+	margin: 0 10%;
+}
 #globalSettingsModal .tabpane {
 	clear: both;
 	background: whitesmoke;
@@ -514,7 +519,6 @@ select[name=sampleRemoveList] {
 	overflow:hidden;
 	font-size: small;
 	background: #dfe2e2;
-	
 }
 .tabbar ul {
 	text-align: center;
