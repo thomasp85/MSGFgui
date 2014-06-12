@@ -3,36 +3,39 @@
 */
 
 body {
-	margin: 0px
+	margin: 0px;
+	background: #dfe2e2;
 }
 h4 {
 	margin: 10px 0;
 }
-
+hr {
+	margin: 10px 0;
+}
 /*
 	Layout
 */
 
 /* Run pane */
-.lefts.col {
+.lefts.Col {
 	width: 390px;
 	padding: 5px;
 	box-shadow: 0px 0px 15px rgba(0,0,0,0.5)
 }
 
-#fileInput.row {
+#fileInput.Row {
 	top: 0;
 	height: 190px;
 	margin: 5px;
 }
 	#fileInput .listview {
 		height: 100px;
-		width: 320px;
+		width: 310px;
 		display: inline-block
 	}
 	#fileInput .textview{
-		height: 1.3em;
-		width: 320px;
+		height: 24px;
+		width: 310px;
 		display: inline-block
 	}
 	.placeholder {
@@ -44,50 +47,41 @@ h4 {
 		font-style: italic;
 	}
 
-#parameters.row {
-	top: 190px;
-	bottom: 70px;
+#parameters.Row {
+	top: 195px;
+	bottom: 55px;
 	margin: 5px;
 }
-
-	#parameters>div {
-		width: 100%;
-		margin: 5px 0px 5px 0px;
-		overflow: hidden;
+	#parameters .control-group {
+		margin-bottom: 10px;
 	}
-	#parameters label {
-		width: 100%;
-	}
-	.formInput {
-		display: inline-block;
-		width: 48%;
-	}
-	label span {
-		width: 48%;
-		text-align: right;
-		vertical-align: top;
-		margin-right: 10px; 
-		display: inline-block;
-	}
-	input[type='number'],
-	input[type='text']{
-		width: 30px;
+	#parameters .controls input[type="text"],
+	#parameters .controls input[type="number"] {
+		width: 40px;
 		text-align: right;
 	}
-	input[type='number']:invalid,
-	input[type='text']:invalid{
-		background-color: lightcoral;
+	#parameters .controls {
+		margin-right: 3px;
 	}
-	select.fill {
-		box-sizing: content-box;
+	#parameters .controls select {
 		width: 100%;
+	}
+	#parameters .controls select[name="tolUnit"] {
+		width: 65px;
 	}
 	#parameters .listview {
 		height: 60px;
 	}
+	#parameters .btn-group {
+		width: 100%;
+		padding-left: 5%;
+	}
+	#parameters .btn-group .btn {
+		width: 30%;
+	}
 
-#run.row {
-	height: 70px;
+#run.Row {
+	height: 60px;
 	bottom: 0;
 	margin: 5px;
 }
@@ -95,36 +89,35 @@ h4 {
 	#run>div {
 		width: 100%;
 	}
-		#run>div>div {
+		#run .progress {
+			position: relative;
 			display: inline-block;
-			width: 320px;
+			width: 310px;
+			height: 24px;
 		}
-			#run>div>div>div {
-				position: relative;
-			}
-	#run progress {
-		width: 100%;
-		height: 1em;
-		position: absolute;
-		z-index: -1;
-	}
+		#run .progress .bar {
+			position: absolute;
+		}
+		#run .progress p {
+			position: relative;
+			width: 100%;
+			text-align: center;
+			padding: 3px;
+			font-size: small;
+		}
 	#run button {
-		vertical-align: baseline;
+		vertical-align: top;
 	}
-	#run p {
-		font-size: small;
-		text-align: center;
-	}	
 
 
 
 /* Results pane */
-.rights.col {
+.rights.Col {
 	left: 400px;
 	right: 0;
 }
 
-.iconmenu.row {
+.iconmenu.Row {
 	top: 0;
 	height: 50px;
 }
@@ -136,7 +129,7 @@ h4 {
 	.iconmenu div, .iconmenu a {
 		display: inline-block;
 	}
-		.iconmenu div:first-child {
+		.iconmenu a:first-child {
 			margin-left: 30px;
 		}
 		.iconmenu div:last-child {
@@ -150,7 +143,7 @@ h4 {
 				fill: darkgrey;
 			}
 
-#resulttabs.row {
+#resulttabs.Row {
 	top: 50px;
 	bottom: 0;
 	background-color: whitesmoke;
@@ -158,20 +151,20 @@ h4 {
 	.tabpane:not(.active) {
 		display: none;
 	}
-	.tabpane.row {
+	.tabpane.Row {
 		top: 40px;
 		bottom: 0;
 	}
 
 #sampleTab .plotArea {
 	top: 0;
-	bottom: 200px;
+	bottom: 220px;
 }
 #samplePlots div {
 	display: inline-block;
 }
 #sampleTab .infoArea {
-	height: 200px;
+	height: 220px;
 	bottom: 0;
 }
 	#sampleTab .infoArea>div {
@@ -185,6 +178,7 @@ h4 {
 		}
 		#sampleTab .infoArea select{
 			width: 230px;
+			margin-bottom: 0;
 		}
 			#sampleTab .infoArea .samples p {
 				font-size: x-small;
@@ -211,13 +205,13 @@ h4 {
 
 #idTab .plotArea {
 	top: 0;
-	bottom: 200px;
+	bottom: 220px;
 }
 #idTab .plotArea div {
 	margin: auto;
 }
 #idTab .infoArea {
-	height: 200px;
+	height: 220px;
 	bottom: 0;
 }
 	#idTab .infoArea div {
@@ -230,7 +224,8 @@ h4 {
 			padding: 0 10px;
 		}
 		#idTab .infoArea select {
-			width: 230px
+			width: 230px;
+			margin-bottom: 0;
 		}
 		#idTab .infoArea p {
 			font-size: x-small;
@@ -241,7 +236,7 @@ h4 {
 			font-weight: bold;
 		}
 
-#filterTab>.col {
+#filterTab>.Col {
 	left: 0;
 	right: 0;
 }
@@ -316,31 +311,50 @@ h4 {
 	}
 	#filterTab .filterInfo input{
 		display: block;
+		box-sizing: border-box;
+		height: 26px;
 	}
 	#filterTab .filterInfo select+p {
 		font-size: x-small;
+		font-weight: bold;
 		margin-top: 2px;
 		text-align: right;
 	}
+	#filterTab .filterInfo select+p span {
+		font-weight: normal;
+	}
 	#filterTab .filterInfo select, #filterTab .filterInfo input{
 		width: 230px;
-		padding: 0;
-		border: 1px solid grey;
-		box-sizing:content-box;
-		-ms-box-sizing:content-box;
-		-moz-box-sizing:content-box;
-		-webkit-box-sizing:content-box;
+		margin-bottom: 0;
 	}
 	
 
 .listview, .textview {
 	background: white;
-	border-style: inset;
-	border-width: 1px;
-	border-radius: 2px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+.textview table td:first-child,
+.listview table td:first-child {
+	padding-left: 3px;
+}
+.textview table td:last-child,
+.listview table td:last-child {
+	padding-right: 3px;
 }
 .textview table{
 	table-layout: fixed;
+	height: 100%;
+}
+.textview td {
+	height: 100%;
 }
 .listview {
 	overflow: auto;
@@ -354,78 +368,15 @@ h4 {
 	display: inline-block;
 	vertical-align: top;
 }
-.rightButton {
-	width: 60px;
-	margin-bottom: 5px;
+.rightButtonPane, .rightButton {
+	width: 70px;
 	margin-left: 4px
 }
-.topcoat-button-bar {
-	margin-top: 3px;
+.rightButtonPane .btn {
 	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-}
-.topcoat-button-bar .topcoat-button {
-	width: 33.33%;
-}
-.topcoat-button-bar .topcoat-button i{
-	font-size: 16px;
-	vertical-align: text-bottom;
 }
 table {
 	font-size: 12px;
-}
-.clearBackground {
-	height: 100%;
-	width: 100%;
-	position: fixed;
-	background-color: white;
-	opacity: 0.5;
-	z-index: 100;
-}
-.modalPopup {
-	height: 100%;
-	width: 100%;
-	position: fixed;
-	z-index: 101
-}
-.modalPopup>div {
-	background: darkgrey;
-	opacity: 1;
-	width: 400px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 100px;
-	z-index: 102;
-	border-radius: 10px;
-	padding-bottom: 10px;
-	box-shadow: 0px 0px 10px 3px grey
-}
-#modalSetPar .modalPopup p {
-	margin: 0 10px;
-	margin-bottom: 20px;
-}
-.modalPopup h5 {
-	width: 100%;
-	text-align: center;
-	background: grey;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-}
-#modalSetPar .modalPopup input, #modalSetPar .modalPopup select {
-	width: 150px;
-	text-align: left;
-}
-.modalButton {
-	position: relative;
-	left: 50%;
-	display: inline-block;
-	margin-top: 10px;
-}
-.modalButton button {
-	left: -50%;
-	width: 75px;
-	margin: 0 2px;
 }
 #modificationList tr {
 	width: 100%
@@ -435,15 +386,6 @@ select[name=sampleRemoveList] {
 	left: 10%;
 	position: relative;
 }
-.listview {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: default;
-}
 .ellipsis {
     white-space: nowrap;
     overflow: hidden;
@@ -451,66 +393,51 @@ select[name=sampleRemoveList] {
     -o-text-overflow: ellipsis;
 }
 .selected {
-	background: lightblue;
-}
-.filePathModal label {
-	margin-left: 20px;
-	margin-right: 20px;
-}
-.filePathModal input {
-	width: 70%;
-	margin-left: 10px;
-	text-align: left;
-}
-.filePathModal .errorContainer {
-	position: relative;
-	height: 30px;
-	margin: 10px 0;
-}
-.filePathModal p.errorMessage {
-	color: darkred;
-	font-size: small;
-	text-align: center;
-}
-.filePathModal .modalButton {
-	margin-top: 0;
-}
-#globalSettingsModal .tabbar {
-	background: darkgrey;
+	background: #006dcc;
+	color: white;
 }
 #globalSettingsModal .tabpane {
 	clear: both;
-	margin: 0 10px;
 	background: whitesmoke;
-	padding: 5px 10px 2px 10px;
-	border-radius: 10px;
+	padding: 10px;
+	border-radius: 5px;
+	border: 1px solid #AAA;
+	position: relative;
+	top: -1px;
 }
-#globalSettingsModal .tabpane div:not(:first-child)>p{
-	padding-top: 20px;
+#globalSettingsModal .tabpane .control-group:last-child,
+#globalSettingsModal .tabpane form{
+	margin: 0;
 }
 #globalSettingsModal .listview {
-	height: 70px;
-}
-#globalSettingsModal .listview:last-child {
-	margin-bottom: 10px;
+	height: 100px;
 }
 #globalSettingsModal .listview table{
-	width: 50%;
-	padding: 2px 0;
+	margin: 4px 0;
+}
+#globalSettingsModal .listview table select{
+	height: 24px;
 }
 #globalSettingsModal .listview table p{
 	display: inline;
-	padding: 6px 4px 3px 4px;
-	margin: 0 6px;
-	border-radius: 3px;
-	vertical-align: middle;
-	vertical-align: -webkit-baseline-middle;
+	padding: 0 6px;
+	position: relative;
+	z-index: 2;
+	background: rgba(255,255,255,0);
+}
+#globalSettingsModal .listview table p.selected::before{
+	content: '';
+	position: absolute;
+	top: -5px;
+	left: 0;
+	bottom: -4px;
+	right: 0;
+	background: #006dcc;
+	border-radius: 4px;
+	z-index: -1;
 }
 #globalSettingsModal .listview table p:not(.selected){
 	color: grey;
-}
-#globalSettingsModal .listview table td{
-	vertical-align: middle;
 }
 #globalSettingsModal .listview table td:first-child{
 	width: 50%;
@@ -530,45 +457,52 @@ select[name=sampleRemoveList] {
 	color: grey;
 	font-style: italic;
 }
-#globalSettingsModal .table {
-	display: table;
-	table-layout: fixed;
-	width: 100%;
-	margin: 5px 0;
+#globalSettingsModal .checkbox.inline {
+	margin-right: 15px;
 }
-#globalSettingsModal .table .topcoat-checkbox {
-	display: table-cell;
-	margin: 0 auto;
-	padding: 0 10px;
-}
-#globalSettingsModal .table .topcoat-checkbox span {
-	width: auto;
-}
-#globalSettingsModal label {
-	display: block;
-	margin: 10px 0;
-}
-#globalSettingsModal span {
-	width: auto;
-	font-size: small;
-	vertical-align: baseline;
-}
-#globalSettingsModal span:first-child {
-	width: 50%;
-	text-align: right;
-	margin: 0 2.5px;
-}
-#globalSettingsModal span:first-child::after {
-	content: ' ';
-	margin-left: 2.5px;
-}
-#globalSettingsModal .modalPopup input[type=number] {
+#globalSettingsModal input[type=number] {
 	text-align: right;
 	width: 40px;
-	margin-right: 5px;
 }
-#globalSettingsModal .tabpane p {
+#globalSettingsModal input[type=number]+span {
+	margin-left: 10px;
+}
+#globalSettingsModal h5:first-child {
+	margin-top: 0;
+}
+#mzidAddModal .listview td:first-child::after {
+	content: 'waiting';
+	font-style: italic;
+	color: grey;
+	padding-left: 5px;
+	vertical-align: top;
+}
+#mzidAddModal .listview .validating td:first-child::after {
+	content: 'validating';
+}
+#mzidAddModal .listview .importing td:first-child::after {
+	content: 'importing';
+}
+#mzidAddModal .listview .done td:first-child::after {
+	content: 'done';
+}
+#mzidAddModal .listview td:first-child div {
+	display: inline-block;
+}
+#mzidAddModal .listview .invalid td:first-child p {
+	color: red;
+	font-style: italic;
 	margin: 0;
+}
+#mzidAddModal .listview .valid td:last-child {
+	color: green;
+}
+#mzidAddModal .listview .invalid td:last-child {
+	color: red;
+}
+.sF-modal .selected {
+	background: none;
+	color: black;
 }
 #database, #datafiles {
 	width: 100%;
@@ -635,15 +569,15 @@ select[name=sampleRemoveList] {
 /*
 	General classes
 */
-.row, .col { 
+.Row, .Col { 
 	overflow: hidden; 
 	position: absolute; 
 }
-.row { 
+.Row { 
 	left: 0; 
 	right: 0; 
 	}
-.col { 
+.Col { 
 	top: 0; 
 	bottom: 0; 
 }
@@ -704,6 +638,7 @@ svg {
 }
 .axis .label {
 	font-size: small;
+	font-weight: normal;
 }
 .grid {
 	fill: none;
@@ -747,6 +682,7 @@ svg {
 }
 .ions line {
 	stroke: grey;
+	shape-rendering: crispedges;
 }
 .ions.fragment:not(.hidden) line {
 	stroke: black;
@@ -920,15 +856,4 @@ svg {
 	padding-left: 5px;
 	padding-right: 5px;
 	padding-bottom: 5px;
-}
-
-
-
-
-select, .listview, .textview, input{
-	border: 1px solid grey;
-	box-sizing:border-box;
-	-ms-box-sizing:border-box;
-	-moz-box-sizing:border-box;
-	-webkit-box-sizing:border-box;
 }
