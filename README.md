@@ -47,7 +47,20 @@ The communication is one-way one-time though - modifications and deletion in the
 
 Screenshots
 ------
-_Comming soon_
+Sample overview
+![Sample overview](/../screenshots/screenshots/samplestat.png?raw=true "Sample overview")
+Protein view
+![Protein view](/../screenshots/screenshots/protein view.png?raw=true "Protein view")
+Peptide view
+![Peptide view](/../screenshots/screenshots/peptide view.png?raw=true "Peptide view")
+Scan view
+![Scan view](/../screenshots/screenshots/scan view.png?raw=true "Scan view")
+Filtering
+![Filtering](/../screenshots/screenshots/filter.png?raw=true "Filtering")
+Tooltips
+![Tooltips](/../screenshots/screenshots/tooltip.png?raw=true "Tooltips")
+Settings
+![Settings](/../screenshots/screenshots/settings.png?raw=true "Settings")
 
 Credit
 ------
