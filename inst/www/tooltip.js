@@ -116,7 +116,7 @@ var tooltip = (function() {
 			},
 			mouseleave: function() {
 				clearTimeout(timer);
-				$(this).attr('class', $(this).attr('class').replace('tooltipTitle', '').replace(/^\s|\s$/g, '').replace(/\s+/, ''));
+				$(this).attr('class', $(this).attr('class').replace('tooltipTitle', '').replace(/^\s|\s$/g, '').replace(/\s+/, ' '));
 				$('#tooltip').remove();
 			}
 		}, '.tt')
