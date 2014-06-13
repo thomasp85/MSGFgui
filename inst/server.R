@@ -372,7 +372,9 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
         trace <- rbind(trace, get3Dmap(data, ms1Indexes[addScans], lowMz=mzMin, highMz=mzMin, resMz=mzRes))
         indexWindow[2] <- scans[2]
     }
-    data.frame(intensity=trace[max(0, round(top-bw*3)):min(nrow(trace), round(top+bw*3)), 1], retention=header(data, ms1Indexes[scans[1]:scans[2]])$retentionTime, acquisitionNum=header(data, ms1Indexes[scans[1]:scans[2]])$acquisitionNum)
+    trace <- cbind(trace, indexWindow[1]:indexWindow[2])
+    scanRange <- scans[1]:scans[2]
+    data.frame(intensity=trace[trace[,2] %in% scanRange, 1], retention=header(data, ms1Indexes[scanRange])$retentionTime, acquisitionNum=header(data, ms1Indexes[scanRange])$acquisitionNum)
 }
 getIonTrace2 <- function(data, index, mz, ppm, skip=1){
     indexRange <- c(1, length(data))
