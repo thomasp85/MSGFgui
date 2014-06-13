@@ -322,10 +322,10 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
         
         if (indexPos == 1) {
             distTop <- which(differential[middle:length(differential)] == -1)[1]
-            if (is.null(distTop)) {
-                if (indexWindow[2] > length(ms1Indexes)) {
+            if (is.null(distTop) || is.na(distTop)) {
+                if (indexWindow[2] >= length(ms1Indexes)) {
                     indexWindow[2] <- length(ms1Indexes)
-                    top <- nrow(smooth)
+                    top <- length(smooth)
                     break
                 }
                 unfinished = 1
@@ -335,8 +335,8 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
             }
         } else if (indexPos == -1) {
             distTop <- which(rev(differential[1:middle]) == 1)[1]
-            if (is.null(distTop)) {
-                if (indexWindow[1] < 1) {
+            if (is.null(distTop) || is.na(distTop)) {
+                if (indexWindow[1] <= 1) {
                     indexWindow[1] <- 1
                     top <- 1
                     break
