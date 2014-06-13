@@ -1853,7 +1853,7 @@ var ResultPane = {
 			});
 		});
 		
-		var modal = createModalDialog(resS.addModal.substring(1), 'Validating result files');
+		var modal = createModalDialog(resS.addModal.substring(1), 'Importing result files');
 		
 		modal.find('.close').css({
 			display: 'none'
