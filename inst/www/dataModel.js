@@ -430,7 +430,7 @@ var dataModel = function() {
 					}
 				} else {
 					if (dFilter.regex) {
-						if (dFilter.regex.test(d.accession)) {
+						if (dFilter.regex.test(d.accession + ' ' + d.description)) {
 							if (!dFilter.regexInclude) {
 								include = false;
 							}

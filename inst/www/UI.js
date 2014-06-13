@@ -1601,6 +1601,7 @@ var FilterTab = {
 		d3.select(filS.proteinSelect).selectAll('option').remove();
 		d3.select(filS.proteinSelect).selectAll('option').data(settings.sortProteins(dataM.allDatabase()))
 			.enter().append('option')
+				.attr('value', function(d) {return d.accession + ' ' + d.description})
 				.text(function(d) {return d.accession});
 		
 		if (filS.tempFilter.database.regex) {
