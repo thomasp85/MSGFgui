@@ -620,6 +620,50 @@ var evidencePlot = function(element, size) {
 		proteinInnerRadius = radiusGenerator(proteinLengthScale(length/2), r-totalArcWidth);
 	};
 	
+	var createProteinAxis = function(element) {
+		element.each(function() {
+			var element = d3.select(this);
+			
+			var tickLength = 6;
+			var tickPadding = 3;
+			var startAngle = arcAngleScale.range()[0];
+			var endAngle = arcAngleScale.range()[1];
+			var radius = proteinInnerRadius - 10;
+			var path = 'M ' + (radius-tickLength)*Math.sin(startAngle) + ' ' + -(radius-tickLength)*Math.cos(startAngle) + 
+			           ' L ' + radius*Math.sin(startAngle) + ' ' + -radius*Math.cos(startAngle) + 
+			           ' A ' + radius + ' ' + radius + ', 0, 0, 1, ' + radius*Math.sin(endAngle) + ' ' + -radius*Math.cos(endAngle) + 
+			           ' L ' + (radius-tickLength)*Math.sin(endAngle) + ' ' + -(radius-tickLength)*Math.cos(endAngle);
+			
+			var ticks = arcAngleScale.ticks()
+			
+			var tickEnter = element.selectAll('.tick').data(ticks).enter().insert('g', '.domain').attr('class', 'tick');
+			tickEnter.append('line');
+			tickEnter.append('text');
+			
+			element.selectAll('.domain').data([path]).enter().append('path').attr('class', 'domain');
+			
+			var tickElements = element.selectAll('.tick')
+			tickElements.select('line')
+				.attr('x1', 0)
+				.attr('x2', 0)
+				.attr('y1', -radius)
+				.attr('y2', -(radius-tickLength));
+			tickElements.select('text')
+				.attr('x', 0)
+				.attr('y', -(radius-tickLength-tickPadding))
+				.attr("dy", ".71em")
+				.style("text-anchor", "middle")
+				.text(arcAngleScale.tickFormat());
+			
+			element.selectAll('.domain')
+				.attr('d', function(d) {return d});
+							
+			tickElements.call(function(selection, x) {
+				selection.attr("transform", function(d) { return "rotate(" + x(d)*180/Math.PI + ")"; });
+			}, arcAngleScale)
+		})
+	}
+	
 	var evidenceSort = function(a,b) {
 		if(a.start == b.start) {
 			return (a.end-a.start)-(b.end-b.start);
@@ -1187,6 +1231,10 @@ var evidencePlot = function(element, size) {
 				.attr('class', 'proteinArc')
 				.attr('d', arc);
 		
+		newArc.append('g')
+			.attr('class', 'position axis')
+			.call(createProteinAxis)
+		
 		currentStack.forEach(function(d, i) {
 			arc.innerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1));
 			arc.outerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1)+arcWidth);
@@ -1288,7 +1336,8 @@ var evidencePlot = function(element, size) {
 				.attr('transform', 'translate(0,'+ (proteinInnerRadius+totalArcWidth-height) +')');
 			svgArc.selectAll('.proteinArc').data([proteinData])
 				.attr('d', arc);
-			
+			svgArc.selectAll('.position.axis')
+				.call(createProteinAxis)
 			svgArc.selectAll('.evidenceArc')
 				.each(function(d) {
 					var i = getStackNumber(d)

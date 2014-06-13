@@ -629,6 +629,16 @@ svg {
 	stroke-width: 1;
 	shape-rendering: crispedges;
 }
+.position.axis {
+	shape-rendering: auto;
+	stroke-width: 0.5;
+}
+.position.axis .domain{
+	stroke-width: 1;
+}
+.position.axis .tick text{
+	font-size: x-small;
+}
 .axis .domain {
 	stroke-width: 2
 }
