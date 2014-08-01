@@ -160,6 +160,10 @@ hr {
 	top: 0;
 	bottom: 220px;
 }
+#samplePlots {
+	margin: auto;
+	white-space: nowrap;
+}
 #samplePlots div {
 	display: inline-block;
 }
