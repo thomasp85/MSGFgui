@@ -103,7 +103,10 @@ hr {
 			width: 100%;
 			text-align: center;
 			padding: 3px;
-			font-size: small;
+			font-size: smaller;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	#run button {
 		vertical-align: top;
