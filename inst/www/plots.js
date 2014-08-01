@@ -412,12 +412,14 @@ var evidencePlot = function(element, size) {
 	var maxProteinLength = 500;
 	var maxArcAngle = Math.PI/2;
 	var proteinInnerRadius = height-40;
+	var minProteinInnerRadius = 200;
 	var arcWidth = 4;
 	var arcGutter = 2;
 	var descriptionWidth = width-100;
 	var totalArcWidth;
 	var currentData;
 	var currentStack;
+	var trimmedStack;
 	var plotState = 'protein';
 	var trace = false;
 	var peptideInfo = {
@@ -671,10 +673,15 @@ var evidencePlot = function(element, size) {
 			return a.start-b.start;
 		}
 	};
-	var stackEvidence = function(evidence) {
+	var stackEvidence = function(evidence, trim) {
 		var stack = [[]];
+		var trimmed = {};
+		if (trim) dataM.evidence().forEach(function(d) {
+			trimmed[d.hash] = true;
+		});
 		
 		evidence.sort(evidenceSort).forEach(function(d,i) {
+			if (trim && !trimmed[d.hash]) return;
 			if (stack[0].length == 0) {
 				stack[0].push(d);
 			} else {
@@ -876,7 +883,7 @@ var evidencePlot = function(element, size) {
 	};
 	
 	var getStackNumber = function(evidence) {
-		return currentStack.map(function(d) {
+		return trimmedStack.map(function(d) {
 			return d.indexOf(evidence) != -1;
 		}).indexOf(true);
 	};
@@ -1205,6 +1212,10 @@ var evidencePlot = function(element, size) {
 		
 		setScales(data.length, currentStack.length);
 		
+		trimmedStack = proteinInnerRadius < minProteinInnerRadius ? stackEvidence(data.evidence, true) : currentStack;
+		
+		setScales(data.length, trimmedStack.length);
+		
 		var proteinData = {
 			start: 1, 
 			end: data.length, 
@@ -1235,7 +1246,7 @@ var evidencePlot = function(element, size) {
 			.attr('class', 'position axis')
 			.call(createProteinAxis)
 		
-		currentStack.forEach(function(d, i) {
+		trimmedStack.forEach(function(d, i) {
 			arc.innerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1));
 			arc.outerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1)+arcWidth);
 			
@@ -1324,6 +1335,12 @@ var evidencePlot = function(element, size) {
 		
 		if (currentData) {
 			setScales(currentData.length, currentStack.length);
+			
+			var trimmed = currentStack == trimmedStack;
+			
+			trimmedStack = proteinInnerRadius < minProteinInnerRadius ? stackEvidence(currentData.evidence, true) : currentStack;
+			
+			setScales(currentData.length, trimmedStack.length);
 		
 			var proteinData = {
 				start: 1, 
@@ -1338,14 +1355,39 @@ var evidencePlot = function(element, size) {
 				.attr('d', arc);
 			svgArc.selectAll('.position.axis')
 				.call(createProteinAxis)
-			svgArc.selectAll('.evidenceArc')
-				.each(function(d) {
-					var i = getStackNumber(d)
+			
+			if (trimmed == (currentStack == trimmedStack)) {
+				svgArc.selectAll('.evidenceArc')
+					.each(function(d) {
+						var i = getStackNumber(d)
+						arc.innerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1));
+						arc.outerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1)+arcWidth);
+						
+						d3.select(this).attr('d', arc)
+					});
+			} else {
+				var newArc = svgArc.selectAll('.arcGroup');
+				newArc.selectAll('.evidenceArc').remove();
+				
+				trimmedStack.forEach(function(d, i) {
 					arc.innerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1));
 					arc.outerRadius(proteinInnerRadius+(arcWidth+arcGutter)*(i+1)+arcWidth);
 					
-					d3.select(this).attr('d', arc)
+					newArc.selectAll('.evidenceArc').data(d, function(dd) {return dd.hash})
+						.enter().append('path')
+							.attr('class', 'evidenceArc')
+							.attr('d', arc);
 				});
+				
+				var filteredEvidenceHash = dataM.trimEvidence(data.evidence).map(function(d) {
+					return dataM.trimPsm(d.peptide.psm).length ? d.hash : null;
+				}).filter(function(f) {return f})
+						
+				newArc.selectAll('.evidenceArc').filter(function(f) {
+					return filteredEvidenceHash.indexOf(f.hash) != -1;
+				}).classed('passFilter', true)
+			}
+			
 			
 			svgArc.selectAll('.textbox tspan').remove();
 			generateProteinInfo(currentData);
