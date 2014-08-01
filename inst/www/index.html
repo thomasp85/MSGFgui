@@ -9,8 +9,6 @@
 		<script src="library/jquery.ba-throttle-debounce.min.js" type="text/javascript"></script>
 		<script src="shared/shiny.js" type="text/javascript"></script>
 		<script src="sF/shinyFiles.js" type="text/javascript"></script>
-		<script src="inputs.js" type="text/javascript"></script>
-		<script src="outputs.js" type="text/javascript"></script>
 		<script src="dataModel.js" type="text/javascript"></script>
 		<script src="plots.js" type="text/javascript"></script>
 		<script src="tooltip.js" type="text/javascript"></script>
@@ -27,7 +25,7 @@
 			<div class="iconmenu Row">
 				<a id="addToDB" class="shinyFiles" data-title="Select MS-GF+ result files" data-selecttype="multiple"></a>
 				<div id="removeFromDB"></div>
-				<a id="saveResults" class="shiny-download-link" style="cursor: default"></a>
+				<a id="saveResults"></a>
 				<div id="setSettings"></div>
 				<div id="helpDialogButton"></div>
 			</div>
@@ -100,7 +98,7 @@
 							</div>
 							<div>
 								<h4>Scans</h4>
-								<select id="scanSelect" class="scanSelector" size="8">
+								<select id="scanSelect" size="8">
 									
 								</select>
 								<p><span>Total:&nbsp</span><span id="scanCount">0</span></p>

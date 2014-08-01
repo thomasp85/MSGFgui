@@ -377,6 +377,23 @@ var globalSettings = function() {
 		$(settings).trigger('change', [d3.keys(changedSettings)]);
 		changedSettings = {};
 	}
+	settings.init = function() {
+		Shiny.onInputChange('globalSettings', {
+			trace: settings.trace(),
+			fragment: settings.fragment(),
+			missedIons: settings.missedIons(),
+			plotTrace: settings.plotTrace()
+		});
+		$(settings).on('change', function() {
+			Shiny.onInputChange('globalSettings', {
+				trace: settings.trace(),
+				fragment: settings.fragment(),
+				missedIons: settings.missedIons(),
+				plotTrace: settings.plotTrace()
+			})
+		});
+	}
+	
 	
 	return settings;
 }
@@ -517,7 +534,11 @@ var ModificationParameters = {
 		$(modS.selector + ' tr').on('mousedown', function() {
 			rowSelector(this);
 			ModificationParameters.setModButtonAct();
-		})
+		});
+		$(modS.selector).on('change', function() {
+			var returnVal =  $.extend({}, $(this).find('tr').map(function(){return $(this).data('collapse')}).toArray());
+			Shiny.onInputChange('modificationList', returnVal);
+		});
 	},
 	validateModPar: function() {
 		
@@ -858,6 +879,15 @@ var DataInputSetup = {
 		$(dataS.dataRemoveButton).on('click', function() {
 			DataInputSetup.removeDatafiles();
 		});
+		
+		$(dataS.datafiles).on('change', function() {
+			var returnVal =  $.extend({}, $(this).find('tr').map(function(){return $(this).data('collapse')}).toArray());
+			Shiny.onInputChange('datafiles', returnVal);
+		});
+		$(dataS.database).on('change', function() {
+			var returnVal =  $.extend({}, $(this).find('tr').map(function(){return $(this).data('collapse')}).toArray());
+			Shiny.onInputChange('database', returnVal);
+		});
 	},
 	updateDatabase: function(file) {
 		file = {path: file.files.toArray()[0], root: file.root};
@@ -922,6 +952,14 @@ var AnalysisPane = {
 		DataInputSetup.init();
 		ParameterSetup.init();
 		
+		Shiny.addCustomMessageHandler('addData', function(data) {
+			dataM.add(parseData(data));
+		});
+		
+		Shiny.addCustomMessageHandler('progressBar', function(data) {
+			AnalysisPane.setProgress(data);
+		});
+		
 		$(anaS.selector + ' *').on('input change', function() {
 			AnalysisPane.setAnalysisButtonAct();
 		});
@@ -985,6 +1023,18 @@ var SamplesTab = {
 		
 		$(samS.plotPane).width(this.plotDim().width*2.1);
 		
+		Shiny.addCustomMessageHandler('scorePlot', function(data) {
+			if(data) {
+				d3.transition().duration(samS.transitionLength).each(function() {
+					samplesDensity.data(data);		
+				})
+			} else {
+				d3.transition().duration(samS.transitionLength).each(function() {
+					samplesDensity.reset(512);				
+				})
+			};
+		});
+		
 		samplesDensity = fdrDensity(d3.select(samS.densityPlot), this.plotDim());
 		samplesDensity.init(512);
 		
@@ -1020,7 +1070,7 @@ var SamplesTab = {
 		};
 	},
 	resize: function() {
-		$(samS.plotPane).width(this.plotDim().width*2.1);
+		$(samS.plotPane).width(this.plotDim().width*2);
 		samplesDensity.resize(this.plotDim());
 		samplesScatter.resize(this.plotDim());
 	},
@@ -1139,6 +1189,12 @@ var IdTab = {
 		identityPlot = evidencePlot(d3.select(idS.plot), this.plotDim());
 		identityPlot.init();
 		
+		Shiny.addCustomMessageHandler('scanPlot', function(data) {
+			d3.transition().duration(1000).each(function() {
+				identityPlot.selectScan(data, {neutralLoss: settings.plotNeutralLoss(), fragmentIons: settings.fragmentIons()});
+			})
+		});
+		
 		$(dataM).bind('change', function() {
 			if (dataM.empty()) {
 				identityPlot.reset();
@@ -1175,6 +1231,24 @@ var IdTab = {
 		$(idS.peptideSelect).on('change click', function() {
 			IdTab.updateScanSelect();
 			IdTab.selectPeptide();
+		});
+		$(idS.scanSelect).on('change', function() {
+			var selection = $(this).prop('selectedIndex');
+			
+			var returnValue = null;
+			
+			if (selection != -1) {
+				var data = d3.selectAll($(this)).selectAll('option').data()[selection];
+			
+				returnValue = {
+					scan: data.scan.ref,
+					sampleID: data.scan.sample.id,
+					peptide: data.peptide.sequence,
+					modifications: data.peptide.modifications
+				};
+			}
+			console.log(returnValue);
+			Shiny.onInputChange('scanData', returnValue);
 		});
 	},
 	plotDim: function() {
@@ -2271,7 +2345,9 @@ $(document).ready(function() {
 	AnalysisPane.init();
 	ResultPane.init();
 	tooltip.init();
-});$(window).load(function() {
+	setTimeout(function() {settings.init()}, 200)
+});
+$(window).load(function() {
 	SamplesTab.resize();
 	IdTab.resize();
 })
