@@ -403,6 +403,12 @@ select[name=sampleRemoveList] {
 	background: #006dcc;
 	color: white;
 }
+#saveResults .btn-group {
+	margin-left: calc( 50% - 3 * 126px / 2 );
+}
+#saveResults .modal-body .btn {
+	width: 100px;
+}
 #globalSettingsModal .tabbar {
 	background: none;
 	width: 80%;
