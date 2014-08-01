@@ -2234,4 +2234,7 @@ $(document).ready(function() {
 	AnalysisPane.init();
 	ResultPane.init();
 	tooltip.init();
-});
+});$(window).load(function() {
+	SamplesTab.resize();
+	IdTab.resize();
+})
