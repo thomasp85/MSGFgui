@@ -2138,6 +2138,28 @@ var ResultPane = {
 		
 		showModal(modal);
 	},
+	showDownload: function() {
+		Shiny.unbindAll()
+		var modal = createModalDialog(resS.exportModal.substring(1), 'Export');
+		
+		modal.find('.modal-body').append(
+			$('<div>').addClass('btn-group').append(
+				$('<a>', {type: 'button', id: 'exportR'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/R.png'}))
+			).append(
+				$('<a>', {type: 'button', id: 'exportExcel'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/excel.png'}))
+			).append(
+				$('<a>', {type: 'button', id: 'exportTxt'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/txt.png'}))
+			)
+		)
+		modal.find('.modal-footer').append(
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+				dismissDialog(modal)
+			})
+		)
+		
+		showModal(modal);
+		Shiny.bindAll()
+	},
 	addSortCondition: function(sortTarget, value) {
 		var sortMethods = settings.sortMethodNames();
 		var sortTypes = settings.sortMethodTypes();
