@@ -1763,6 +1763,7 @@ var ResultPane = {
 		helpButton: '#helpDialogButton',
 		infoModal: '#infoModal',
 		addModal: '#mzidAddModal',
+		exportModal: '#saveResults',
 		removeModal: '#sampleRemoveModal',
 		settingsModal: '#globalSettingsModal'
 	},
@@ -1780,6 +1781,8 @@ var ResultPane = {
 		$(resS.helpButton).on('click', function() {ResultPane.showInfo()});
 		$(resS.addButton).on('fileselect', function(el, files) {ResultPane.showAddData(files)});
 		$(resS.removeButton).on('click', function() {ResultPane.showRemoveSample()});
+		$(resS.saveButton).on('click', function() {
+			ResultPane.showDownload()});
 		$(resS.settingsButton).on('click', function() {ResultPane.showSettings()});
 		
 		SamplesTab.init();
