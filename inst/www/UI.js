@@ -2099,14 +2099,6 @@ var ResultPane = {
 								$('<input>', {type: 'checkbox'}).prop('checked', settings.plotTrace())
 							)
 						)
-					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Allowed ion gaps'}).addClass('control-label')
-						).append(
-							$('<div>').addClass('controls ionGaps').append(
-								$('<input>', {type: 'number'}).val(settings.missedIons())
-							)
-						)
 					)
 				)
 			)
