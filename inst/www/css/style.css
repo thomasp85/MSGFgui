@@ -512,6 +512,9 @@ select[name=sampleRemoveList] {
 	font-style: italic;
 	margin: 0;
 }
+#mzidAddModal .listview td:last-child {
+	text-align: right;
+}
 #mzidAddModal .listview .valid td:last-child {
 	color: green;
 }
