@@ -1830,10 +1830,30 @@ var ResultPane = {
 		});
 	},
 	showInfo: function() {
-		var modal = createModalDialog(resS.infoModal.substring(1), 'Help');
+		var modal = createModalDialog(resS.infoModal.substring(1), 'About MSGFgui');
 		
 		modal.find('.modal-body').append(
-			$('<p>', {text: 'There should be some text here'})
+			$('<h5>', {text: 'MSGFgui v0.2.0'})
+		).append(
+			$('<p>', {html: '<em>A graphic user interface to running and evaluating MS-GF+</em>'})
+		).append(
+			$('<p>', {html: 'This program is part of the <a href="http://www.bioconductor.org" target="_blank">Bioconductor</a> project. Please refer to the <a href="https://github.com/thomasp85/MSGFgui" target="_blank">GitHub</a> page for source code, feature requests and bug reports.'})
+		).append(
+			$('<p>', {text: 'This program stands on the shoulders on some other great work. Without further ado:'})
+		).append(
+			$('<ul>').append(
+				$('<li>', {html: '<a href="http://proteomics.ucsd.edu/software-tools/ms-gf/" target="_blank">MS-GF+</a>'})
+			).append(
+				$('<li>', {html: '<a href="http://shiny.rstudio.com" target="_blank">Shiny</a>'})
+			).append(
+				$('<li>', {html: '<a href="http://d3js.org" target="_blank">D3.js</a>'})
+			).append(
+				$('<li>', {html: '<a href="http://getbootstrap.com" target="_blank">Bootstrap</a>'})
+			).append(
+				$('<li>', {html: '<a href="http://adamwhitcroft.com/batch/" target="_blank">Batch icons</a>'})
+			).append(
+				$('<li>', {html: '<a href="http://www.fatcow.com/free-icons" target="_blank">FatCow Icons</a>'})
+			)
 		)
 		modal.find('.modal-footer').append(
 			$('<div>').addClass('modalButton').append(
