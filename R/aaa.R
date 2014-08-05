@@ -120,7 +120,7 @@ modStringToMod <- function(modString) {
         } else if(par[1] == 'C') {
             modPar$composition <- par[2]
         } else if(par[1] == 'W') {
-            modPar$mass <- par[2]
+            modPar$mass <- as.numeric(par[2])
         } else if(par[1] == 'R') {
             modPar$residues <- par[2]
         } else if(par[1] == 'T') {
