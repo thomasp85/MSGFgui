@@ -1,10 +1,13 @@
 ## IMPORTS
-library(shiny)
-library(shinyFiles)
-library(MSGFplus)
-library(mzID)
-library(mzR)
-require(tools)
+suppressMessages({
+    library(shiny)
+    library(shinyFiles)
+    library(MSGFplus)
+    library(mzID)
+    library(mzR)
+    library(xlsx)
+    require(tools)
+})
 
 ## SERVER LOGIC
 shinyServer(function(input, output, session) {
@@ -17,7 +20,7 @@ shinyServer(function(input, output, session) {
     currentAnalysis <- NULL
     saveRDS(dataStore, file.path(system.file(package='MSGFgui'), 'currentData.RDS')) # Reset currentData
     filesystem <- getVolumes()
-    output$dataAddButton <- shinyFileChoose(input, 'dataAddButton', session=session, roots=filesystem, filetypes=c('mzML', 'mzData', 'mzXML'))
+    shinyFileChoose(input, 'dataAddButton', session=session, roots=filesystem, filetypes=c('mzML', 'mzData', 'mzXML'))
     datafileSelection <- reactive({
         if(length(input$datafiles) == 0) return(character())
         
@@ -27,7 +30,7 @@ shinyServer(function(input, output, session) {
             file.path(roots[x$root], lastPath)
         })
     })
-    output$databaseButton <- shinyFileChoose(input, 'databaseButton', session=session, roots=filesystem, filetypes=c('fasta'))
+    shinyFileChoose(input, 'databaseButton', session=session, roots=filesystem, filetypes=c('fasta'))
     databaseSelection <- reactive({
         if(length(input$database) == 0) return(character())
         
@@ -37,7 +40,7 @@ shinyServer(function(input, output, session) {
             file.path(roots[x$root], lastPath)
         })
     })
-    output$addToDB <- shinyFileChoose(input, 'addToDB', session=session, roots=filesystem, filetypes=c('mzid'))
+    shinyFileChoose(input, 'addToDB', session=session, roots=filesystem, filetypes=c('mzid'))
     
     # Run MSGFplus analysis
     par <- reactive({
@@ -293,10 +296,18 @@ shinyServer(function(input, output, session) {
     
     # Save results
     output$exportR <- downloadHandler('MSGFgui data.RDS', function(file) {
-        ans <- mzIDCollection()
-        if(length(data)) {
-            ans <- do.call('mzIDCollection', lapply(dataStore, function(x) {x$mzID}))
-        }
+        ans <- do.call('mzIDCollection', lapply(dataStore, function(x) {x$mzID}))
         saveRDS(ans, file)
+    })
+    output$exportExcel <- downloadHandler('MSGFgui data.xlsx', function(file) {
+        ans <- flatten(do.call('mzIDCollection', lapply(dataStore, function(x) {x$mzID})))
+        wb <- createWorkbook()
+        sheet <- createSheet(wb, 'results')
+        addDataFrame(ans, sheet, col.names=TRUE, row.names=FALSE, startRow=1, startColumn=1, colStyle=NULL, colnamesStyle=NULL, rownamesStyle=NULL)
+        saveWorkbook(wb, file)
+    })
+    output$exportTxt <- downloadHandler('MSGFgui data.txt', function(file) {
+        ans <- flatten(do.call('mzIDCollection', lapply(dataStore, function(x) {x$mzID})))
+        write.table(ans, file, quote=FALSE, sep='\t', row.names=FALSE)
     })
 })

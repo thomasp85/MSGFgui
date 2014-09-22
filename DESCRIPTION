@@ -19,7 +19,8 @@ Imports:
     mzID (>= 1.2),
     MSGFplus,
     mzR,
-    shinyFiles
+    shinyFiles,
+    xlsx
 Collate:
     'aaa.R'
     'MSGFgui.R'

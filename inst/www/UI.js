@@ -1247,7 +1247,6 @@ var IdTab = {
 					modifications: data.peptide.modifications
 				};
 			}
-			console.log(returnValue);
 			Shiny.onInputChange('scanData', returnValue);
 		});
 	},
@@ -1998,7 +1997,6 @@ var ResultPane = {
 		}
 	},
 	updateValidator: function(message) {
-		console.log(message)
 		if (message.status == 'finished') {
 			$(resS.addModal).find('.modal-footer button').prop('disabled', false);
 		} else {
@@ -2076,7 +2074,18 @@ var ResultPane = {
 							$(modal.find('.tabpane').get(index)).toggleClass('active', true)
 								.siblings().removeClass('active');
 						})
-					)
+					)/*.append(                                   //MS-GF+ setting to be implemented
+						$('<li>').addClass('last').append(
+							$('<p>', {text: 'MS-GF+'})
+						).on('click', function() {
+							var index = $(this).index()
+							
+							$(this).toggleClass('active', true).siblings().removeClass('active');
+							
+							$(modal.find('.tabpane').get(index)).toggleClass('active', true)
+								.siblings().removeClass('active');
+						})
+					)*/
 				)
 			).append(
 				$('<div>').addClass('tabpane active').append(
@@ -2198,7 +2207,31 @@ var ResultPane = {
 						)
 					)
 				)
-			)
+			)/*.append(              // MS-GF+ specific settings to be implemented
+				$('<div>').addClass('tabpane').append(
+					$('<form>').addClass('form-horizontal').append(
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Available memory'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('controls').append(
+								$('<input>', {type: 'text'})
+							).append(
+								$('<span>', {text: 'Mb'})
+							)
+						)
+					).append(
+						$('<div>').addClass('control-group').append(
+							$('<label>', {text: 'Available memory'}).addClass('control-label')
+						).append(
+							$('<div>').addClass('controls').append(
+								$('<input>', {type: 'text'})
+							).append(
+								$('<span>', {text: 'Mb'})
+							)
+						)
+					)
+				)
+			)*/
 		)
 		
 		modal.find('.modal-footer').append(

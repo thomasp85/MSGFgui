@@ -222,7 +222,7 @@ renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, traceP
     
     ans$scan <- annotateSpec(getScan(mzML, scan, tracePPM), seq, modifications, fragPPM, ions, neutralLosses)
     
-    ans$trace <- if(showTrace) {traceParent(mzML, scan, tracePPM)} else {NULL}
+    ans$trace <- if(showTrace) {tryCatch(traceParent(mzML, scan, tracePPM), error=function(e){NULL})} else {NULL}
     
     ans$id <- sampleID()
     
@@ -448,7 +448,7 @@ getEIC <- function(data, scans, low, high) {
 #' 
 #' @noRd
 #' 
-getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
+getIonTrace <- function(data, index, mz, ppm, meanwidth=30){
     widthMod <- 1.5
     ms1Indexes <- which(header(data)$msLevel == 1)
     indexIndex <- which(ms1Indexes == index)
@@ -516,7 +516,7 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=10){
                 unfinished = -1
                 iter <- iter+1
             } else {
-                top = middle-distTop
+                top <- middle-distTop
                 break
             }
         } else {
