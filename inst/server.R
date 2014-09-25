@@ -9,6 +9,9 @@ suppressMessages({
     require(tools)
 })
 
+helpers <- new.env()
+source('helper functions.R', local = helpers)
+
 ## SERVER LOGIC
 shinyServer(function(input, output, session) {
     # Client setup
@@ -54,7 +57,7 @@ shinyServer(function(input, output, session) {
             enzyme=as.numeric(input$enzyme),
             protocol=as.numeric(input$protocol),
             ntt=input$ntt,
-            modification=list(nMod=input$nMod, modifications=lapply(input$modificationList, MSGFgui:::modStringToMod)),
+            modification=list(nMod=input$nMod, modifications=lapply(input$modificationList, helpers$modStringToMod)),
             lengthRange=c(input$lengthMin, input$lengthMax),
             chargeRange=c(input$chargeMin, input$chargeMax),
             matches=input$matches
@@ -101,9 +104,9 @@ shinyServer(function(input, output, session) {
                     name=basename(sample),
                     mzID=res,
                     mzML=raw,
-                    id=MSGFgui:::sampleID()
+                    id=helpers$sampleID()
                 )
-                session$sendCustomMessage(type='addData', do.call(MSGFgui:::renderMzID, dataStore[[index]]))
+                session$sendCustomMessage(type='addData', do.call(helpers$renderMzID, dataStore[[index]]))
             } else {
                 session$sendCustomMessage(type='progressBar', list(
                     max=isolate({progressBarData$max}),
@@ -137,7 +140,7 @@ shinyServer(function(input, output, session) {
         sNames <- input$samplesSelect
         if(length(sNames) == 0) return(session$sendCustomMessage(type='scorePlot', NULL))
         
-        dist <- MSGFgui:::getScoreDistribution(dataStore[sapply(dataStore, function(x) {x$id %in% sNames})])
+        dist <- helpers$getScoreDistribution(dataStore[sapply(dataStore, function(x) {x$id %in% sNames})])
         scoreData <- list(
             target = list(
                 x=dist$target$x,
@@ -176,7 +179,7 @@ shinyServer(function(input, output, session) {
         }
         print(paste('Scan: beginning render', (proc.time()-t)[3]))
         flush.console()
-        scanData <- MSGFgui:::renderScan(dataStore[[sampleIndex]]$mzML, 
+        scanData <- helpers$renderScan(dataStore[[sampleIndex]]$mzML, 
                    scanNum,
                    scan$peptide, 
                    modifications, 
@@ -254,9 +257,9 @@ shinyServer(function(input, output, session) {
                         name=basename(mzidFilePath$rawPath),
                         mzID=res,
                         mzML=raw,
-                        id=MSGFgui:::sampleID()
+                        id=helpers$sampleID()
                     )
-                    session$sendCustomMessage(type='addData', do.call(MSGFgui:::renderMzID, dataStore[[index]]))
+                    session$sendCustomMessage(type='addData', do.call(helpers$renderMzID, dataStore[[index]]))
                 }
                 session$sendCustomMessage(type='resultValidator', list(filename=basename(path), valid=mzidFilePath$valid, reason=mzidFilePath$reason))
                 session$sendCustomMessage(type='validatorUpdates', list(status='done', filename=basename(path)))
