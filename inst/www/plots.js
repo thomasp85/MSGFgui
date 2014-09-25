@@ -728,8 +728,6 @@ var evidencePlot = function(element, size) {
 			.text('Length: '+protein.length)
 			.attr('dy', '1.5em');
 		
-		var textboxHeight = text.node().getBBox().height;
-		
 		text.insert('tspan', 'tspan:first-child')
 			.text('Name: '+protein.accession);
 		
@@ -751,7 +749,6 @@ var evidencePlot = function(element, size) {
 	var generatePeptideSequence = function(evidence) {	
 		var sequence = evidence.peptide.sequence.split('');
 		var modifications = dataM.getModifications(evidence);
-		
 /*		if (evidence.peptide.modifications) {
 			evidence.peptide.modifications.forEach(function(d) {
 				if (modifications[d.location]) {
@@ -1094,7 +1091,7 @@ var evidencePlot = function(element, size) {
 	};
 	
 	var removeTrace = function() {
-		trace = 'false';
+		trace = false;
 		
 		return d3.transition().each(function() {
 			svgScan.selectAll('.trace').transition()
@@ -1446,7 +1443,7 @@ var evidencePlot = function(element, size) {
 		var pan = d3.behavior.drag()
 			.origin(function(d) {return d;})
 		    .on('drag', function(d) {
-		    	var windowWidth = defs.select('#peptideSequenceMask').selectAll('rect:nth-child(2)').node().getBBox().width;
+		    	var windowWidth = svgArc.selectAll('#peptideSequenceMask').selectAll('rect:nth-child(2)').attr('width');
 		    	if (this.getBBox().width > windowWidth) {
 			    	d.x = Math.min(0, Math.max(windowWidth-this.getBBox().width, d.x+d3.event.dx))
 					d3.select(this)

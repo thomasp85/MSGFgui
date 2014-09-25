@@ -152,7 +152,7 @@ hr {
 	background-color: whitesmoke;
 }
 	.tabpane:not(.active) {
-		display: none;
+		visibility: hidden;
 	}
 	.tabpane.Row {
 		top: 40px;
