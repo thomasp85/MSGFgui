@@ -104,7 +104,7 @@ sampleID <- function() {
 #' This function takes a string describing a modification as returned by the
 #' client, and creates a msgfParModification object.
 #' 
-#' @param modString A string of the format: 'N:num;(C:string | W:num);R:string;T:string;P:string'
+#' @param modString A string of the format: 'N:string;(C:string | W:num);R:string;T:string;P:string'
 #' 
 #' @return An msgfParModification object matching the information in the string
 #' 
@@ -294,7 +294,7 @@ getScan <- function(data, scan, ppm=20) {
 #' @param pepseq A character string with the one-letter code for the peptide
 #' sequence
 #' 
-#' @param modifications A vector of delta-masses for the modifications on the
+#' @param modifications A list of delta-masses for the modifications on the
 #' peptide
 #' 
 #' @param ions The fragment ion types to match
