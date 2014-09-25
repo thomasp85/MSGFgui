@@ -7,7 +7,7 @@ var tooltip = (function() {
 		
 		'#removeFromDB svg': 'Remove a sample completely from the MSGFgui session (as opposed to using filtering).',
 		
-		'#saveResults svg': 'Save the current unfiltered data as an .RDS file for quick import into R.',
+		'#saveResults svg': 'Save the current unfiltered data, either as an .RDS file for quick import into R, an xlsx file for excel or a tab delimited text file for universal support',
 		
 		'#setSettings svg': 'Change global settings.',
 		
