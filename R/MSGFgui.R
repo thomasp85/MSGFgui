@@ -1,4 +1,4 @@
-#' @include aaa.R
+#' @include MSGFgui-package.R
 NULL
 
 #' Start MSGFgui in the default browser
@@ -30,7 +30,6 @@ NULL
 #' 
 MSGFgui <- function(...) {
     cat('Please refresh the page once it is loaded in order to get shiny to work\n\n')
-    library(shiny)
     runApp(system.file(package='MSGFgui'), ...)
 }
 
@@ -55,11 +54,14 @@ MSGFgui <- function(...) {
 #' @export
 #' 
 currentData <- function() {
-    data <- readRDS(system.file(package='MSGFgui', 'currentData.RDS'))
     ans <- mzIDCollection()
-    if(length(data)) {
-        ans <- do.call('mzIDCollection', lapply(data, function(x) {x$mzID}))
+    datafile <- system.file(package='MSGFgui', 'currentData.RDS')
+    if(file.exists(datafile)) {
+        data <- readRDS(datafile)
+        
+        if(length(data)) {
+            ans <- do.call('mzIDCollection', lapply(data, function(x) {x$mzID}))
+        }
     }
-    
     ans
 }
