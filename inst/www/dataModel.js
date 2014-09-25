@@ -161,6 +161,8 @@ var dataModel = function() {
 	var filteredDatabaseLookup = {};
 	var filteredEvidenceLookup = {};
 	
+	var massDeltaPrecision = 0.000001;
+	
 	// Default filter. Includes everything but psms with q-value above 0.01
 	var filter = {
 		samples: {
@@ -365,7 +367,7 @@ var dataModel = function() {
 		
 		return mods.some(function(d) {
 			var filteredMod = evidence.peptide.modifications.filter(function(f) {
-				return f.massDelta == d.massDelta;
+				return Math.abs(f.massDelta - d.massDelta) < massDeltaPrecision;
 			})
 			if (filteredMod.length != 0) {
 				if (d.residues != '*') {
@@ -808,7 +810,7 @@ var dataModel = function() {
 				};
 			};
 			modifications.forEach(function(dd) {
-				if (dd.massDelta == d.massDelta) {
+				if (Math.abs(dd.massDelta - d.massDelta) < massDeltaPrecision) {
 					if (dd.residues == '*' || dd.residues.split('').indexOf(residue) != -1) {
 						if (position.indexOf(dd.Specificity) != -1) {
 							ans.modification.push(dd);
