@@ -3,15 +3,15 @@
 */
 var tooltip = (function() {
 	var tips = {
-		'#addToDB svg': 'Import already analysed result files into MSGFgui. The files must be analysed using MS-GF+ and the original .mzML file must be present.',
+		'#addToDB svg': 'Import already analysed result files into MSGFgui. The files must be analysed using MS-GF+ and the original .mzML file must be present',
 		
-		'#removeFromDB svg': 'Remove a sample completely from the MSGFgui session (as opposed to using filtering).',
+		'#removeFromDB svg': 'Remove a sample completely from the MSGFgui session (as opposed to using filtering)',
 		
 		'#saveResults svg': 'Save the current unfiltered data, either as an .RDS file for quick import into R, an xlsx file for excel or a tab delimited text file for universal support',
 		
-		'#setSettings svg': 'Change global settings.',
+		'#setSettings svg': 'Change global settings',
 		
-		'#helpDialogButton svg': 'About MSGFgui.',
+		'#helpDialogButton svg': 'About MSGFgui',
 		
 		'#inputLabelTolerance': 'Parent mass tolerance in Da. or ppm. It is recommended to use a tight tolerance rather than a loose tolerance (e.g. for Orbitrap data, 10 or 20ppm usually identifies more spectra than 50ppm).',
 		

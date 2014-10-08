@@ -21,6 +21,7 @@ Thomas Lin Pedersen
 \href{http://proteomics.ucsd.edu/software-tools/ms-gf/}{MS-GF+}
 }
 \seealso{
-\code{\link{MSGFgui}} \code{\link{currentData}} \code{\link[MSGFplus]{MSGFplus-package}}
+\code{\link{MSGFgui}} \code{\link{currentData}}
+\code{\link[MSGFplus]{MSGFplus-package}}
 }
 

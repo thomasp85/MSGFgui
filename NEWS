@@ -1,3 +1,24 @@
+Version 0.99.5
+________________________________________________________________________________
+* Yet another refactoring of shiny server functionality following Dan's 
+  (Tenenbaum) suggestions
+
+Version 0.99.4
+________________________________________________________________________________
+* Fix for namespace clash with new version of mzR
+
+Version 0.99.3
+________________________________________________________________________________
+* Refactoring of shiny part of code
+* Change how mzR is used. Now connections are opened and closed whenever raw 
+  data is needed
+* Fix to namespace
+* Added warning to RStudio users about potential problems due to mzR problems
+
+Version 0.99.1
+________________________________________________________________________________
+* Small changes to documentation, vignette and tests
+
 Version 0.99.0
 ________________________________________________________________________________
 * Submission to Bioconductor

@@ -1,6 +1,3 @@
-library(MSGFgui)
-source(system.file('helper functions.R', package='MSGFgui'), local=TRUE)
-
 context('Data tables')
 
 test_that('table gets loaded', {

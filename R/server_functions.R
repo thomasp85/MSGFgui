@@ -1,6 +1,7 @@
 #' Return a table with amino acid information
 #' 
-#' This functionality should be located in a separate peptide package in the future
+#' This functionality should be located in a separate peptide package in the 
+#' future
 #' 
 #' @return A data.frame with a row for each of the 20 common amino acids and 
 #' columns for code, weight, composition, hydrophobicity and pK value
@@ -14,7 +15,8 @@ getAAtable <- function(){
 }
 #' Return a table with adduct information
 #' 
-#' This functionality should be located in a separate peptide package in the future
+#' This functionality should be located in a separate peptide package in the 
+#' future
 #' 
 #' @return A data.frame with a row for 32 common adducts and columns for charge
 #' and delta mass
@@ -28,7 +30,8 @@ getAdductTable <- function(){
 }
 #' Calculate the mass of a peptide sequence
 #' 
-#' This functionality should be located in a separate peptide package in the future
+#' This functionality should be located in a separate peptide package in the 
+#' future
 #' 
 #' @param pepseq A character string with the one-letter code for the peptide
 #' sequence
@@ -72,11 +75,13 @@ pepMass <- function(pepseq, modifications, mono=FALSE, neutral=FALSE){
 }
 #' Random ID generator based on UUID
 #' 
-#' This function returns a unique string of the UUID format each time it is called
+#' This function returns a unique string of the UUID format each time it is 
+#' called
 #' 
 #' @return A UUID compliant random string
 #' 
-#' @references Based on implementation by thelatemail \url{http://stackoverflow.com/questions/10492817/how-can-i-generate-a-guid-in-r}
+#' @references Based on implementation by thelatemail 
+#' \url{http://stackoverflow.com/questions/10492817/how-can-i-generate-a-guid-in-r}
 #' 
 #' @noRd
 #' 
@@ -104,9 +109,12 @@ sampleID <- function() {
 #' This function takes a string describing a modification as returned by the
 #' client, and creates a msgfParModification object.
 #' 
-#' @param modString A string of the format: 'N:string;(C:string | W:num);R:string;T:string;P:string'
+#' @param modString A string of the format: 
+#' 'N:string;(C:string | W:num);R:string;T:string;P:string'
 #' 
 #' @return An msgfParModification object matching the information in the string
+#' 
+#' @importFrom MSGFplus msgfParModification
 #' 
 #' @noRd
 #' 
@@ -145,13 +153,16 @@ modStringToMod <- function(modString) {
 #' 
 #' @param name the name of the object
 #' 
-#' @param id A unique id across the session for the sample e.g. created by sampleID()
+#' @param id A unique id across the session for the sample e.g. created by 
+#' sampleID()
 #' 
 #' @return A list with elements: name, id, modifications and mzid
 #' 
+#' @import mzID
+#' 
 #' @noRd
 #' 
-renderMzID <- function(mzID, mzML, name, id) {
+renderMzID <- function(mzID, mzML, metaML, name, id) {
     idNames <- c('peptide_ref', 'experimentalmasstocharge', 'chargestate', 'ms-gf:denovoscore', 'ms-gf:qvalue', 'id')
     evidenceNames <- c('post', 'pre', 'end', 'start', 'peptide_ref', 'dbsequence_ref')
     databaseNames <- c('accession', 'length', 'id', 'description')
@@ -172,7 +183,7 @@ renderMzID <- function(mzID, mzML, name, id) {
     tempMzID$id <- id(mzID)[, names(id(mzID)) %in% idNames]
     scanIndex <- rep(1:length(idScanMap(mzID)), sapply(idScanMap(mzID), length))[match(1:nrow(id(mzID)), unlist(idScanMap(mzID)))]
     tempMzID$id$scan_ref <- scans(mzID)$id[scanIndex]
-    tempMzID$id$rt <- header(mzML)$retentionTime[match(scans(mzID)$acquisitionnum, header(mzML)$acquisitionNum)][scanIndex]
+    tempMzID$id$rt <- metaML$retentionTime[match(scans(mzID)$acquisitionnum, metaML$acquisitionNum)][scanIndex]
     tempMzID$id$peptide_ref <- as.numeric(sub(peptide_refPrefix, '', tempMzID$id$peptide_ref))
     
     tempMzID$peptides <- peptides(mzID)
@@ -201,7 +212,8 @@ renderMzID <- function(mzID, mzML, name, id) {
 #' 
 #' @param seq The sequence of the predicted peptide
 #' 
-#' @param modifications a list of modifications. The index correspond to the residue
+#' @param modifications a list of modifications. The index correspond to the 
+#' residue
 #' 
 #' @param fragPPM The sensitivity used for matching fragment ions
 #' 
@@ -209,21 +221,22 @@ renderMzID <- function(mzID, mzML, name, id) {
 #' 
 #' @param ions The fragment ion types to match
 #' 
-#' @param neutralLosses Logical. Should neutral losses be matches. Defaults to TRUE
+#' @param neutralLosses Logical. Should neutral losses be matches. Defaults to 
+#' TRUE
 #' 
-#' @param showTrace Logical should parent ion trace be computed. Defaults to FALSE
+#' @param showTrace Logical should parent ion trace be computed. Defaults to 
+#' FALSE
 #' 
 #' @return A list with the elements: scan, trace and id
 #' 
 #' @noRd
 #' 
-renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, tracePPM=5, ions='abcxyz', neutralLosses=TRUE, showTrace=FALSE) {
+renderScan <- function(mzML, metaML, scan, seq, modifications=list(), fragPPM=60, tracePPM=5, ions='abcxyz', neutralLosses=TRUE, showTrace=FALSE) {
     ans <- list()
-    
-    ans$scan <- annotateSpec(getScan(mzML, scan, tracePPM), seq, modifications, fragPPM, ions, neutralLosses)
-    
-    ans$trace <- if(showTrace) {tryCatch(traceParent(mzML, scan, tracePPM), error=function(e){NULL})} else {NULL}
-    
+    data <- openMSfile(mzML)
+    ans$scan <- annotateSpec(getScan(data, metaML, scan, tracePPM), seq, modifications, fragPPM, ions, neutralLosses)
+    ans$trace <- if(showTrace) {tryCatch(traceParent(data, metaML, scan, tracePPM), error=function(e){NULL})} else {NULL}
+    close(data)
     ans$id <- sampleID()
     
     ans
@@ -234,10 +247,13 @@ renderScan <- function(mzML, scan, seq, modifications=list(), fragPPM=60, traceP
 #' decoy matches for a set of samples
 #' 
 #' @param samples A list of samples, where each sample is a list containing the 
-#' elements: name, id, mzID and mzML where the two latter are mzID and mzRamp objects
+#' elements: name, id, mzID and mzML where the two latter are mzID and mzRamp 
+#' objects
 #' 
 #' @return A list with elements: decoy and target, each containing the output of
 #' a density() call
+#' 
+#' @import mzID
 #' 
 #' @noRd
 #' 
@@ -269,8 +285,8 @@ getScoreDistribution <- function(samples) {
 #' 
 #' @noRd
 #' 
-getScan <- function(data, scan, ppm=20) {
-    index <- which(header(data)$acquisitionNum == scan)
+getScan <- function(data, metaML, scan, ppm=20) {
+    index <- which(metaML$acquisitionNum == scan)
     scanInfo <- header(data, index)
     spec <- peaks(data, index)
     spec <- data.frame(mz=spec[,1], intensity=spec[,2], parent=FALSE)
@@ -448,9 +464,9 @@ getEIC <- function(data, scans, low, high) {
 #' 
 #' @noRd
 #' 
-getIonTrace <- function(data, index, mz, ppm, meanwidth=30){
+getIonTrace <- function(data, metaML, index, mz, ppm, meanwidth=50){
     widthMod <- 1.5
-    ms1Indexes <- which(header(data)$msLevel == 1)
+    ms1Indexes <- which(metaML$msLevel == 1)
     indexIndex <- which(ms1Indexes == index)
     mzRes <- (mz/1000000)*ppm*2
     mzMin <- mz-mzRes/2
@@ -547,98 +563,9 @@ getIonTrace <- function(data, index, mz, ppm, meanwidth=30){
     }
     trace <- cbind(trace, indexWindow[1]:indexWindow[2])
     scanRange <- scans[1]:scans[2]
-    data.frame(intensity=trace[trace[,2] %in% scanRange, 1], retention=header(data, ms1Indexes[scanRange])$retentionTime, acquisitionNum=header(data, ms1Indexes[scanRange])$acquisitionNum)
+    data.frame(intensity=trace[trace[,2] %in% scanRange, 1], retention=metaML$retentionTime[ms1Indexes[scanRange]], acquisitionNum=metaML$acquisitionNum[ms1Indexes[scanRange]])
 }
-#' An old alternative version of getIonTrace
-#' 
-#' This function is only kept around for safekeeping atm
-#' 
-#' @noRd
-#' 
-getIonTrace2 <- function(data, index, mz, ppm, skip=1){
-    indexRange <- c(1, length(data))
-    mzWin <- c(mz-(mz/1000000)*ppm, mz+(mz/1000000)*ppm)
-    scan <- peaks(data, index)
-    mzIndex <- which(scan[,1] > mzWin[1] & scan[,1] < mzWin[2])
-    if(length(mzIndex) == 0){
-        intensity <- c()
-        retention <- c()
-        acquisitionNum <- c()
-    } else {
-        if(length(mzIndex) != 1){
-            mzIndex <- mzIndex[which.max(scan[mzIndex, 2])]
-        } else {}
-        intensity <- c(scan[mzIndex, 2])
-        retention <- c(header(data, index)$retentionTime)
-        acquisitionNum <- c(header(data, index)$acquisitionNum)
-    }
-    indexBack <- index
-    indexForward <- index
-    doBreak <- FALSE
-    nextIter <- 1
-    while(as.logical(nextIter)){
-        indexBack <- indexBack-1
-        while(header(data, indexBack)$msLevel == 2){
-            indexBack <- indexBack-1
-            if(indexBack <= indexRange[1]){
-                doBreak <- TRUE
-                break
-            }
-        }
-        if(doBreak) break
-        if(indexBack < 1) break
-        scan <- peaks(data, indexBack)
-        mzIndex <- which(scan[,1] > mzWin[1] & scan[,1] < mzWin[2])
-        if(length(mzIndex) == 0){
-            nextIter <- nextIter + 1
-        } else {
-            if(length(mzIndex) != 1){
-                mzIndex <- mzIndex[which.max(scan[mzIndex, 2])]
-            } else {}
-            intensity <- c(scan[mzIndex, 2], intensity)
-            retention <- c(header(data, indexBack)$retentionTime, retention)
-            acquisitionNum <- c(header(data, indexBack)$acquisitionNum, acquisitionNum)
-        }
-        if(nextIter > skip+1){
-            nextIter <- 0
-        }
-        if(indexBack <= indexRange[1]){
-            nextIter <- 0
-        }
-    }
-    nextIter <- 1
-    doBreak <- FALSE
-    while(as.logical(nextIter)){
-        indexForward <- indexForward+1
-        while(header(data, indexForward)$msLevel == 2){
-            indexForward <- indexForward+1
-            if(indexForward >= indexRange[2]){
-                doBreak <- TRUE
-                break
-            }
-        }
-        if(doBreak) break
-        scan <- peaks(data, indexForward)
-        mzIndex <- which(scan[,1] > mzWin[1] & scan[,1] < mzWin[2])
-        if(length(mzIndex) == 0){
-            nextIter <- nextIter + 1
-        } else {
-            if(length(mzIndex) != 1){
-                mzIndex <- mzIndex[which.max(scan[mzIndex, 2])]
-            } else {}
-            intensity <- c(intensity, scan[mzIndex, 2])
-            retention <- c(retention, header(data, indexForward)$retentionTime)
-            acquisitionNum <- c(acquisitionNum, header(data, indexForward)$acquisitionNum)
-        }
-        if(nextIter > skip+1){
-            nextIter <- 0
-        }
-        if(indexForward >= indexRange[2]){
-            nextIter <- 0
-        }
-    }
-    data.frame(intensity, retention, acquisitionNum)
-}
+
 #' Extract the trace of a parent ion
 #' 
 #' Given an MS2 scan find the parent ion scan and get the chromatographic trace
@@ -656,14 +583,14 @@ getIonTrace2 <- function(data, index, mz, ppm, skip=1){
 #' 
 #' @noRd
 #' 
-traceParent <- function(data, scan, ppm=20) {
-    scans <- header(data)
-    scanInfo <- scans[scans$acquisitionNum == scan, ]
+traceParent <- function(data, metaML, scan, ppm=20) {
+    scans <- metaML
+    scanInfo <- header(data, which(scans$acquisitionNum == scan))
     parentInfo <- scans[scans$acquisitionNum == scanInfo$precursorScanNum, ]
     
     if(nrow(parentInfo) == 0) return(NULL)
     
-    trace <- getIonTrace(data, which(scans$acquisitionNum == scanInfo$precursorScanNum), scanInfo$precursorMZ, ppm=ppm)
+    trace <- getIonTrace(data, metaML, which(scans$acquisitionNum == scanInfo$precursorScanNum), scanInfo$precursorMZ, ppm=ppm)
     
     trace$parent <- trace$retention == parentInfo$retentionTime
     

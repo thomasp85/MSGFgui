@@ -1,4 +1,6 @@
 #' @include MSGFgui-package.R
+#' @include server.R
+#' 
 NULL
 
 #' Start MSGFgui in the default browser
@@ -16,7 +18,7 @@ NULL
 #' has no return value.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Default mode
 #' MSGFgui()
 #' 
@@ -26,10 +28,15 @@ NULL
 #' 
 #' @export
 #' 
-#' @importFrom shiny runApp
+#' @importFrom shiny runApp addResourcePath shinyUI includeHTML
 #' 
 MSGFgui <- function(...) {
-    cat('Please refresh the page once it is loaded in order to get shiny to work\n\n')
+    if(Sys.getenv("RSTUDIO") == 1) {
+        message('WARNING: Running MSGFgui through RStudio may cause the R session to crash')
+        flush.console()
+    }
+    addResourcePath("sF", system.file("www", package="shinyFiles"))
+    
     runApp(system.file(package='MSGFgui'), ...)
 }
 
@@ -45,11 +52,7 @@ MSGFgui <- function(...) {
 #' results in the the MSGFgui browser
 #' 
 #' @examples
-#' \dontrun{
 #' results <- currentData()
-#' }
-#' 
-#' @importFrom mzID mzIDCollection
 #' 
 #' @export
 #' 

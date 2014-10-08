@@ -1,7 +1,3 @@
-library(MSGFgui)
-library(MSGFplus)
-source(system.file('helper functions.R', package='MSGFgui'), local=TRUE)
-
 context('Parsing of modification strings from client')
 
 modstring1 <- 'N:Carbamidomethyl;C:C2H3N1O1;R:C;T:fix;P:any'

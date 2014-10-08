@@ -1,6 +1,3 @@
-library(MSGFgui)
-source(system.file('helper functions.R', package='MSGFgui'), local=TRUE)
-
 context('Peptide functions')
 
 test_that('mass calculation works', {

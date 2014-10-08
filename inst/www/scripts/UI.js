@@ -1909,7 +1909,7 @@ var ResultPane = {
 		var modal = createModalDialog(resS.infoModal.substring(1), 'About MSGFgui');
 		
 		modal.find('.modal-body').append(
-			$('<h5>', {text: 'MSGFgui v0.2.0'})
+			$('<h5>', {text: 'MSGFgui v1.0.0'})
 		).append(
 			$('<p>', {html: '<em>A graphic user interface to running and evaluating MS-GF+</em>'})
 		).append(

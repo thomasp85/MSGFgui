@@ -17,8 +17,6 @@ on so calling \code{currentData()} when no instance of MSGFgui is running
 will return the last set of data used.
 }
 \examples{
-\dontrun{
 results <- currentData()
-}
 }
 

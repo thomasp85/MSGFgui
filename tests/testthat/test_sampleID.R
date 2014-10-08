@@ -1,6 +1,3 @@
-library(MSGFgui)
-source(system.file('helper functions.R', package='MSGFgui'), local=TRUE)
-
 context('UUID generator')
 
 UUID <- sapply(1:1000, function(x) {sampleID()})

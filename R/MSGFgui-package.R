@@ -10,7 +10,8 @@
 #' have other things to worry about. Please consult the vignette for a 
 #' run-through of the functionality exposed in the GUI.
 #' 
-#' @seealso \code{\link{MSGFgui}} \code{\link{currentData}} \code{\link[MSGFplus]{MSGFplus-package}}
+#' @seealso \code{\link{MSGFgui}} \code{\link{currentData}} 
+#' \code{\link[MSGFplus]{MSGFplus-package}}
 #' 
 #' @references \href{http://proteomics.ucsd.edu/software-tools/ms-gf/}{MS-GF+}
 #' 
@@ -18,5 +19,7 @@
 #' 
 #' @docType package
 #' @name MSGFgui-package
+#' 
+#' @importFrom mzR openMSfile close header peaks
 #' 
 NULL

@@ -23,7 +23,8 @@ workings of MS-GF+ - the algorithm that performs the identification. For users
 interested in the nitty-gritty of the algorithm please see the 
 [MS-GF+ webpage](http://proteomics.ucsd.edu/software-tools/ms-gf/).
 
-This package comes with a sister package, MSGFplus, that provides the interface
+This package comes with a sister package, 
+[MSGFplus](https://github.com/thomasp85/MSGFplus), that provides the interface
 to the original MS-GF+ java code. If you wish to implement MS-GF+ analysis
 within your own functions or packages, MSGFplus provide a command-line interface
 to MS-GF+. This package, conversely, only provides a GUI overlay and a symphony
@@ -44,6 +45,12 @@ When that is said there is nothing about the GUI itself that requires a
 mighty machine, so if you have some small (~200 mb) raw files you'll have no 
 problem playing around with the GUI on a decent laptop.
 
+**WARNING:** Due to some unfortunate incompatibility between shiny, mzR/Rcpp and
+RStudio, running MSGFgui through RStudio will cause the R session to crash once
+raw data is trying to get accessed (retrieving raw MS/MS scans). This is not a 
+problem when running R in the standard way. This problem will hopefully soon be
+adressed and this warning will disappear.
+
 ## Opening the GUI
 As this package is all about a graphic user interface, it exposes very few 
 functions to the user (only 2). The one that you will probably use most often is
@@ -58,14 +65,9 @@ MSGFgui()
 MSGFgui(port='0.0.0.0')
 ```
 
-This will open up MSGFgui in your standard browser. Unfortunately due to a 
-timing issue in how shiny sets up the server, it is necessary to reload the page
-once before everything works as expected. This will probably be fixed before the
-next Bioconductor release so maybe it doesn't apply to you at the time of 
-reading this. But to be sure, just do it anyway.
-
-Once the GUI is running the R process is interupted. To regain control of R (and
-shut down MSGFgui) press the 'esc' key.
+This will open up MSGFgui in your standard browser. Once the GUI is running the 
+R process is interupted. To regain control of R (and shut down MSGFgui) press 
+the 'esc' key.
 
 ## Overview of the GUI
 Once the GUI has opened you will be greated by an interface split in two: The 
@@ -293,3 +295,8 @@ Following is a roadmap in no particular order:
 * Show modification sites on the protein arc
 * Show expected cleavage sites on protein arc
 * Add brushing and linking to plots
+
+## Session
+```{r, eval=TRUE, echo=TRUE}
+sessionInfo()
+```

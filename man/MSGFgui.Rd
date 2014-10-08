@@ -21,7 +21,7 @@ designed to run locally. This means that there is automatic view rights to
 the full file system of the computer running the server.
 }
 \examples{
-\dontrun{
+\donttest{
 # Default mode
 MSGFgui()
 

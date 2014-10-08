@@ -1,29 +1,23 @@
 Package: MSGFgui
 Type: Package
 Title: A shiny GUI for MSGFplus
-Version: 0.99.0
-Date: 2014-09-24
+Version: 0.99.5
+Date: 2014-10-01
 Author: Thomas Lin Pedersen
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
-Description: This package makes it possible to perform analyses using the
-    MSGFplus package in a GUI environment. Furthermore it enables the user to
-    investigate the results using interactive plots, summary statistics and
-    filtering. Lastly it exposes the current results to another R session so
-    the user can seamlessly integrate the gui into other workflows.
+Description: This package makes it possible to perform analyses using
+        the MSGFplus package in a GUI environment. Furthermore it
+        enables the user to investigate the results using interactive
+        plots, summary statistics and filtering. Lastly it exposes the
+        current results to another R session so the user can seamlessly
+        integrate the gui into other workflows.
 License: GPL (>= 2)
 LazyLoad: yes
-biocViews: MassSpectrometry, Proteomics, GUI
+biocViews: MassSpectrometry, Proteomics, GUI, Visualization
 VignetteBuilder: knitr
-Imports:
-    shiny,
-    mzID (>= 1.2),
-    MSGFplus,
-    shinyFiles (>= 0.4.0),
-    xlsx,
-    mzR
-Suggests:
-    knitr,
-    testthat
-Collate:
-    'MSGFgui-package.R'
-    'MSGFgui.R'
+Depends: mzR
+Imports: shiny, mzID (>= 1.2), MSGFplus, shinyFiles (>= 0.4.0), xlsx,
+        tools
+Suggests: knitr, testthat
+Collate: 'MSGFgui-package.R' 'server_functions.R' 'server.R'
+        'MSGFgui.R'
