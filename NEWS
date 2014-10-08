@@ -1,3 +1,7 @@
+Version 0.99.6
+________________________________________________________________________________
+* Fixed a visual glitch in the settings modal box
+
 Version 0.99.5
 ________________________________________________________________________________
 * Yet another refactoring of shiny server functionality following Dan's 

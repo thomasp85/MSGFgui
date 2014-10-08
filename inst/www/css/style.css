@@ -151,10 +151,10 @@ hr {
 	bottom: 0;
 	background-color: whitesmoke;
 }
-	.tabpane:not(.active) {
+#resulttabs .tabpane:not(.active) {
 		visibility: hidden;
 	}
-	.tabpane.Row {
+#resulttabs .tabpane.Row {
 		top: 40px;
 		bottom: 0;
 	}
@@ -409,6 +409,9 @@ select[name=sampleRemoveList] {
 #saveResults .modal-body .btn {
 	width: 100px;
 }
+.modal .tabpane:not(.active) {
+    	display: none;
+	}
 #globalSettingsModal .tabbar {
 	background: none;
 	width: 80%;
