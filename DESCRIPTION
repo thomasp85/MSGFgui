@@ -1,8 +1,8 @@
 Package: MSGFgui
 Type: Package
 Title: A shiny GUI for MSGFplus
-Version: 1.1.0
-Date: 2014-10-08
+Version: 1.1.1
+Date: 2014-10-15
 Author: Thomas Lin Pedersen
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
 Description: This package makes it possible to perform analyses using
