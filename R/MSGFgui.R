@@ -31,10 +31,6 @@ NULL
 #' @importFrom shiny runApp addResourcePath shinyUI includeHTML
 #' 
 MSGFgui <- function(...) {
-    if(Sys.getenv("RSTUDIO") == 1) {
-        message('WARNING: Running MSGFgui through RStudio may cause the R session to crash')
-        flush.console()
-    }
     addResourcePath("sF", system.file("www", package="shinyFiles"))
     
     runApp(system.file(package='MSGFgui'), ...)

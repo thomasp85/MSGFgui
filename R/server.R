@@ -64,7 +64,7 @@ server <- function(input, output, session) {
         msgfPar(
             database=databaseSelection(),
             tolerance=list(value=as.numeric(input$tolValue), unit=input$tolUnit),
-            isotopeError=input$isoLow:input$isoHigh,
+            isotopeError=c(input$isoLow,input$isoHigh),
             tda=ifelse(is.null(input$tda), FALSE, TRUE),
             fragmentation=as.numeric(input$fragMethod),
             instrument=as.numeric(input$instrument),
