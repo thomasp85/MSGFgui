@@ -55,7 +55,7 @@
 						<div>
 							<div class="samples">
 								<h4>Samples</h4>
-								<select name="samplesSelect" multiple size="8">
+								<select name="samplesSelect" multiple size="8" class="form-control">
 									
 								</select>
 								<p><span>Total:&nbsp</span><span id="sampleCount">0</span></p>
@@ -84,21 +84,21 @@
 						<div>
 							<div>
 								<h4>Proteins</h4>
-								<select id="proteinSelect" size="8">
+								<select id="proteinSelect" size="8" class="form-control">
 									
 								</select>
 								<p><span>Total:&nbsp</span><span id="proteinCount">0</span></p>
 							</div>
 							<div>
 								<h4>Peptides</h4>
-								<select id="peptideSelect" size="8">
+								<select id="peptideSelect" size="8" class="form-control">
 									
 								</select>
 								<p><span>Total:&nbsp</span><span id="peptideCount">0</span></p>
 							</div>
 							<div>
 								<h4>Scans</h4>
-								<select id="scanSelect" size="8">
+								<select id="scanSelect" size="8" class="form-control">
 									
 								</select>
 								<p><span>Total:&nbsp</span><span id="scanCount">0</span></p>
@@ -109,7 +109,7 @@
 				<div id="filterTab" class="Row tabpane filterTab">
 					<div class="Col scroll-y">
 						<div class="fdr Row scroll-x">
-							<h4>FDR</h4>
+							<h4 class="center">FDR</h4>
 							<div id="fdrSlider">
 							</div>
 						</div>
@@ -118,16 +118,16 @@
 							<div>
 								<div>
 									<h4>Samples</h4>
-									<select id="sampleFilterSelect" multiple size=9></select>
+									<select id="sampleFilterSelect" multiple size=9 class="form-control"></select>
 									<p>Selected:&nbsp<span id="sampleFilterCount">0</span></p>
-									<input type="text" id="sampleRegex" placeholder="Regular expression"/>
+									<input type="text" id="sampleRegex" placeholder="Regular expression" class="form-control"/>
 								</div>
 								<div>
-									<h4>Charge</h4>
+									<h4 class="center">Charge</h4>
 									<div id="chargeSlider"></div>
-									<h4>Mass-to-charge ratio</h4>
+									<h4 class="center">Mass-to-charge ratio</h4>
 									<div id="mzSlider"></div>
-									<h4>Retention time</h4>
+									<h4 class="center">Retention time</h4>
 									<div id="rtSlider"></div>
 								</div>
 							</div>
@@ -137,19 +137,19 @@
 							<div>
 								<div>
 									<h4>Proteins</h4>
-									<select id="proteinFilterSelect" multiple size=9></select>
+									<select id="proteinFilterSelect" multiple size=9 class="form-control"></select>
 									<p>Selected:&nbsp<span id="proteinFilterCount">0</span></p>
-									<input type="text" id="proteinRegex" placeholder="Regular expression"/>
+									<input type="text" id="proteinRegex" placeholder="Regular expression" class="form-control"/>
 								</div>
 								<div>
-									<h4>Protein length</h4>
+									<h4 class="center">Protein length</h4>
 									<div id="proteinSlider"></div>
-									<h4>Peptide length</h4>
+									<h4 class="center">Peptide length</h4>
 									<div id="peptideSlider"></div>
 								</div>
 								<div>
 									<h4>Modifications</h4>
-									<select id="modificationFilterSelect" multiple size=9></select>
+									<select id="modificationFilterSelect" multiple size=9 class="form-control"></select>
 									<p>Selected:&nbsp<span id="modificationFilterCount">0</span></p>
 								</div>
 							</div>
@@ -169,9 +169,9 @@
 							</tbody>
 						</table>
 					</div>
-					<div class="rightButtonPane btn-group btn-group-vertical">
-						<button id="dataAddButton" type="button" class="shinyFiles btn btn-small" data-title="Select MS/MS data files" data-selecttype="multiple">Upload</button>
-						<button id="dataRemoveButton" type="button" class="btn btn-small" disabled>Remove</button>
+					<div class="rightButtonPane btn-group-vertical">
+						<button id="dataAddButton" type="button" class="shinyFiles btn btn-default btn-sm" data-title="Select MS/MS data files" data-selecttype="multiple">Upload</button>
+						<button id="dataRemoveButton" type="button" class="btn btn-default btn-sm" disabled>Remove</button>
 					</div>
 				</div>
 				<div>
@@ -186,7 +186,7 @@
 						<p ></p>
 					</div>
 					<div class="rightButtonPane">
-						<button id="databaseButton" type="button" class="shinyFiles btn btn-small" data-title="Select a FASTA database" data-selecttype="single">Upload</button>
+						<button id="databaseButton" type="button" class="shinyFiles btn btn-default btn-sm" data-title="Select a FASTA database" data-selecttype="single">Upload</button>
 					</div>
 				</div>
 				<hr/>
@@ -194,42 +194,42 @@
 			<div id='parameters' class="Row scroll-y">
 				<h4>Set parameters</h4>
 				<form class="form-horizontal">
-					<div class="control-group">
-						<label class="control-label" for="tolValue">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="tolValue">
 							<span class="tt" id="inputLabelTolerance">Tolerance</span>
 						</label>
-						<div class="controls">
-							<input name="tolValue" id="tolValue" type="text" value="20" class="numeric"/>
-							<select name="tolUnit">
+						<div class="col-md-7 controls form-inline">
+							<input name="tolValue" id="tolValue" type="text" value="20" class="form-control numeric"/>
+							<select name="tolUnit" class="form-control">
 								<option>ppm</option>
 								<option>Da</option>
 							</select>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="isoLow">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="isoLow">
 							<span class="tt" id="inputLabelIsotopeError">Isotope error range</span>
 						</label>
-						<div class="controls">
-							<input name="isoLow" id="isoLow" type="number" value="0"/>
+						<div class="col-md-7 controls form-inline">
+							<input name="isoLow" id="isoLow" type="number" value="0" class="form-control"/>
 							-
-							<input name="isoHigh" type="number" value="1"/>
+							<input name="isoHigh" type="number" value="1" class="form-control"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="tda">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="tda">
 							<span class="tt" id="inputLabelTda">Target-decoy</span>
 						</label>
-						<div class="controls">
+						<div class="col-md-7 controls check-hightadjust">
 							<input name="tda" id="tda" type="checkbox" checked/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="fragMethod">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="fragMethod">
 							<span class="tt" id="inputLabelMethod">Fragmentation method</span>
 						</label>
-						<div class="controls">
-							<select name="fragMethod" id="fragMethod">
+						<div class="col-md-7 controls">
+							<select name="fragMethod" id="fragMethod" class="form-control">
 								<option value="0">From spectrum</option>
 								<option value="1">CID</option>
 								<option value="2">ETD</option>
@@ -238,12 +238,12 @@
 							</select>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="instrument">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="instrument">
 							<span class="tt" id="inputLabelInstrument">Instrument</span>
 						</label>
-						<div class="controls">
-							<select name="instrument" id="instrument">
+						<div class="col-md-7 controls">
+							<select name="instrument" id="instrument" class="form-control">
 								<option value='0'>Low-res LCQ/LTQ</option>
 								<option value='1'>High-res LTQ</option>
 								<option value='2'>TOF</option>
@@ -251,12 +251,12 @@
 							</select>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="enzyme">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="enzyme">
 							<span class="tt" id="inputLabelEnzyme">Enzyme</span>
 						</label>
-						<div class="controls">
-							<select name="enzyme" id="enzyme">
+						<div class="col-md-7 controls">
+							<select name="enzyme" id="enzyme" class="form-control">
 								<option value="0">Unspecific cleavage</option>
 								<option value="1" selected>Trypsin</option>
 								<option value="2">Chymotrypsin</option>
@@ -270,12 +270,12 @@
 							</select>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="protocol">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="protocol">
 							<span class="tt" id="inputLabelProtocol">Protocol</span>
 						</label>
-						<div class="controls">
-							<select name="protocol" id="protocol">
+						<div class="col-md-7 controls">
+							<select name="protocol" id="protocol" class="form-control">
 								<option value="0">No protocol</option>
 								<option value="1">Phosphorylation</option>
 								<option value="2">iTRAQ</option>
@@ -283,19 +283,19 @@
 							</select>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="ntt">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="ntt">
 							<span class="tt" id="inputLabelNtt">Tolerable termini</span>
 						</label>
-						<div class="controls">
-							<input name="ntt" id="ntt" type="number" value="2" min="0" max="2" />
+						<div class="col-md-7 controls">
+							<input name="ntt" id="ntt" type="number" value="2" min="0" max="2" class="form-control"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label">
+					<div class="form-group">
+						<label class="control-label col-md-5">
 							<span class="tt" id="inputLabelMod">Allowed modifications</span>
 						</label>
-						<div class="controls">
+						<div class="col-md-7 controls">
 							<div class="listview">
 								<table id="modificationList" class='tableList' rules='none'>
 									<tbody>
@@ -309,46 +309,46 @@
 								</table>
 							</div>
 							<div class="btn-group">
-								<button id="addModButton" type="button" class="btn btn-small"><i class="fa fa-plus-circle"></i></button>
-								<button id="editModButton" type="button" class="btn btn-small" disabled><i class="fa fa-pencil"></i></button>
-								<button id="removeModButton" type="button" class="btn btn-small" disabled><i class="fa fa-minus-circle"></i></button>
+								<button id="addModButton" type="button" class="btn btn-default btn-sm"><i class="fa fa-plus-circle"></i></button>
+								<button id="editModButton" type="button" class="btn btn-default btn-sm" disabled><i class="fa fa-pencil"></i></button>
+								<button id="removeModButton" type="button" class="btn btn-default btn-sm" disabled><i class="fa fa-minus-circle"></i></button>
 							</div>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="nMod">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="nMod">
 							<span class="tt" id="inputLabelNmod">Modifications per peptide</span>
 						</label>
-						<div class="controls">
-							<input name="nMod" id="nMod" type="number" value="2" min='1'/>
+						<div class="col-md-7 controls">
+							<input name="nMod" id="nMod" type="number" value="2" min='1' class="form-control"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="lengthMin">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="lengthMin">
 							<span class="tt" id="inputLabelLength">Peptide length</span>
 						</label>
-						<div class="controls">
-							<input name="lengthMin" id="lengthMin" type="number" value="6" min="1"/>
+						<div class="col-md-7 controls form-inline">
+							<input name="lengthMin" id="lengthMin" type="number" value="6" min="1" class="form-control"/>
 							-
-							<input name="lengthMax" type="number" value="40"/>
+							<input name="lengthMax" type="number" value="40" class="form-control"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="chargeMin">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="chargeMin">
 							<span class="tt" id="inputLabelCharge">Peptide charge</span>
 						</label>
-						<div class="controls">
-							<input name="chargeMin" id="chargeMin" type="number" value="2" min="1"/>
+						<div class="col-md-7 controls form-inline">
+							<input name="chargeMin" id="chargeMin" type="number" value="2" min="1" class="form-control"/>
 							-
-							<input name="chargeMax" type="number" value="3"/>
+							<input name="chargeMax" type="number" value="3" class="form-control"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<label class="control-label" for="matches">
+					<div class="form-group">
+						<label class="control-label col-md-5" for="matches">
 							<span class="tt" id="inputLabelMatches">Matches per spectrum</span>
 						</label>
-						<div class="controls">
-							<input name="matches" id="matches" type="number" value="1" min="1"/>
+						<div class="col-md-7 controls">
+							<input name="matches" id="matches" type="number" value="1" min="1" class="form-control"/>
 						</div>
 					</div>
 				</form>
@@ -357,10 +357,10 @@
 				<hr/>
 				<div>
 					<div id="runProgress" class="msgfProgress progress progress-striped active">
-						<div class="bar"></div>
+						<div class="progress-bar"></div>
 						<p>Waiting...</p>
 					</div>
-					<button id="analysisButton" type="button" class="btn btn-small btn-primary rightButton action-button" disabled>Analyse</button>
+					<button id="analysisButton" type="button" class="btn btn-default btn-sm btn-primary rightButton action-button" disabled>Analyse</button>
 				</div>
 			</div>
 		</div>

@@ -1,3 +1,7 @@
+Version 1.1.2
+________________________________________________________________________________
+* Update to Bootstrap 3 to work with shiny 0.11
+
 Version 0.99.6
 ________________________________________________________________________________
 * Fixed a visual glitch in the settings modal box

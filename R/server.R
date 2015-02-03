@@ -20,7 +20,6 @@ NULL
 #' @importFrom shiny reactiveValues reactive observe isolate invalidateLater downloadHandler
 #' @importFrom MSGFplus msgfPar runMSGF finished import
 #' @importFrom shinyFiles getVolumes shinyFileChoose
-#' @importFrom xlsx createWorkbook createSheet addDataFrame saveWorkbook
 #' @importFrom tools file_ext
 #' 
 #' @note This function should only be used as part of a runApp call

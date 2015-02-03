@@ -18,7 +18,7 @@ hr {
 
 /* Run pane */
 .lefts.Col {
-	width: 390px;
+	width: 400px;
 	padding: 5px;
 	box-shadow: 0px 0px 15px rgba(0,0,0,0.5)
 }
@@ -34,7 +34,7 @@ hr {
 		display: inline-block
 	}
 	#fileInput .textview{
-		height: 24px;
+		height: 30px;
 		width: 310px;
 		display: inline-block
 	}
@@ -52,32 +52,29 @@ hr {
 	bottom: 55px;
 	margin: 5px;
 }
-	#parameters .control-group {
+	#parameters .form-group {
 		margin-bottom: 10px;
+	}
+    #parameters .control-label {
+    	padding-right: 0;
+        font-size: 12px;
 	}
 	#parameters .controls input[type="text"],
 	#parameters .controls input[type="number"] {
-		width: 40px;
+		width: 65px;
 		text-align: right;
 	}
-	#parameters .controls {
-		margin-right: 3px;
-	}
-	#parameters .controls select {
-		width: 100%;
-	}
 	#parameters .controls select[name="tolUnit"] {
-		width: 65px;
+		width: auto;
 	}
 	#parameters .listview {
 		height: 60px;
 	}
 	#parameters .btn-group {
 		width: 100%;
-		padding-left: 5%;
 	}
 	#parameters .btn-group .btn {
-		width: 30%;
+		width: 33.33333%;
 	}
 
 #run.Row {
@@ -93,16 +90,13 @@ hr {
 			position: relative;
 			display: inline-block;
 			width: 310px;
-			height: 24px;
-		}
-		#run .progress .bar {
-			position: absolute;
+			height: 30px;
 		}
 		#run .progress p {
-			position: relative;
+			position: absolute;
 			width: 100%;
 			text-align: center;
-			padding: 3px;
+			padding: 6px;
 			font-size: smaller;
 			white-space: nowrap;
 			overflow: hidden;
@@ -247,16 +241,19 @@ hr {
 	left: 0;
 	right: 0;
 }
+#filterTab .center{
+    	text-align: center;
+	}
 #filterTab .fdr {
 	height: 120px;
 }
-	#filterTab .fdr>h4{
-		text-align: center;
-	}
 	#filterTab .fdr>div{
 		width: 500px;
 		margin-left: auto;
 		margin-right: auto;
+	}
+    #filterTab .fdr .d3-slider{
+    	left: 0;
 	}
 	
 #filterTab>div>hr {
@@ -272,7 +269,7 @@ hr {
 	height: 300px;
 }
 	#filterTab .sample>div {
-		width: 675px;
+		width: 715px;
 		margin-right: auto;
 		margin-left: auto;
 		padding: 0 20px;
@@ -283,7 +280,7 @@ hr {
 	height: 300px;
 }
 	#filterTab .database>div {
-		width: 950px;
+		width: 990px;
 		margin-right: auto;
 		margin-left: auto;
 		padding: 0 20px;
@@ -377,7 +374,7 @@ hr {
 }
 .rightButtonPane, .rightButton {
 	width: 70px;
-	margin-left: 4px
+	margin-left: 6px
 }
 .rightButtonPane .btn {
 	width: 100%;
@@ -398,13 +395,14 @@ select[name=sampleRemoveList] {
     overflow: hidden;
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
 }
 .selected {
 	background: #006dcc;
 	color: white;
 }
 #saveResults .btn-group {
-	margin-left: calc( 50% - 3 * 126px / 2 );
+	margin-left: calc( 50% - 3 * 100px / 2 );
 }
 #saveResults .modal-body .btn {
 	width: 100px;
@@ -437,7 +435,7 @@ select[name=sampleRemoveList] {
 	margin: 4px 0;
 }
 #globalSettingsModal .listview table select{
-	height: 24px;
+	padding: 2px;
 }
 #globalSettingsModal .listview table p{
 	display: inline;
@@ -460,9 +458,13 @@ select[name=sampleRemoveList] {
 #globalSettingsModal .listview table p:not(.selected){
 	color: grey;
 }
+#globalSettingsModal .listview table tr{
+    height: 26px;
+}
 #globalSettingsModal .listview table td:first-child{
 	width: 50%;
-}#globalSettingsModal .listview table td:nth-child(2){
+}
+#globalSettingsModal .listview table td:nth-child(2){
 	text-align: center;
 }
 #globalSettingsModal .listview table td:last-child{
@@ -480,10 +482,14 @@ select[name=sampleRemoveList] {
 }
 #globalSettingsModal .checkbox.inline {
 	margin-right: 15px;
+    padding-top: 0;
+}
+#globalSettingsModal .checkbox.inline input{
+    margin-left: 5px;
 }
 #globalSettingsModal input[type=number] {
 	text-align: right;
-	width: 40px;
+	width: 65px;
 }
 #globalSettingsModal input[type=number]+span {
 	margin-left: 10px;
@@ -609,6 +615,9 @@ select[name=sampleRemoveList] {
 }
 .scroll-y { 
 	overflow-y: auto; 
+}
+.check-hightadjust {
+    margin-top: 7px;
 }
 
 .centerOuter {
@@ -750,6 +759,7 @@ svg {
     background: lightgrey;
     z-index: 2;
     margin: 15px 10px;
+    left: -10px;
 }
 
 .d3-slider-horizontal {

@@ -413,25 +413,32 @@ var COMPOSITION_REGEX = /^(([CHNOSP]|Br|Cl|Fe|Se)-?\d*)+$/;
 
 var createModalDialog = function(id, title) {
 	$('#tooltip').remove();
-	var backdrop = $('<div>').addClass('modal-backdrop fade').appendTo($('body'));
+	var backdrop = $('<div>').addClass('modal-backdrop fade').css({
+        'height': '100%',
+        'z-index': 1000
+    }).appendTo($('body'));
 	
-	var modal = $('<div>', {id: id}).addClass('modal hide fade').append(
-		$('<div>').addClass('modal-header').append(
-			$('<button>', {type: 'button', html: '&times;'}).addClass('close').on('click', function() {
-				dismissDialog(modal)
-			})
-		).append(
-			$('<h3>', {text: title})
-		)
-	).append(
-		$('<div>').addClass('modal-body')
-	).append(
-		$('<div>').addClass('modal-footer')
-	).data('backdrop', backdrop).appendTo($('body'))
+	var modal = $('<div>', {id: id}).addClass('modal fade').append(
+		$('<div>').addClass('modal-dialog').append(
+            $('<div>').addClass('modal-content').append(
+                $('<div>').addClass('modal-header').append(
+                	$('<button>', {type: 'button', html: '&times;'}).addClass('close').on('click', function() {
+            			dismissDialog(modal)
+            		})
+            	).append(
+                    $('<h4>', {text: title}).addClass('modal-title')
+            	)
+            ).append(
+                $('<div>').addClass('modal-body')
+            ).append(
+                $('<div>').addClass('modal-footer')
+            )
+        )
+    ).data('backdrop', backdrop).appendTo($('body'))
 	return modal;
 }
 var showModal = function(modal) {
-	modal.removeClass('hide');
+    modal.css('display', 'block')
 	setTimeout(function() {
 		modal.addClass('in')
 			.data('backdrop').addClass('in');
@@ -492,7 +499,11 @@ var rowSelector = function(row, single, forceSelect) {
     }
 }
 
+function myRound(value, places) {
+    var multiplier = Math.pow(10, places);
 
+    return (Math.round(value * multiplier) / multiplier);
+}
 
 
 /*
@@ -641,35 +652,35 @@ var ModificationParameters = {
 					
 		modal.find('.modal-body').append(
 			$('<form>').addClass('form-horizontal').append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Name', 'for': ids.name}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Name', 'for': ids.name}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<input>', {id: ids.name, type: 'text'}).prop('autofocus', true)
+					$('<div>').addClass('controls col-md-7').append(
+						$('<input>', {id: ids.name, type: 'text'}).addClass('form-control').prop('autofocus', true)
 					)
 				)
 			).append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Composition', 'for': ids.composition}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Composition', 'for': ids.composition}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<input>', {id: ids.composition, type: 'text', pattern: COMPOSITION_REGEX.toString().replace(/\//g, '')})
+					$('<div>').addClass('controls col-md-7').append(
+						$('<input>', {id: ids.composition, type: 'text', pattern: COMPOSITION_REGEX.toString().replace(/\//g, '')}).addClass('form-control')
 					)
 				)
 			).append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Molecular weight', 'for': ids.mass}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Molecular weight', 'for': ids.mass}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<input>', {id: ids.mass, type: 'text', pattern: NUMERIC_REGEX.toString().replace(/\//g, '')})
+					$('<div>').addClass('controls col-md-7').append(
+						$('<input>', {id: ids.mass, type: 'text', pattern: NUMERIC_REGEX.toString().replace(/\//g, '')}).addClass('form-control')
 					)
 				)
 			).append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Residues', 'for': ids.residues}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Residues', 'for': ids.residues}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<select>', {id: ids.residues}).prop('multiple', true).append(
+					$('<div>').addClass('controls col-md-7').append(
+						$('<select>', {id: ids.residues}).prop('multiple', true).addClass('form-control').append(
 							$('<option>', {text: 'All', value: '*'}).prop('selected', true)
 						).append(
 							$('<option>', {text: 'Alanine', value: 'A'})
@@ -715,11 +726,11 @@ var ModificationParameters = {
 					)
 				)
 			).append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Modification type', 'for': ids.type}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Modification type', 'for': ids.type}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<select>', {id: ids.type}).append(
+					$('<div>').addClass('controls col-md-7').append(
+						$('<select>', {id: ids.type}).addClass('form-control').append(
 							$('<option>', {text: 'Fixed', value: 'fix'}).prop('selected', true)
 						).append(
 							$('<option>', {text: 'Variable', value: 'opt'})
@@ -727,11 +738,11 @@ var ModificationParameters = {
 					)
 				)
 			).append(
-				$('<div>').addClass('control-group').append(
-					$('<label>', {text: 'Position', 'for': ids.position}).addClass('control-label')
+				$('<div>').addClass('form-group').append(
+					$('<label>', {text: 'Position', 'for': ids.position}).addClass('control-label col-md-5')
 				).append(
-					$('<div>').addClass('controls').append(
-						$('<select>', {id: ids.position}).append(
+					$('<div>').addClass('controls col-md-7').append(
+						$('<select>', {id: ids.position}).addClass('form-control').append(
 							$('<option>', {text: 'Anywhere', value: 'any'}).prop('selected', true)
 						).append(
 							$('<option>', {text: 'Peptide N-term', value: 'nterm'})
@@ -747,7 +758,7 @@ var ModificationParameters = {
 			)
 		);
 		modal.find('.modal-footer').append(
-			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function(){
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn btn-default').on('click', function(){
 				dismissDialog(modal)
 			})
 		).append(
@@ -975,8 +986,8 @@ var AnalysisPane = {
 		$(anaS.runButton).prop('disabled', disable);
 	},
 	setProgress: function(progress) {
-		var progressBar = $(anaS.progressElement).find('.bar');
-		var progressText = $(anaS.progressElement).find('.bar+p');
+		var progressBar = $(anaS.progressElement).find('.progress-bar');
+		var progressText = $(anaS.progressElement).find('.progress-bar+p');
 		progressBar.css({
 			width: Math.round(100*progress.value/progress.max)+'%'
 		})
@@ -1082,7 +1093,7 @@ var SamplesTab = {
 		
 		if (!dataM.empty()) {
 			dataM.samples().forEach(function(d) {
-				selectBox.append($('<option>', {text: d.name, value: d.id}));
+				selectBox.append($('<option>', {text: d.name, value: d.id, title: d.name}));
 			})
 			selectBox.val(currentSelect);
 			
@@ -1269,6 +1280,9 @@ var IdTab = {
 				.property('value', function(d) {
 					return d.hash;
 				})
+                .property('title', function(d) {
+    				return d.description;
+				})
 				.text(function(d) {
 					return d.accession;
 				});
@@ -1303,6 +1317,9 @@ var IdTab = {
 			.enter().append('option')
 				.property('value', function(d) {
 					return d.hash;
+				})
+                .property('title', function(d) {
+    				return d.peptide.sequence;
 				})
 				.text(function(d) {
 					return d.peptide.sequence;
@@ -1340,9 +1357,12 @@ var IdTab = {
 			d3.select(idS.scanSelect).selectAll('option').data(settings.sortPsm(scans))
 				.enter().append('option')
 					.text(function(d) {
-						return 'rt: '+d.scan.rt+', mz: '+d.scan.mz+', charge: '+d.charge+' ('+d.scan.sample.name+')';
+						return 'rt: '+myRound(d.scan.rt, 2)+', mz: '+myRound(d.scan.mz, 2)+', charge: '+d.charge+' ('+d.scan.sample.name+')';
 					})
-					.attr('value', function(d) {return d.scan.sample.name+':'+d.scan.ref});
+					.property('value', function(d) {return d.scan.sample.name+':'+d.scan.ref})
+                    .property('title', function(d) {
+                        return 'rt: '+myRound(d.scan.rt, 2)+', mz: '+myRound(d.scan.mz, 2)+', charge: '+d.charge+' ('+d.scan.sample.name+')';
+                    });
 			
 			if (keepSelect && (currentSelect && $(idS.scanSelect+' option[value="'+currentSelect+'"]').length != 0)) {
 				$(idS.scanSelect).val(currentSelect);
@@ -1592,7 +1612,8 @@ var FilterTab = {
 		d3.select(filS.sampleSelect).selectAll('option').remove();
 		d3.select(filS.sampleSelect).selectAll('option').data(dataM.allSamples())
 			.enter().append('option')
-				.text(function(d) {return d.name});
+				.text(function(d) {return d.name})
+                .property('title', function(d) {return d.name});
 		
 		if (filS.tempFilter.samples.regex) {
 			this.regexFilterSamples();
@@ -1675,7 +1696,8 @@ var FilterTab = {
 		d3.select(filS.proteinSelect).selectAll('option').data(settings.sortProteins(dataM.allDatabase()))
 			.enter().append('option')
 				.attr('value', function(d) {return d.accession + ' ' + d.description})
-				.text(function(d) {return d.accession});
+				.text(function(d) {return d.accession})
+                .property('title', function(d) {return d.description});
 		
 		if (filS.tempFilter.database.regex) {
 			this.regexFilterProteins();
@@ -1687,7 +1709,8 @@ var FilterTab = {
 		d3.select(filS.modificationSelect).selectAll('option').remove();
 		d3.select(filS.modificationSelect).selectAll('option').data(dataM.modificationNames())
 			.enter().append('option')
-				.text(function(d) {return d});
+				.text(function(d) {return d})
+                .property('title', function(d) {return d});
 		
 		$(filS.modificationSelect).val(filS.tempFilter.peptides.modifications);
 		this.countModifications();
@@ -1909,7 +1932,7 @@ var ResultPane = {
 		var modal = createModalDialog(resS.infoModal.substring(1), 'About MSGFgui');
 		
 		modal.find('.modal-body').append(
-			$('<h5>', {text: 'MSGFgui v1.0.0'})
+			$('<h5>', {text: 'MSGFgui v1.1.2'})
 		).append(
 			$('<p>', {html: '<em>A graphic user interface to running and evaluating MS-GF+</em>'})
 		).append(
@@ -2010,7 +2033,7 @@ var ResultPane = {
 		
 		modal.find('.modal-body').append(
 			$('<div>').append(
-				$('<select>', {multiple: true})
+				$('<select>', {multiple: true}).addClass('form-control')
 					.attr('name', 'sampleRemoveList')
 					.prop('size', 9)
 					.on('change', function() {
@@ -2019,7 +2042,7 @@ var ResultPane = {
 			)
 		)
 		modal.find('.modal-footer').append(
-			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn btn-default').on('click', function() {
 				dismissDialog(modal)
 			})
 		).append(
@@ -2090,46 +2113,52 @@ var ResultPane = {
 			).append(
 				$('<div>').addClass('tabpane active').append(
 					$('<form>').addClass('form-horizontal').append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Proteins'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Proteins'}).addClass('control-label col-md-3')
 						).append(
-							$('<div>').addClass('listview proteinSort controls').append(
-								$('<table>').append(
-									$('<tr>').append(
-										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-									).on('dblclick', function() {
-										$(this).before(ResultPane.addSortCondition('protein'));
-									})
-								)
-							)
+                            $('<div>').addClass('col-md-9').append(
+                                $('<div>').addClass('listview proteinSort controls').append(
+    								$('<table>').append(
+    									$('<tr>').append(
+    										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+    									).on('dblclick', function() {
+    										$(this).before(ResultPane.addSortCondition('protein'));
+    									})
+    								)
+    							)
+                            )
 						)
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Peptides'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Peptides'}).addClass('control-label col-md-3')
 						).append(
-							$('<div>').addClass('listview evidenceSort controls').append(
-								$('<table>').append(
-									$('<tr>').append(
-										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-									).on('dblclick', function() {
-										$(this).before(ResultPane.addSortCondition('evidence'));
-									})
-								)
-							)
+                            $('<div>').addClass('col-md-9').append(
+                                $('<div>').addClass('listview evidenceSort controls').append(
+    								$('<table>').append(
+    									$('<tr>').append(
+    										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+    									).on('dblclick', function() {
+    										$(this).before(ResultPane.addSortCondition('evidence'));
+    									})
+    								)
+    							)
+                            )
 						)
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Scans'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Scans'}).addClass('control-label col-md-3')
 						).append(
-							$('<div>').addClass('listview psmSort controls').append(
-								$('<table>').append(
-									$('<tr>').append(
-										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
-									).on('dblclick', function() {
-										$(this).before(ResultPane.addSortCondition('psm'));
-									})
-								)
-							)
+							$('<div>').addClass('col-md-9').append(
+                                $('<div>').addClass('listview psmSort controls').append(
+        							$('<table>').append(
+    									$('<tr>').append(
+    										$('<td>', {colspan: 3, text: 'Double-click to add sorting condition'})
+    									).on('dblclick', function() {
+    										$(this).before(ResultPane.addSortCondition('psm'));
+    									})
+    								)
+    							)
+                            )
 						)
 					)
 				)
@@ -2138,10 +2167,10 @@ var ResultPane = {
 					$('<form>').addClass('form-horizontal').append(
 						$('<h5>', {text: 'Fragment ions'})
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Ions'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Ions'}).addClass('control-label col-md-5')
 						).append(
-							$('<div>').addClass('plotIons controls').append(
+							$('<div>').addClass('plotIons controls col-md-7 form-inline check-hightadjust').append(
 								$('<label>', {text: 'a'}).addClass('checkbox inline').append(
 									$('<input>', {type: 'checkbox'}).prop('checked', fragmentIons['a'])
 								)
@@ -2168,19 +2197,19 @@ var ResultPane = {
 							)
 						)
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Neutral losses'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Neutral losses'}).addClass('control-label col-md-5')
 						).append(
-							$('<div>').addClass('controls neutralLoss').append(
+							$('<div>').addClass('controls neutralLoss col-md-7 check-hightadjust').append(
 								$('<input>', {type: 'checkbox'}).prop('checked', settings.plotNeutralLoss())
 							)
 						)
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Fragment ion accuracy'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Fragment ion accuracy'}).addClass('control-label col-md-5')
 						).append(
-							$('<div>').addClass('controls fragmentAcc').append(
-								$('<input>', {type: 'number'}).val(settings.fragment())
+							$('<div>').addClass('controls fragmentAcc col-md-7 form-inline').append(
+								$('<input>', {type: 'number'}).addClass('form-control').val(settings.fragment())
 							).append(
 								$('<span>', {text: 'ppm'})
 							)
@@ -2188,20 +2217,20 @@ var ResultPane = {
 					).append(
 						$('<h5>', {text: 'Parent ion'})
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Parent ion accuracy'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Parent ion accuracy'}).addClass('control-label col-md-5')
 						).append(
-							$('<div>').addClass('controls traceAcc').append(
-								$('<input>', {type: 'number'}).val(settings.trace())
+							$('<div>').addClass('controls traceAcc col-md-7 form-inline').append(
+								$('<input>', {type: 'number'}).addClass('form-control').val(settings.trace())
 							).append(
 								$('<span>', {text: 'ppm'})
 							)
 						)
 					).append(
-						$('<div>').addClass('control-group').append(
-							$('<label>', {text: 'Plot trace'}).addClass('control-label')
+						$('<div>').addClass('form-group').append(
+							$('<label>', {text: 'Plot trace'}).addClass('control-label col-md-5')
 						).append(
-							$('<div>').addClass('controls plotTrace').append(
+							$('<div>').addClass('controls check-hightadjust plotTrace col-md-7').append(
 								$('<input>', {type: 'checkbox'}).prop('checked', settings.plotTrace())
 							)
 						)
@@ -2235,7 +2264,7 @@ var ResultPane = {
 		)
 		
 		modal.find('.modal-footer').append(
-			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn btn-default').on('click', function() {
 				dismissDialog(modal)
 			})
 		).append(
@@ -2266,15 +2295,15 @@ var ResultPane = {
 		
 		modal.find('.modal-body').append(
 			$('<div>').addClass('btn-group').append(
-				$('<a>', {type: 'button', id: 'exportR'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/R.png'}))
+				$('<a>', {type: 'button', id: 'exportR'}).addClass('btn btn-default shiny-download-link').append($('<img>', {src: 'icons/R.png'}))
 			).append(
-				$('<a>', {type: 'button', id: 'exportExcel'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/excel.png'}))
+				$('<a>', {type: 'button', id: 'exportExcel'}).addClass('btn btn-default shiny-download-link').append($('<img>', {src: 'icons/excel.png'}))
 			).append(
-				$('<a>', {type: 'button', id: 'exportTxt'}).addClass('btn shiny-download-link').append($('<img>', {src: 'icons/txt.png'}))
+				$('<a>', {type: 'button', id: 'exportTxt'}).addClass('btn btn-default shiny-download-link').append($('<img>', {src: 'icons/txt.png'}))
 			)
 		)
 		modal.find('.modal-footer').append(
-			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn').on('click', function() {
+			$('<button>', {text: 'Cancel', type: 'button'}).addClass('btn btn-default').on('click', function() {
 				dismissDialog(modal)
 			})
 		)
@@ -2288,7 +2317,7 @@ var ResultPane = {
 		
 		var row = $('<tr>').append(
 			$('<td>').addClass('attrSelect').append(
-				$('<select>').on('change', function() {
+				$('<select>').addClass('form-control').on('change', function() {
 					var self = this;
 					row.find('.sortDir i').removeClass('fa-sort-alpha-asc fa-sort-alpha-desc fa-sort-numeric-asc fa-sort-numeric-desc fa-sort-amount-asc fa-sort-amount-desc ')
 						.addClass(function(index) {
