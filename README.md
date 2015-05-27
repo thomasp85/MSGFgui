@@ -1,5 +1,6 @@
 MSGFgui
 =======
+![](http://bioconductor.org/shields/years-in-bioc/MSGFgui.svg) ![](http://bioconductor.org/shields/downloads/MSGFgui.svg) Release: ![](http://bioconductor.org/shields/build/release/bioc/MSGFgui.svg) Devel: ![](http://bioconductor.org/shields/build/devel/bioc/MSGFgui.svg)
 
 This is an R package that functions as a GUI overlay for the MSGFplus package. Besides giving the user a visual way of running MS-GF+, it also present a large and engaging set of functions to evaluate the search results. The GUI is build using shiny and D3.js and thus requires a modern browser (which everyone should use anyway).
 
