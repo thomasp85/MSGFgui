@@ -15,18 +15,11 @@ Main features
 
 Installation
 ------
-MSGFgui and it's sister package MSGFplus is intented for inclusion within the next Bioconductor release. Until then, try it out by installing as follows:
+MSGFgui and it's sister package MSGFplus are part of [Bioconductor](http://www.bioconductor.org/packages/release/bioc/html/MSGFgui.html) and can be installed through that repository. Instructions are as follows:
 
 ```R
 source("http://bioconductor.org/biocLite.R")
-biocLite('mzR')
-biocLite('mzID')
-install.packages('shiny')
-install.packages('devtools')
-library(devtools)
-install_github('shinyFiles', 'thomasp85')
-install_github('MSGFplus', 'thomasp85')
-install_github('MSGFgui', 'thomasp85')
+biocLite('MSGFgui')
 ```
 
 Usage
